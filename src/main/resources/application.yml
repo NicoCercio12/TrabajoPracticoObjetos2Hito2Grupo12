@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: epicentro-gourmet
+
+  datasource:
+    url: ${DB_URL}
+    username: root
+    password: 280508
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  thymeleaf:
+    cache: false
