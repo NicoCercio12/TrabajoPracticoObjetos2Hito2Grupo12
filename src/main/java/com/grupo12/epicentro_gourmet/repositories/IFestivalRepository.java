@@ -7,5 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface IFestivalRepository extends JpaRepository<Festival, Long> {
+    //festivales activos
     List<Festival> findByFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(LocalDate hoy, LocalDate hoy1);
+    // festivales ordenados ascendentes
+    List<Festival> findAllByOrderByFechaInicioAsc();
 }
