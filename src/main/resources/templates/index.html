@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentro Gourmet</title>
+</head>
+<body>
+<h1>Epicentro Gourmet</h1>
+
+<div th:if="${!logueado}">
+    <a th:href="@{/login}">Iniciar sesión</a> |
+    <a th:href="@{/registro}">Registrar unidad de venta</a>
+</div>
+<div th:if="${logueado}">
+    <p>Hola, <b th:text="${username}"></b> (<span th:text="${roles}"></span>)</p>
+    <form th:action="@{/logout}" method="post"><button type="submit">Cerrar sesión</button></form>
+</div>
+
+<h2>Festivales</h2>
+<table border="1" cellpadding="4">
+    <tr><th>Nombre</th><th>Temporada</th><th>Inicio</th><th>Fin</th></tr>
+    <tr th:each="f : ${festivales}">
+        <td th:text="${f.nombre}"></td>
+        <td th:text="${f.temporada}"></td>
+        <td th:text="${f.fechaInicio}"></td>
+        <td th:text="${f.fechaFin}"></td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión</title>
+</head>
+<body>
+<h1>Epicentro Gourmet</h1>
+<h2>Iniciar sesión</h2>
+
+<p th:if="${mensaje}" th:text="${mensaje}" style="color:green"></p>
+<p th:if="${param.error}" style="color:red">Usuario o contraseña incorrectos.</p>
+<p th:if="${param.logout}">Sesión cerrada.</p>
+
+<form th:action="@{/loginprocess}" method="post">
+    <div><label>Usuario <input type="text" name="username" required></label></div>
+    <div><label>Contraseña <input type="password" name="password" required></label></div>
+    <button type="submit">Ingresar</button>
+</form>
+
+<p><a th:href="@{/registro}">Registrar una unidad de venta</a> | <a th:href="@{/}">Inicio</a></p>
+</body>
+</html>

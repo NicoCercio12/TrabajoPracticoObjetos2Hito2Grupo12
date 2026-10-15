@@ -1,5 +1,6 @@
 package com.grupo12.epicentro_gourmet.configuration;
 
+import com.grupo12.epicentro_gourmet.helpers.Roles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,9 +37,10 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/css/*", "/imgs/*", "/js/*",
                             "/vendor/bootstrap/css/*", "/vendor/jquery/*",
                             "/vendor/bootstrap/js/*").permitAll();
-                    auth.requestMatchers("/admin/**").hasRole("ADMINISTRADOR");
-                    auth.requestMatchers("/reportes/**", "/unidades/**")
-                            .hasAnyRole("ADMINISTRADOR", "RESPONSABLE");
+                    auth.requestMatchers("/", "/login", "/registro").permitAll();
+                    auth.requestMatchers("/admin/**").hasRole(Roles.ADMINISTRADOR);
+                    auth.requestMatchers("/reportes/**", "/unidades/**", "/empleados/**", "/platos/**")
+                            .hasAnyRole(Roles.ADMINISTRADOR, Roles.RESPONSABLE);
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(login -> {

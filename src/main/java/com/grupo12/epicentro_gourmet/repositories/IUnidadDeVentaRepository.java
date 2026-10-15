@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IUnidadDeVentaRepository extends JpaRepository<UnidadDeVenta, Long> {
 
+    boolean existsByCodigoUnico(String codigoUnico);
 }

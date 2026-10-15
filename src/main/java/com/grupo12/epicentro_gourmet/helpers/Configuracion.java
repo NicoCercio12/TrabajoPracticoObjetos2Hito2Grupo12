@@ -11,4 +11,8 @@ public final class Configuracion {
     public static final double PLUS_COCINERO = 150000;
     public static final double PLUS_COCINERO_AYUDANTE = 100000;
     public static final double PLUS_LAVAPLATOS = 50000;
+    public static final int CODIGO_UNICO_LONGITUD = 10;
+    public static final String PREFIJO_CODIGO_FOOD_TRUCK = "FT";
+    public static final String PREFIJO_CODIGO_PUESTO = "PD";
+    public static final int PASSWORD_LONGITUD_MINIMA = 6;
 }

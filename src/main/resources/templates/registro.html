@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar unidad de venta</title>
+</head>
+<body>
+<h1>Registrar unidad de venta</h1>
+
+<div th:if="${#fields.hasErrors('${registro}')}" style="color:red">
+    <ul><li th:each="e : ${#fields.errors('${registro}')}" th:text="${e}"></li></ul>
+</div>
+
+<form th:action="@{/registro}" th:object="${registro}" method="post">
+
+    <h3>Usuario del responsable</h3>
+    <div><label>Usuario <input type="text" th:field="*{username}"></label></div>
+    <div><label>Contraseña <input type="password" th:field="*{password}"></label></div>
+
+    <h3>Responsable</h3>
+    <div><label>Nombre <input type="text" th:field="*{nombre}"></label></div>
+    <div><label>Apellido <input type="text" th:field="*{apellido}"></label></div>
+    <div><label>DNI <input type="text" th:field="*{dni}"></label></div>
+    <div><label>Email <input type="text" th:field="*{email}"></label></div>
+    <div><label>Fecha de nacimiento <input type="date" th:field="*{fechaNacimiento}"></label></div>
+    <div><label>Fecha de ingreso <input type="date" th:field="*{fechaIngreso}"></label></div>
+    <div>
+        <label>Tipo de empleado
+            <select th:field="*{tipoEmpleado}" id="tipoEmpleado">
+                <option value="">-- elegir --</option>
+                <option th:each="t : ${tiposEmpleado}" th:value="${t}" th:text="${t}"></option>
+            </select>
+        </label>
+    </div>
+    <div id="bloqueCocinero">
+        <label>Rol en la cocina
+            <select th:field="*{rolCocina}">
+                <option value="">-- elegir --</option>
+                <option th:each="r : ${rolesCocina}" th:value="${r}" th:text="${r}"></option>
+            </select>
+        </label>
+    </div>
+    <div id="bloqueCajero">
+        <label>Turno
+            <select th:field="*{turno}">
+                <option value="">-- elegir --</option>
+                <option th:each="t : ${turnos}" th:value="${t}" th:text="${t}"></option>
+            </select>
+        </label>
+    </div>
+
+    <h3>Unidad de venta</h3>
+    <div><label>Nombre comercial <input type="text" th:field="*{nombreComercial}"></label></div>
+    <div><label>Código único (10 caracteres, FT o PD al inicio) <input type="text" th:field="*{codigoUnico}" maxlength="10"></label></div>
+    <div><label>Superficie (m²) <input type="number" step="0.01" th:field="*{superficie}"></label></div>
+    <div>
+        <label>Tipo de unidad
+            <select th:field="*{tipoUnidad}" id="tipoUnidad">
+                <option value="">-- elegir --</option>
+                <option th:each="t : ${tiposUnidad}" th:value="${t}" th:text="${t}"></option>
+            </select>
+        </label>
+    </div>
+    <div id="bloqueFoodTruck">
+        <div><label>Patente <input type="text" th:field="*{patente}"></label></div>
+        <div><label><input type="checkbox" th:field="*{requiereElectricidad}"> Requiere conexión eléctrica</label></div>
+    </div>
+    <div id="bloquePuesto">
+        <div><label>Cantidad de carpas <input type="number" th:field="*{cantCarpas}"></label></div>
+        <div><label>Tiempo de montaje (min) <input type="number" th:field="*{tiempoMontajeMinutos}"></label></div>
+    </div>
+
+    <button type="submit">Registrar</button>
+    <a th:href="@{/}">Cancelar</a>
+</form>
+
+<script>
+    function mostrar(id, visible) { document.getElementById(id).style.display = visible ? '' : 'none'; }
+    function actualizar() {
+        var te = document.getElementById('tipoEmpleado').value;
+        var tu = document.getElementById('tipoUnidad').value;
+        mostrar('bloqueCocinero', te === 'COCINERO');
+        mostrar('bloqueCajero', te === 'CAJERO');
+        mostrar('bloqueFoodTruck', tu === 'FOOD_TRUCK');
+        mostrar('bloquePuesto', tu === 'PUESTO_DESARMABLE');
+    }
+    document.getElementById('tipoEmpleado').addEventListener('change', actualizar);
+    document.getElementById('tipoUnidad').addEventListener('change', actualizar);
+    actualizar();
+</script>
+</body>
+</html>

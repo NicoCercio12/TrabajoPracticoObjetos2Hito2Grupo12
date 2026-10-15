@@ -40,6 +40,20 @@ public abstract class Empleado {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    protected Empleado(String nombre, String apellido, String dni, String email,
+                       LocalDate fechaNacimiento, LocalDate fechaIngreso) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.dni = dni;
+        this.email = email;
+        this.fechaNacimiento = fechaNacimiento;
+        this.fechaIngreso = fechaIngreso;
+    }
+
     public abstract double calcularSueldo(Festival festival);
+
+    public boolean esMayorDeEdad() {
+        return false;
+    }
     //aca calculamos esMayorDeEdad, calcularAntiguedad, darDeBaja, reactivar...
 }
