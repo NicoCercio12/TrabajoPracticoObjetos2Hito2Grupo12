@@ -3,7 +3,7 @@ spring:
     name: epicentro-gourmet
 
   datasource:
-    url: ${DB_URL}
+    url: jdbc:mysql://localhost:3306/db_grupo_12_hito_2?serverTimezone=America/Argentina/Buenos_Aires
     username: root
     password: 280508
 

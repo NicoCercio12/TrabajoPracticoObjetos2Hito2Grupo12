@@ -3,7 +3,9 @@ package com.grupo12.epicentro_gourmet.services.implementation;
 import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
 import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UnidadDeVentaService implements IUnidadDeVentaService {
 
     private final IUnidadDeVentaRepository repository;

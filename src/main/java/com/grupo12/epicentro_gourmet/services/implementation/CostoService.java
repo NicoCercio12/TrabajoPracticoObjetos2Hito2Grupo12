@@ -2,7 +2,9 @@ package com.grupo12.epicentro_gourmet.services.implementation;
 
 import com.grupo12.epicentro_gourmet.repositories.ICostoRepository;
 import com.grupo12.epicentro_gourmet.services.ICostoService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CostoService implements ICostoService {
 
     private final ICostoRepository repository;
