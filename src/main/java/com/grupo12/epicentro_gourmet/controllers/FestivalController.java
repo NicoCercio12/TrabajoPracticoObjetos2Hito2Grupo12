@@ -1,7 +1,8 @@
-package com.unla.oo2.epicentro.controllers;
+package com.grupo12.epicentro_gourmet.controllers;
 
-import com.unla.oo2.epicentro.dtos.FestivalDTO;
-import com.unla.oo2.epicentro.services.IFestivalService;
+import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
+import com.grupo12.epicentro_gourmet.services.IFestivalService;
+import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,12 +17,31 @@ import java.util.List;
 public class FestivalController {
 
     private final IFestivalService festivalService;
+    private final IUnidadDeVentaService unidadDeVentaService;
 
+    //MOSTRAR UNIDADES DE VENTA AL ADMIN
     @GetMapping
     public String listarFestivales(Model model) {
-        List<FestivalDTO> festivales = festivalService.obtenerTodosLosFestivales();
+        List<FestivalDTO> festivales = IFestivalService.obtenerTodosLosFestivales();
         model.addAttribute("festivales", festivales);
         model.addAttribute("titulo", "Listado de Festivales");
         return "festivales/lista"; // Renderiza templates/festivales/lista.html
+    }
+
+
+    //MOSTRAR UNIDADES DE VENTA DE UN FESTIVAL
+    @GetMapping("/{id}/unidades")
+    public String verUnidadesDeFestival(@PathVariable("id") Long id, Model model) {
+        // Pedir al FestivalService los datos de cabecera del festival
+        FestivalDTO festival = festivalService.obtenerPorIdDTO(id);
+        
+        // Pedir al UnidadDeVentaService las unidades de ese festival
+        List<UnidadVentaDTO> unidades = unidadDeVentaService.obtenerPorFestivalId(id);
+
+        model.addAttribute("festival", festival);
+        model.addAttribute("unidades", unidades);
+        model.addAttribute("titulo", "Unidades de Venta - " + festival.getNombre());
+
+        return "festivales/unidades";
     }
 }
