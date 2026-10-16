@@ -16,4 +16,12 @@ public class FoodTruck extends UnidadDeVenta {
         this.patente = patente;
         this.requiereElectricidad = requiereElectricidad;
     }
+
+    //formula cannon
+    @Override
+    public double calcularCanon() {
+        double base = (getSuperficie() != null ? getSuperficie() : 0.0) * 500.0;
+        return base + (requiereElectricidad ? 2000.0 : 0.0);
+    }
+
 }

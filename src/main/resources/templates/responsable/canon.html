@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cálculo de Canon</title>
+    <link rel="stylesheet" th:href="@{/static.css/estilos.css}">
+</head>
+<body>
+<div style="padding: 20px;">
+    <h2>Detalle de Canon a Pagar</h2>
+    <p><strong>Unidad de Venta:</strong> <span th:text="${unidad.nombreComercial}"></span></p>
+    <p><strong>Código Único:</strong> <span th:text="${unidad.codigoUnico}"></span></p>
+    <p><strong>Superficie:</strong> <span th:text="${unidad.superficie}"></span> m²</p>
+    <h3>Total Canon: $<span th:text="${canon}"></span></h3>
+</div>
+</body>
+</html>

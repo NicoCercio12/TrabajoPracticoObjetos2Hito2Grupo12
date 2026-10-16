@@ -1,13 +1,17 @@
 package com.grupo12.epicentro_gourmet.services.implementation;
 
+import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
 import com.grupo12.epicentro_gourmet.services.IFestivalService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FestivalService implements IFestivalService {
@@ -46,11 +50,11 @@ public class FestivalService implements IFestivalService {
         return repository.findByFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(hoy, hoy);
     }
 
-@Override
+    @Override
     @Transactional(readOnly = true)
     public List<FestivalDTO> obtenerTodosDTO() {
         // 1. Buscamos todos los festivales ordenados cronológicamente
-        return festivalRepository.findAllByOrderByFechaInicioAsc()
+        return repository.findAllByOrderByFechaInicioAsc()
                 // 2. Abrimos un Stream para procesar la lista funcionalmente
                 .stream()
                 // 3. Mapeamos cada entidad Festival a su respectivo FestivalDTO llamando al método privado
@@ -58,19 +62,20 @@ public class FestivalService implements IFestivalService {
                 // 4. Agrupamos los DTOs resultantes en una nueva lista
                 .collect(Collectors.toList());
     }
-    
-@Override
+
+    @Override
     @Transactional(readOnly = true)
     public FestivalDTO obtenerPorIdDTO(Long id) {
         // Buscamos el festival, si no existe lanzamos una excepción descriptiva
-        Festival festival = festivalRepository.findById(id)
+        Festival festival = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Festival no encontrado con ID: " + id));
 
         // Convertimos a DTO y lo devolvemos
         return mapearADTO(festival);
     }
-// Funcion auxiliar para mapear de la capa de entidad a la capa de dto 
-private FestivalDTO mapearADTO(Festival festival) {
+
+    // Funcion auxiliar para mapear de la capa de entidad a la capa de dto
+    private FestivalDTO mapearADTO(Festival festival) {
         // Calculamos la duración total en días (incluyendo el día de inicio y de fin)
         int duracion = 0;
         if (festival.getFechaInicio() != null && festival.getFechaFin() != null) {
@@ -97,7 +102,3 @@ private FestivalDTO mapearADTO(Festival festival) {
                 .build();
     }
 }
-
-
-
-
