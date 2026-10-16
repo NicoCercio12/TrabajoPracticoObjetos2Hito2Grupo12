@@ -3,7 +3,9 @@ package com.grupo12.epicentro_gourmet.services.implementation;
 import com.grupo12.epicentro_gourmet.repositories.IEmpleadoRepository;
 import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
 import com.grupo12.epicentro_gourmet.services.IEmpleadoService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmpleadoService implements IEmpleadoService {
 
     private final IEmpleadoRepository repository;

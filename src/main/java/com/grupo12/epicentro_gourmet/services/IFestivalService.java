@@ -3,8 +3,10 @@ package com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 import org.jspecify.annotations.Nullable;
 
+
 import java.util.List;
 import java.util.Optional;
+
 
 public interface IFestivalService {
 
