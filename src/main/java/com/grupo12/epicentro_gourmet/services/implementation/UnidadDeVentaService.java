@@ -1,6 +1,6 @@
 package com.grupo12.epicentro_gourmet.services.implementation;
 
-import com.grupo12.epicentro_gourmet.dtos.UnidadVentaDTO;
+import com.grupo12.epicentro_gourmet.dtos.UnidadDeVentaDTO;
 import com.grupo12.epicentro_gourmet.entities.FoodTruck;
 import com.grupo12.epicentro_gourmet.entities.PuestoDesarmable;
 import com.grupo12.epicentro_gourmet.entities.UnidadDeVenta;
@@ -24,7 +24,7 @@ public class UnidadDeVentaService implements IUnidadDeVentaService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UnidadVentaDTO> obtenerPorFestivalId(Long festivalId) {
+   public List<UnidadDeVentaDTO> obtenerUnidadesPorFestivalId(Long festivalId) {
         // Consulta las unidades asociadas a dicho festival en la BD
         List<UnidadDeVenta> unidades = unidadDeVentaRepository.findByFestivalesId(festivalId);
 
@@ -34,8 +34,8 @@ public class UnidadDeVentaService implements IUnidadDeVentaService {
                 .collect(Collectors.toList());
     }
 
-    private UnidadVentaDTO convertirADTO(UnidadDeVenta uv) {
-        UnidadVentaDTO.UnidadVentaDTOBuilder builder = UnidadVentaDTO.builder()
+    private UnidadDeVentaDTO convertirADTO(UnidadDeVenta uv) {
+        UnidadDeVentaDTO.UnidadDeVentaDTOBuilder builder = UnidadDeVentaDTO.builder()
                 .id(uv.getId())
                 .codigoUnico(uv.getCodigoUnico())
                 .nombreComercial(uv.getNombreComercial())

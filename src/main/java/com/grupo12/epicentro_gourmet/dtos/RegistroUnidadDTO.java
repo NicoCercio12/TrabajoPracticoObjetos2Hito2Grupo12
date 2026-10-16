@@ -78,6 +78,5 @@ public class RegistroUnidadDTO {
     private Integer cantCarpas;
     private Integer tiempoMontajeMinutos;
 
-    public Object getTurno() {
-    }
+    
 }

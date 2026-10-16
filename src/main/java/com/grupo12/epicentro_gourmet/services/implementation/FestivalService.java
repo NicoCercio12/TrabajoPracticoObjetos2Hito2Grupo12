@@ -3,7 +3,7 @@ import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
 import com.grupo12.epicentro_gourmet.services.IFestivalService;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -46,11 +46,11 @@ public class FestivalService implements IFestivalService {
         return repository.findByFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(hoy, hoy);
     }
 
-@Override
+    @Override
     @Transactional(readOnly = true)
     public List<FestivalDTO> obtenerTodosDTO() {
         // 1. Buscamos todos los festivales ordenados cronológicamente
-        return IFestivalRepository.findAllByOrderByFechaInicioAsc()
+        return repository.findAllByOrderByFechaInicioAsc()
                 // 2. Abrimos un Stream para procesar la lista funcionalmente
                 .stream()
                 // 3. Mapeamos cada entidad Festival a su respectivo FestivalDTO llamando al método privado
@@ -59,11 +59,11 @@ public class FestivalService implements IFestivalService {
                 .collect(Collectors.toList());
     }
     
-@Override
+    @Override
     @Transactional(readOnly = true)
     public FestivalDTO obtenerPorIdDTO(Long id) {
         // Buscamos el festival, si no existe lanzamos una excepción descriptiva
-        Festival festival = IfestivalRepository.findById(id)
+        Festival festival = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Festival no encontrado con ID: " + id));
 
         // Convertimos a DTO y lo devolvemos
