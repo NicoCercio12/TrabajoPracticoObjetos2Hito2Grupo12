@@ -15,6 +15,8 @@
                     <div th:if="${param.error}" class="alert alert-danger">Usuario o contraseña incorrectos.</div>
                     <div th:if="${param.logout}" class="alert alert-info">Cerraste sesión.</div>
 
+                    <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+
                     <form th:action="@{/loginprocess}" method="post">
                         <div class="mb-3">
                             <label class="form-label" for="username">Usuario</label>
@@ -28,6 +30,9 @@
                     </form>
 
                     <hr>
+                    <p class="text-center small mb-0 mt-3">
+                        ¿No tenés cuenta? <a th:href="@{/signup}">Crear cuenta</a>
+                    </p>
                     <p class="text-center small mb-0">
                         ¿Tenés una unidad de venta? <a th:href="@{/registro}">Registrala acá</a>
                     </p>
