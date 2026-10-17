@@ -20,9 +20,15 @@ public class Cocinero extends Empleado {
         this.rolCocina = rolCocina;
     }
 
+
     @Override
     public double calcularSueldo(Festival festival) {
-        return 0;
+        if (festival == null) return 0.0;
+
+        double sueldoBase = 100000.0;
+        double plusCategory = (rolCocina != null) ? rolCocina.getPlusCategoria() : 0.0;
+        double multiplicador = calcularMultiplicadorDias(festival.getDuracionEnDias());
+
+        return multiplicador * (sueldoBase + plusCategory);
     }
-    // calcularSueldo(...)
 }

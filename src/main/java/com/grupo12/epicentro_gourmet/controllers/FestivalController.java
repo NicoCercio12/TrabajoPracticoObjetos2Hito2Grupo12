@@ -1,7 +1,7 @@
-package com.unla.oo2.epicentro.controllers;
+package com.grupo12.epicentro_gourmet.controllers;
 
-import com.unla.oo2.epicentro.dtos.FestivalDTO;
-import com.unla.oo2.epicentro.services.IFestivalService;
+import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
+import com.grupo12.epicentro_gourmet.services.IFestivalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +19,9 @@ public class FestivalController {
 
     @GetMapping
     public String listarFestivales(Model model) {
-        List<FestivalDTO> festivales = festivalService.obtenerTodosLosFestivales();
+        List<FestivalDTO> festivales = festivalService.obtenerTodosDTO();
         model.addAttribute("festivales", festivales);
         model.addAttribute("titulo", "Listado de Festivales");
-        return "festivales/lista"; // Renderiza templates/festivales/lista.html
+        return "festivales/lista";
     }
 }

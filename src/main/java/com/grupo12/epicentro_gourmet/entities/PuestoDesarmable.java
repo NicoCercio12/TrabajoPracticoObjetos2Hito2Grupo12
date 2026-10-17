@@ -17,4 +17,11 @@ public class PuestoDesarmable extends UnidadDeVenta {
         this.cantCarpas = cantCarpas;
         this.tiempoMontajeMinutos = tiempoMontajeMinutos;
     }
+
+    @Override
+    public double calcularCanon() {
+        double base = (getSuperficie() != null ? getSuperficie() : 0.0) * 500.0;
+        return base - (tiempoMontajeMinutos * 10.0);
+    }
+
 }

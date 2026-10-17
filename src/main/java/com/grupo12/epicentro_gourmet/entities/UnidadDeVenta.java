@@ -79,4 +79,5 @@ public abstract class UnidadDeVenta {
         this.codigoUnico = codigoUnico.trim().toUpperCase();
     }
 
+    public abstract double calcularCanon();
 }
