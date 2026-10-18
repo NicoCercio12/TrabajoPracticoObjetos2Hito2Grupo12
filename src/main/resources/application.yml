@@ -6,7 +6,9 @@ spring:
     name: epicentro-gourmet
 
   datasource:
+
     url: jdbc:mariadb://localhost:3306/epicentro_gourmet?createDatabaseIfNotExist=true
+
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver

@@ -1,5 +1,4 @@
 package com.grupo12.epicentro_gourmet.services.implementation;
-
 import com.grupo12.epicentro_gourmet.dtos.UnidadDeVentaDTO;
 import com.grupo12.epicentro_gourmet.entities.FoodTruck;
 import com.grupo12.epicentro_gourmet.entities.PuestoDesarmable;
@@ -60,5 +59,16 @@ public class UnidadDeVentaService implements IUnidadDeVentaService {
 
         return builder.build();
     }
-}
 
+    @Override
+    public UnidadDeVenta buscarPorId(Long idUnidad) {
+        return unidadDeVentaRepository.findById(idUnidad)
+                .orElseThrow(() -> new IllegalArgumentException("Unidad de Venta no encontrada con ID: " + idUnidad));
+    }
+
+    @Override
+    public double calcularCanon(Long idUnidad) {
+        UnidadDeVenta unidad = buscarPorId(idUnidad);
+        return unidad.calcularCanon();
+    }
+}

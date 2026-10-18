@@ -1,5 +1,6 @@
 package com.grupo12.epicentro_gourmet.controllers;
 
+import com.grupo12.epicentro_gourmet.helpers.Roles;
 import com.grupo12.epicentro_gourmet.helpers.ViewRouteHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +13,11 @@ public class LoginController {
         return ViewRouteHelper.LOGIN;
     }
 
-    @GetMapping("loginsuccess")
-    public String loginSuccess(){
-        return ViewRouteHelper.REDIRECT_INDEX;
+    @GetMapping("/loginsuccess")
+    public String loginSuccess(org.springframework.security.core.Authentication auth) {
+        boolean pendiente = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + Roles.PENDIENTE));
+        return pendiente ? "redirect:/cuenta-pendiente" : "redirect:/";
     }
 
 

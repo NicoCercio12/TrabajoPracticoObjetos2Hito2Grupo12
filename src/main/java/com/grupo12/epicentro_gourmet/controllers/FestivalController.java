@@ -27,7 +27,7 @@ public class FestivalController {
         List<FestivalDTO> festivales = festivalService.obtenerTodosDTO();
         model.addAttribute("festivales", festivales);
         model.addAttribute("titulo", "Listado de Festivales");
-        return "festivales/lista"; // Renderiza templates/festivales/lista.html
+        return "festivales/lista";
     }
 
 

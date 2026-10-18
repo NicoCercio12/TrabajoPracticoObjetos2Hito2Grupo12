@@ -16,7 +16,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class RegistroUnidadDTO {
 
     //Usuario del responsable
@@ -55,6 +56,7 @@ public class RegistroUnidadDTO {
     @NotNull(message = "Elegí el tipo de empleado")
     private TipoEmpleado tipoEmpleado;
     private RolCocina rolCocina;
+    private Turno turno;
 
     //Unidad de venta
     @NotBlank(message = "El nombre comercial es obligatorio")
@@ -78,5 +80,5 @@ public class RegistroUnidadDTO {
     private Integer cantCarpas;
     private Integer tiempoMontajeMinutos;
 
-    
+
 }

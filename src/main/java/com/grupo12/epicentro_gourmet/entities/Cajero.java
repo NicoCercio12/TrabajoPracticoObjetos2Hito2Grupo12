@@ -23,9 +23,19 @@ public class Cajero extends Empleado {
         this.turno = turno;
     }
 
+
     @Override
     public double calcularSueldo(Festival festival) {
-        return 0;
+        if (festival == null) return 0.0;
+
+        double sueldoBase = 100000.0;
+        double montoAntiguedad = calcularAntiguedad() * 5000.0;
+        double multiplicador = calcularMultiplicadorDias(festival.getDuracionEnDias());
+
+        return multiplicador * (sueldoBase + montoAntiguedad);
     }
-    // calcularSueldo(...), cerrarCaja(...)
+    public CierreCaja cerrarCaja(LocalDate fecha) {
+        // Metodo para el cierre de caja del cajero
+        return null;
+    }
 }

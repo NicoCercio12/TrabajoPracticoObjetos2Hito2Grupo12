@@ -9,13 +9,17 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter 
+@NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    private long idEmpleado;
+
 
     private String nombre;
     private String apellido;
@@ -56,4 +60,15 @@ public abstract class Empleado {
         return false;
     }
     //aca calculamos esMayorDeEdad, calcularAntiguedad, darDeBaja, reactivar...
+
+
+    //liqi de haberes
+    public int calcularAntiguedad() {
+        if (fechaIngreso == null) return 0;
+        return java.time.Period.between(fechaIngreso, java.time.LocalDate.now()).getYears();
+    }
+
+    protected double calcularMultiplicadorDias(long dias) {
+        return ((int) (dias / 15) + 1) * 0.5;
+    }
 }

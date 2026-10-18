@@ -22,16 +22,8 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String index(Model model, Authentication auth) {
+    public String index(Model model) {
         model.addAttribute("festivales", festivalService.getAll());
-        boolean logueado = auth != null && auth.isAuthenticated()
-                && !(auth instanceof AnonymousAuthenticationToken);
-        model.addAttribute("logueado", logueado);
-        if (logueado) {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("roles", auth.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority).toList());
-        }
         return ViewRouteHelper.INDEX;
     }
 }

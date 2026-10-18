@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liquidación de Haberes</title>
+    <link rel="stylesheet" th:href="@{/static.css/estilos.css}">
+</head>
+<body>
+<div style="padding: 20px;">
+    <h2>Liquidación de Haberes</h2>
+    <p><strong>Empleado:</strong> <span th:text="${empleado.nombre + ' ' + empleado.apellido}"></span></p>
+    <p><strong>DNI:</strong> <span th:text="${empleado.dni}"></span></p>
+    <p><strong>Antigüedad:</strong> <span th:text="${empleado.calcularAntiguedad()}"></span> años</p>
+    <h3>Sueldo a Cobrar: $<span th:text="${sueldo}"></span></h3>
+</div>
+</body>
+</html>
