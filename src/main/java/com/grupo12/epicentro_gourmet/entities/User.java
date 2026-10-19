@@ -30,7 +30,6 @@ public class User {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<UserRole> userRoles = new HashSet<>();
 

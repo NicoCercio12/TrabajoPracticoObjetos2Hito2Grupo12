@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${titulo}">Unidades de Venta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/festivales">Epicentro Gourmet</a>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Encabezado con información del Festival -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="text-primary mb-0" th:text="${festival.nombre}">Nombre del Festival</h2>
+            <span class="text-muted" th:text="|Temporada: ${festival.temporada} | Fechas: ${#temporals.format(festival.fechaInicio, 'dd/MM/yyyy')} al ${#temporals.format(festival.fechaFin, 'dd/MM/yyyy')}|"></span>
+        </div>
+        <!-- Botón para volver a la lista general de festivales -->
+        <a href="/festivales" class="btn btn-secondary">Volver a Festivales</a>
+    </div>
+
+    <!-- Alerta si el festival aún no tiene unidades asignadas -->
+    <div th:if="${#lists.isEmpty(unidades)}" class="alert alert-warning">
+        Este festival aún no tiene unidades de venta asignadas.
+    </div>
+
+    <!-- Tabla con las unidades de venta -->
+    <div class="card shadow-sm" th:unless="${#lists.isEmpty(unidades)}">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Puestos y Food Trucks Habilitados</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre Comercial</th>
+                        <th>Tipo</th>
+                        <th>Superficie</th>
+                        <th>Responsable</th>
+                        <th>Detalles Específicos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="udv : ${unidades}">
+                        <td><code class="fw-bold" th:text="${udv.codigoUnico}">ABC1234567</code></td>
+                        <td class="fw-bold" th:text="${udv.nombreComercial}">Burger Truck</td>
+                        <td>
+                            <span th:if="${udv.tipoUnidad == 'Food Truck'}" class="badge bg-info text-dark">Food Truck</span>
+                            <span th:if="${udv.tipoUnidad == 'Puesto Desarmable'}" class="badge bg-warning text-dark">Puesto Desarmable</span>
+                        </td>
+                        <td th:text="|${udv.superficie} m²|">25 m²</td>
+                        <td th:text="${udv.responsable}">Juan Pérez</td>
+                        <td>
+                            <!-- Si es Food Truck -->
+                            <div th:if="${udv.tipoUnidad == 'Food Truck'}">
+                                <small><strong>Patente:</strong> <span th:text="${udv.patente}">AB123CD</span></small><br>
+                                <small><strong>Electricidad:</strong> 
+                                    <span th:if="${udv.requiereElectricidad}" class="badge bg-success">Sí</span>
+                                    <span th:unless="${udv.requiereElectricidad}" class="badge bg-secondary">No</span>
+                                </small>
+                            </div>
+
+                            <!-- Si es Puesto Desarmable -->
+                            <div th:if="${udv.tipoUnidad == 'Puesto Desarmable'}">
+                                <small><strong>Carpas:</strong> <span th:text="${udv.cantCarpas}">2</span></small><br>
+                                <small><strong>Montaje:</strong> <span th:text="|${udv.tiempoMontajeMinutos} min|">45 min</span></small>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

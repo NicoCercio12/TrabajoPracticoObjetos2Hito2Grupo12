@@ -1,5 +1,4 @@
 package com.grupo12.epicentro_gourmet.services;
-
 import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 import org.jspecify.annotations.Nullable;
@@ -21,5 +20,7 @@ public interface IFestivalService {
 
     // Devuelve un festival puntual convertido a FestivalDTO por su ID
     FestivalDTO obtenerPorIdDTO(Long id);
+
+
 
 }

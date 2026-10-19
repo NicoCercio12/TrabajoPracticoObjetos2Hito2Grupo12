@@ -13,7 +13,7 @@ public class CierreCaja {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private LocalDate fecha;
     private double totalRecaudado;
