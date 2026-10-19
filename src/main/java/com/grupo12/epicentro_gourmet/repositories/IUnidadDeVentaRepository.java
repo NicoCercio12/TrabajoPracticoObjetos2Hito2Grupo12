@@ -13,8 +13,10 @@ public interface IUnidadDeVentaRepository extends JpaRepository<UnidadDeVenta, L
 
     boolean existsByCodigoUnico(String codigoUnico);
 
+    boolean existsByIdAndResponsable_Usuario_Username(Long idUnidad, String username);
 
     // Busca unidades que pertenezcan al festival dado por su ID
     @Query("SELECT u FROM UnidadDeVenta u JOIN u.lstFestivales f WHERE f.id = :festivalId")
     List<UnidadDeVenta> findByFestivalesId(@Param("festivalId") Long festivalId);
+
 }

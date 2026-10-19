@@ -6,7 +6,7 @@ import org.hibernate.annotations.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.time.Period;
 
 @Entity
 @Getter
@@ -56,10 +56,24 @@ public abstract class Empleado {
 
     public abstract double calcularSueldo(Festival festival);
 
+    //Lo termino - MatiFunes
     public boolean esMayorDeEdad() {
-        return false;
+        boolean mayorDeEdad = false;
+
+        if(fechaNacimiento != null){
+            int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
+            mayorDeEdad = edad >= 18;
+        }
+        return mayorDeEdad;
     }
-    //aca calculamos esMayorDeEdad, calcularAntiguedad, darDeBaja, reactivar...
+
+    public void darDeBaja() {
+        this.activo = false;
+    }
+
+    public void reactivar() {
+        this.activo = true;
+    }
 
 
     //liqi de haberes
