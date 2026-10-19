@@ -5,6 +5,6 @@ import com.grupo12.epicentro_gourmet.entities.UnidadDeVenta;
 
 public interface IRegistroService {
 
-    UnidadDeVenta registrarUnidadConResponsable(RegistroUnidadDTO dto);
+    UnidadDeVenta registrarUnidadConResponsable(RegistroUnidadDTO dto, String username);
 
 }

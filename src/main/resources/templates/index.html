@@ -9,11 +9,17 @@
     <section class="hero mb-5">
         <h1>Festivales gastronómicos</h1>
         <p class="lead mb-4">Gestioná unidades de venta, personal y rendimiento de cada jornada del predio ferial.</p>
+
         <div th:if="${!logueado}" class="d-flex flex-wrap gap-2">
-            <a class="btn btn-eg btn-lg" th:href="@{/registro}">Registrar mi unidad de venta</a>
+            <a class="btn btn-eg btn-lg" th:href="@{/signup}">Crear cuenta</a>
             <a class="btn btn-outline-light btn-lg" th:href="@{/login}">Iniciar sesión</a>
         </div>
-        <p th:if="${logueado}" class="mb-0">Hola, <b th:text="${username}"></b>.</p>
+
+        <div th:if="${logueado}">
+            <p class="mb-3">Hola, <b th:text="${username}"></b>.</p>
+            <a th:if="${#lists.contains(roles, 'ROLE_PENDIENTE')}"
+               class="btn btn-eg btn-lg" th:href="@{/registro}">Registrar mi unidad de venta</a>
+        </div>
     </section>
 
     <div class="card">

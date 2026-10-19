@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Cuenta pendiente')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<div class="container pb-5">
+<main class="container pb-5">
     <div class="row justify-content-center">
         <div class="col-md-7">
             <div class="card">
-                <div class="card-header card-header-eg">Cuenta pendiente de aprobación</div>
+                <div class="card-header card-header-eg">Tu cuenta está lista</div>
                 <div class="card-body p-4 text-center">
                     <p class="lead mb-3">Tu cuenta fue creada correctamente.</p>
                     <p class="text-muted mb-4">
-                        Un administrador tiene que asignarte un rol antes de que puedas operar.
-                        Cuando lo haga, cerrá sesión y volvé a ingresar.
+                        Para empezar a operar, registrá tu unidad de venta y tus datos como responsable.
                     </p>
+                    <a class="btn btn-primary me-2" th:href="@{/registro}">Registrar mi unidad</a>
                     <a class="btn btn-outline-secondary" th:href="@{/logout}">Cerrar sesión</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 </body>
 </html>

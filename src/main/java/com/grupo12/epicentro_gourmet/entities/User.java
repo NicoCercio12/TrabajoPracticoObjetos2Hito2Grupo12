@@ -30,8 +30,7 @@ public class User {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="user", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<UserRole> userRoles = new HashSet<>();
 
     public User(String username, String password, boolean enabled) {

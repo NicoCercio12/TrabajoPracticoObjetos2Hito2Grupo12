@@ -36,7 +36,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/css/**", "/imgs/**", "/js/**", "/images/**",
                             "/vendor/**", "/webjars/**", "/favicon.ico").permitAll();
-                    auth.requestMatchers("/", "/login", "/registro", "/signup", "/error","/festivales","/unidades").permitAll();
+
+                    auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades").permitAll();
+
                     auth.requestMatchers("/admin/**").hasRole(Roles.ADMINISTRADOR);
                     auth.requestMatchers("/reportes/**", "/unidades/**", "/empleados/**", "/platos/**")
                             .hasAnyRole(Roles.ADMINISTRADOR, Roles.RESPONSABLE);

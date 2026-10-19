@@ -1,5 +1,8 @@
 package com.grupo12.epicentro_gourmet.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +19,8 @@ import com.grupo12.epicentro_gourmet.enums.Turno;
 import com.grupo12.epicentro_gourmet.helpers.ViewRouteHelper;
 import com.grupo12.epicentro_gourmet.services.IRegistroService;
 import jakarta.validation.Valid;
+
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/registro")
@@ -47,15 +52,16 @@ public class RegistroController {
 
     @PostMapping
     public String registrar(@Valid @ModelAttribute("registro") RegistroUnidadDTO dto,
-                            BindingResult result, RedirectAttributes redirect) {
+                            BindingResult result, Principal principal, HttpServletRequest request) {
         if (result.hasErrors()) return ViewRouteHelper.REGISTRO;
         try {
-            registroService.registrarUnidadConResponsable(dto);
+            registroService.registrarUnidadConResponsable(dto, principal.getName());
         } catch (IllegalArgumentException e) {
             result.reject("registro.invalido", e.getMessage());
             return ViewRouteHelper.REGISTRO;
         }
-        redirect.addFlashAttribute("mensaje", "Unidad registrada. Ya podés iniciar sesión.");
-        return ViewRouteHelper.REDIRECT_LOGIN;
+        request.getSession().invalidate();
+        SecurityContextHolder.clearContext();
+        return "redirect:/login?registrada";
     }
 }
