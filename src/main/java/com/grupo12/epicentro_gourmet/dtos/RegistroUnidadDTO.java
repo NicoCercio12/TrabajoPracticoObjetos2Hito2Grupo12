@@ -19,14 +19,6 @@ import lombok.Setter;
 @Getter @Setter
 public class RegistroUnidadDTO {
 
-    //Usuario del responsable
-    @NotBlank(message = "El usuario es obligatorio")
-    private String username;
-
-    @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
-    private String password;
-
     //Responsable
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;

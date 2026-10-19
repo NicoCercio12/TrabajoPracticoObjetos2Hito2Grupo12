@@ -19,10 +19,13 @@
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" th:href="@{/}">Inicio</a></li>
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_PENDIENTE')}">
+                    <a class="nav-link" th:href="@{/registro}">Registrar unidad</a>
+                </li>
             </ul>
             <div class="d-flex align-items-center gap-2" th:if="${!logueado}">
                 <a class="btn btn-outline-light btn-sm" th:href="@{/login}">Iniciar sesión</a>
-                <a class="btn btn-eg btn-sm" th:href="@{/registro}">Registrar unidad</a>
+                <a class="btn btn-eg btn-sm" th:href="@{/signup}">Crear cuenta</a>
             </div>
             <div class="d-flex align-items-center gap-3" th:if="${logueado}">
                 <span class="text-white small">

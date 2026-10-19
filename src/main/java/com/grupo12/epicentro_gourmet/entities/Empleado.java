@@ -1,11 +1,13 @@
 package com.grupo12.epicentro_gourmet.entities;
 
+import com.grupo12.epicentro_gourmet.helpers.Configuracion;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 
 @Entity
@@ -53,7 +55,7 @@ public abstract class Empleado {
     public abstract double calcularSueldo(Festival festival);
 
     public boolean esMayorDeEdad() {
-        return false;
+        return Period.between(fechaNacimiento, LocalDate.now()).getYears() >= Configuracion.EDAD_MINIMA_LABORAL;
     }
     //aca calculamos esMayorDeEdad, calcularAntiguedad, darDeBaja, reactivar...
 

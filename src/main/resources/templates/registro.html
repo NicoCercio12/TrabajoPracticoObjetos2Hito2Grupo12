@@ -6,28 +6,19 @@
 
 <main class="container pb-5" style="max-width: 860px;">
     <h2 class="mb-1">Registrar unidad de venta</h2>
-    <p class="text-muted mb-4">Cargá los datos de la unidad y de su responsable. Con eso se crea tu usuario para ingresar al sistema.</p>
-
-    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
-        <ul class="mb-0">
-            <li th:each="e : ${#fields.globalErrors()}" th:text="${e}"></li>
-        </ul>
-    </div>
+    <p class="text-muted mb-4">Cargá los datos de la unidad y de su responsable. Se asocian a la cuenta con la que iniciaste sesión.</p>
 
     <form th:action="@{/registro}" th:object="${registro}" method="post" novalidate>
 
-        <div class="card mb-4">
-            <div class="card-header card-header-eg">1. Usuario de acceso</div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div th:replace="~{fragments/layout :: campo('Usuario', 'username', 'text')}"></div>
-                    <div th:replace="~{fragments/layout :: campo('Contraseña', 'password', 'password')}"></div>
-                </div>
-            </div>
+        <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+            <strong>Revisá estos datos:</strong>
+            <ul class="mb-0">
+                <li th:each="e : ${#fields.allErrors()}" th:text="${e}"></li>
+            </ul>
         </div>
 
         <div class="card mb-4">
-            <div class="card-header card-header-eg">2. Responsable</div>
+            <div class="card-header card-header-eg">1. Responsable</div>
             <div class="card-body">
                 <div class="row g-3">
                     <div th:replace="~{fragments/layout :: campo('Nombre', 'nombre', 'text')}"></div>
@@ -65,7 +56,7 @@
         </div>
 
         <div class="card mb-4">
-            <div class="card-header card-header-eg">3. Unidad de venta</div>
+            <div class="card-header card-header-eg">2. Unidad de venta</div>
             <div class="card-body">
                 <div class="row g-3">
                     <div th:replace="~{fragments/layout :: campo('Nombre comercial', 'nombreComercial', 'text')}"></div>
@@ -123,7 +114,9 @@
     }
     document.getElementById('tipoEmpleado').addEventListener('change', actualizar);
     document.getElementById('tipoUnidad').addEventListener('change', actualizar);
+    document.addEventListener('DOMContentLoaded', actualizar);
+    window.addEventListener('pageshow', actualizar);
     actualizar();
 </script>
 </body>
-</html>>
+</html>
