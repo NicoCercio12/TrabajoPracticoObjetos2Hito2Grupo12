@@ -1,16 +1,27 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: epicentro-gourmet
 
   datasource:
-    url: jdbc:mysql://localhost:3306/db_grupo_12_hito_2?serverTimezone=America/Argentina/Buenos_Aires
+
+    url: jdbc:mariadb://localhost:3306/epicentro_gourmet?createDatabaseIfNotExist=true
+
     username: root
-    password: 280508
+    password: root
+    driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
 
   thymeleaf:
     cache: false

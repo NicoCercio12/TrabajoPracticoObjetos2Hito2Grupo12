@@ -5,66 +5,195 @@
     <title th:text="${titulo}">Festivales</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Vis.js Network -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    <style>
+        #red-festivales {
+            width: 100%;
+            height: 480px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #f8fafc;
+        }
+        .leyenda-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Epicentro Gourmet</a>
+        <a class="navbar-brand" href="#">🎪 Epicentro Gourmet</a>
     </div>
 </nav>
 
-<div class="container">
+<div class="container pb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-primary" th:text="${titulo}">Festivales Registrados</h2>
+        <h2 class="text-primary m-0" th:text="${titulo}">Festivales Registrados</h2>
     </div>
 
     <!-- Alerta si no hay festivales cargados -->
-    <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info">
+    <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-info shadow-sm">
         No hay festivales registrados actualmente en el sistema.
     </div>
 
-    <!-- Tabla de festivales -->
-    <div class="card shadow-sm" th:unless="${#lists.isEmpty(festivales)}">
-        <div class="card-body p-0">
-            <table class="table table-striped table-hover mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Temporada</th>
-                        <th>Fecha Inicio</th>
-                        <th>Fecha Fin</th>
-                        <th>Duración</th>
-                        <th>Estado</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="fest, stat : ${festivales}">
-                        <td th:text="${stat.count}">1</td>
-                        <td class="fw-bold" th:text="${fest.nombre}">Primavera Fest</td>
-                        <td th:text="${fest.temporada}">Primavera</td>
-                        <td th:text="${#temporals.format(fest.fechaInicio, 'dd/MM/yyyy')}">01/09/2026</td>
-                        <td th:text="${#temporals.format(fest.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
-                        <td th:text="|${fest.duracionDias} días|">15 días</td>
-                        <td>
-                            <span th:if="${fest.activo}" class="badge bg-success">Activo</span>
-                            <span th:unless="${fest.activo}" class="badge bg-secondary">Finalizado / Inactivo</span>
-                        </td>
-                        <td class="text-center">
-                            <!-- Enlace para el Caso de Uso 2: Ver Unidades -->
-                            <a th:href="@{/festivales/{id}/unidades(id=${fest.id})}" class="btn btn-sm btn-outline-primary">
-                                Ver Unidades
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div th:unless="${#lists.isEmpty(festivales)}">
+        <!-- Panel del Grafo Interactivo -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-secondary">Mapa Interactivo de Red</span>
+                <div class="small">
+                    <span class="me-3"><span class="leyenda-dot" style="background-color: #0d6efd;"></span>Festival</span>
+                    <span><span class="leyenda-dot" style="background-color: #198754;"></span>Unidad de Venta</span>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div id="red-festivales"></div>
+            </div>
+            <div class="card-footer bg-light text-muted small text-center">
+                Tip: Podés arrastrar los nodos, hacer zoom con la rueda del mouse o hacer <strong>doble clic</strong> en un festival para ver sus unidades.
+            </div>
+        </div>
+
+        <!-- Tabla de festivales -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <span class="fw-bold text-secondary">Listado Detallado</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Temporada</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Duración</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="fest, stat : ${festivales}">
+                            <td th:text="${stat.count}">1</td>
+                            <td class="fw-bold" th:text="${fest.nombre}">Primavera Fest</td>
+                            <td th:text="${fest.temporada}">Primavera</td>
+                            <td th:text="${#temporals.format(fest.fechaInicio, 'dd/MM/yyyy')}">01/09/2026</td>
+                            <td th:text="${#temporals.format(fest.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
+                            <td th:text="|${fest.duracionDias} días|">15 días</td>
+                            <td>
+                                <span th:if="${fest.activo}" class="badge bg-success">Activo</span>
+                                <span th:unless="${fest.activo}" class="badge bg-secondary">Finalizado / Inactivo</span>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{/festivales/{id}/unidades(id=${fest.id})}" class="btn btn-sm btn-outline-primary">
+                                    Ver Unidades
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Script Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script para dibujar el grafo con Thymeleaf -->
+<script th:inline="javascript" th:unless="${#lists.isEmpty(festivales)}">
+    const festivales = /*[[${festivales}]]*/ [];
+
+    const nodos = [];
+    const aristas = [];
+
+    festivales.forEach(fest => {
+        const festId = 'fest_' + fest.id;
+        
+        // 1. Nodo del Festival
+        nodos.push({
+            id: festId,
+            label: fest.nombre,
+            shape: 'hexagon',
+            size: 26,
+            color: { 
+                background: fest.activo ? '#0d6efd' : '#6c757d', 
+                border: fest.activo ? '#0a58ca' : '#495057' 
+            },
+            font: { color: '#ffffff', size: 14, bold: true },
+            tipo: 'festival',
+            rawId: fest.id
+        });
+
+        // 2. Nodos de Unidades de Venta asociadas (si las trae cargadas el DTO/Entidad)
+        if (fest.unidadesDeVenta && fest.unidadesDeVenta.length > 0) {
+            fest.unidadesDeVenta.forEach(uv => {
+                const uvId = 'uv_' + uv.id;
+                nodos.push({
+                    id: uvId,
+                    label: uv.nombre || ('Unidad #' + uv.id),
+                    shape: 'dot',
+                    size: 16,
+                    color: { background: '#198754', border: '#146c43' },
+                    font: { color: '#212529', size: 12 },
+                    tipo: 'unidad',
+                    rawId: uv.id
+                });
+
+                // Conexión del Festival hacia la Unidad
+                aristas.push({
+                    from: festId,
+                    to: uvId,
+                    arrows: 'to',
+                    color: { color: '#adb5bd' },
+                    width: 2
+                });
+            });
+        }
+    });
+
+    const contenedor = document.getElementById('red-festivales');
+    const datos = {
+        nodes: new vis.DataSet(nodos),
+        edges: new vis.DataSet(aristas)
+    };
+
+    const opciones = {
+        physics: {
+            solver: 'forceAtlas2Based',
+            forceAtlas2Based: {
+                gravitationalConstant: -40,
+                centralGravity: 0.01,
+                springLength: 90,
+                springConstant: 0.08
+            }
+        },
+        interaction: {
+            hover: true,
+            navigationButtons: true,
+            tooltipDelay: 150
+        }
+    };
+
+    const red = new vis.Network(contenedor, datos, opciones);
+
+    // Navegar a unidades al hacer doble clic sobre un festival
+    red.on("doubleClick", function (params) {
+        if (params.nodes.length > 0) {
+            const nodoSeleccionado = datos.nodes.get(params.nodes[0]);
+            if (nodoSeleccionado.tipo === 'festival') {
+                window.location.href = '/festivales/' + nodoSeleccionado.rawId + '/unidades';
+            }
+        }
+    });
+</script>
 </body>
 </html>
