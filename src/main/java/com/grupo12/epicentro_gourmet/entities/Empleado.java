@@ -9,17 +9,13 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Getter
-@Setter 
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_empleado")
-    private Long idEmpleado;
-
+    private long idEmpleado;
 
     private String nombre;
     private String apellido;

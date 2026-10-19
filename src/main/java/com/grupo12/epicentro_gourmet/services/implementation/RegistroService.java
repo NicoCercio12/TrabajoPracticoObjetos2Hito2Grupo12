@@ -45,12 +45,21 @@ public class RegistroService implements IRegistroService {
 
     @Override
     @Transactional
-    public UnidadDeVenta registrarUnidadConResponsable(RegistroUnidadDTO dto) {
+    public UnidadDeVenta registrarUnidadConResponsable(RegistroUnidadDTO dto, String username) {
         validar(dto);
 
-        // 1) Usuario con rol RESPONSABLE
-        User user = new User(dto.getUsername().trim(), passwordEncoder.encode(dto.getPassword()), true);
-        user.getUserRoles().add(new UserRole(user, Roles.RESPONSABLE));
+        // 1) Cuenta existente (la de la sesión)
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la cuenta"));
+        if (empleadoRepository.existsByUsuario(user))
+            throw new IllegalArgumentException("Esta cuenta ya tiene un responsable registrado");
+
+        // La cuenta pasa de PENDIENTE a RESPONSABLE
+        user.getUserRoles().stream()
+                .filter(r -> Roles.PENDIENTE.equals(r.getRole()))
+                .forEach(r -> r.setRole(Roles.RESPONSABLE));
+        if (user.getUserRoles().stream().noneMatch(r -> Roles.RESPONSABLE.equals(r.getRole())))
+            user.getUserRoles().add(new UserRole(user, Roles.RESPONSABLE));
 
         // 2) Empleado responsable (cocinero o cajero)
         Empleado responsable = crearEmpleado(dto);
@@ -61,16 +70,14 @@ public class RegistroService implements IRegistroService {
         // 3) Unidad de venta
         UnidadDeVenta unidad = unidadRepository.save(crearUnidad(dto));
 
-        // 4) Vínculos: el responsable pertenece al staff y es responsable de la unidad
+        // 4) Vínculos
         responsable.setUnidadAsignada(unidad);
-        empleadoRepository.save(responsable);   // guarda también el usuario (cascade)
+        empleadoRepository.save(responsable);
         unidad.setResponsable(responsable);
         return unidad;
     }
 
     private void validar(RegistroUnidadDTO dto) {
-        if (userRepository.existsByUsername(dto.getUsername().trim()))
-            throw new IllegalArgumentException("Ya existe un usuario con ese nombre");
         if (empleadoRepository.existsByDni(dto.getDni()))
             throw new IllegalArgumentException("Ya existe un empleado con ese DNI");
 
