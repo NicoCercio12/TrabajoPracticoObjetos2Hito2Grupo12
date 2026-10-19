@@ -40,6 +40,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/admin/**").hasRole(Roles.ADMINISTRADOR);
                     auth.requestMatchers("/reportes/**", "/unidades/**", "/empleados/**", "/platos/**")
                             .hasAnyRole(Roles.ADMINISTRADOR, Roles.RESPONSABLE);
+                    auth.requestMatchers("/responsable/**").hasAnyRole(Roles.RESPONSABLE);
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(login -> {
