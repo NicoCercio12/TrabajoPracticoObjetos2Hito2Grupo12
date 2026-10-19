@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${titulo}">Festivales - Epicentro Gourmet</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,14 +14,15 @@
         :root {
             --color-borgoña: #6b1d28;
             --color-borgoña-oscuro: #50131c;
-            --color-fondo-crema: #faf6f0;
-            --color-naranja-boton: #eab308;
-            --color-mapa-naranja: #fff7ed;
+            --color-fondo-crema: #f8fafc;
+            --color-neon-cyan: #38bdf8;
+            --color-neon-orange: #fb923c;
+            --color-neon-pink: #f43f5e;
         }
 
         body {
             background-color: var(--color-fondo-crema);
-            color: #292524;
+            color: #1e293b;
             overflow-x: hidden;
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
@@ -50,6 +52,7 @@
             gap: 10px;
             transition: all 0.2s ease;
             border: 1px solid transparent;
+            text-decoration: none;
         }
         .sidebar .btn-menu:hover {
             background-color: #fef2f2;
@@ -62,91 +65,111 @@
             border-color: var(--color-borgoña-oscuro);
         }
 
-        /* WIDGET CALENDARIO DE AÑOS */
-        .calendar-widget {
-            background-color: #fffaf5;
-            border: 1.5px solid #fed7aa;
-            border-radius: 10px;
-            padding: 10px;
+        /* WIDGET ALMANAQUE / CALENDARIO LATERAL */
+        .almanaque-card {
+            background-color: #fffdfa;
+            border: 1px solid #fed7aa;
+            border-radius: 12px;
+            padding: 12px;
         }
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--color-borgoña);
-            margin-bottom: 8px;
-            padding-bottom: 4px;
-            border-bottom: 1px dashed #fdba74;
-        }
-        .calendar-grid {
+        .almanaque-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
+            gap: 6px;
         }
-        .year-pill {
+        .btn-anio {
             background-color: #ffffff;
             border: 1px solid #fca5a5;
             color: #44403c;
-            font-size: 0.82rem;
             font-weight: 600;
-            padding: 5px 0;
-            text-align: center;
+            font-size: 0.82rem;
+            padding: 6px 0;
             border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.15s ease-in-out;
+            text-align: center;
         }
-        .year-pill:hover {
+        .btn-anio:hover {
             background-color: #fef2f2;
-            color: var(--color-borgoña);
             border-color: var(--color-borgoña);
-            transform: scale(1.03);
+            color: var(--color-borgoña);
         }
-        .year-pill.active {
+        .btn-anio.active {
             background-color: var(--color-borgoña);
-            color: #ffffff;
             border-color: var(--color-borgoña-oscuro);
-            box-shadow: 0 2px 4px rgba(107, 29, 40, 0.25);
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(107, 29, 40, 0.4);
+        }
+        .select-festivales {
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            font-size: 0.84rem;
+            color: #44403c;
+            background-color: #ffffff;
+            padding: 6px 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .select-festivales:focus {
+            outline: none;
+            border-color: var(--color-borgoña);
         }
 
-        /* Recuadros / Tarjetas estilo Borgoña */
+        /* Tarjeta Contenedora */
         .card-gourmet {
             background-color: #ffffff;
-            border: 2px solid #ef4444;
+            border: 1px solid #cbd5e1;
             border-radius: 14px;
             overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
         .card-gourmet .card-header-gourmet {
-            background-color: var(--color-borgoña);
-            color: #ffffff;
-            padding: 12px 20px;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid #334155;
         }
 
-        /* Contenedor del Mapa en Anaranjado Claro */
+        /* Contenedor Neuronal */
         #red-festivales {
             width: 100%;
             height: 640px;
-            border: 1px solid #fed7aa;
             border-radius: 10px;
-            background-color: var(--color-mapa-naranja);
+            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85);
             cursor: grab;
         }
         #red-festivales:active {
             cursor: grabbing;
         }
-        .leyenda-dot {
-            width: 14px;
-            height: 14px;
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseAnimation 1.8s infinite;
+        }
+        @keyframes pulseAnimation {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.8; }
         }
 
-        /* Botón de acción dorado */
         .btn-dorado {
             background-color: #f59e0b;
             color: #ffffff;
@@ -161,27 +184,28 @@
 </head>
 <body>
 
-<!-- Navbar Superior estilo Login -->
+<!-- Navbar Superior -->
 <nav class="navbar navbar-expand-lg navbar-dark navbar-gourmet shadow-sm py-2">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold fs-4 text-white" href="/festivales">
-            🎪 Epicentro Gourmet
+            Epicentro Gourmet
+            <span class="badge bg-danger text-white fs-6 ms-2">Neural Hub</span>
         </a>
         <div class="d-flex align-items-center gap-2">
             <a href="/festivales" class="btn btn-sm btn-outline-light px-3">Inicio</a>
-            <a href="#" class="btn btn-sm btn-dorado px-3">Registrar unidad</a>
+            <a href="#" class="btn btn-sm btn-dorado px-3">Registrar festival</a>
         </div>
     </div>
 </nav>
 
 <div class="container-fluid">
     <div class="row">
-        <!-- BARRA LATERAL CON SELECTOR TIPO CALENDARIO -->
+        <!-- BARRA LATERAL -->
         <aside class="col-12 col-md-3 col-xl-2 p-3 sidebar shadow-sm">
             <h6 class="text-uppercase fw-bold small mb-3 text-secondary">Navegación</h6>
             
             <a href="/festivales" class="btn btn-menu active w-100">
-                <i class="bi bi-bezier2"></i> Flujo de Años
+                <i class="bi bi-diagram-3"></i> Topología Neuronal
             </a>
 
             <button type="button" class="btn btn-menu w-100" onclick="scrollToTabla()">
@@ -190,40 +214,47 @@
 
             <hr class="my-3 text-danger opacity-25">
 
-            <!-- WIDGET CALENDARIO -->
+            <!-- WIDGET ALMANAQUE -->
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="text-uppercase fw-bold small m-0 text-secondary">
-                    <i class="bi bi-calendar-range text-danger me-1"></i> Ir a Año
-                </h6>
-                <span class="badge bg-danger" id="badge-total-anios">10 años</span>
+                <span class="fw-bold small" style="color: var(--color-borgoña);">
+                    <i class="bi bi-calendar3 me-1"></i> IR A AÑO
+                </span>
+                <span class="badge bg-danger rounded-pill" id="badgeTotalAnios">10 años</span>
             </div>
 
-            <div class="calendar-widget mb-3 shadow-sm">
-                <div class="calendar-header">
-                    <span><i class="bi bi-calendar2-event me-1"></i> Almanaque</span>
-                    <small class="text-muted" id="year-range-label">2017 - 2026</small>
+            <div class="almanaque-card mb-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-warning border-opacity-25">
+                    <span class="small fw-bold" style="color: var(--color-borgoña);">
+                        <i class="bi bi-calendar-event me-1"></i> Almanaque
+                    </span>
+                    <span class="small text-muted" id="rangoAniosTexto">2017 - 2026</span>
                 </div>
 
-                <!-- Grilla generada dinámicamente con los años disponibles -->
-                <div class="calendar-grid" id="calendar-years-grid"></div>
-
-                <div class="mt-2 pt-2 border-top text-center">
-                    <select class="form-select form-select-sm border-danger" id="select-rapido-anio" onchange="enfocarAnio(this.value)">
-                        <option value="" disabled selected>Búsqueda rápida...</option>
-                    </select>
+                <!-- Grilla de Botones de Años -->
+                <div class="almanaque-grid mb-2" id="gridBotonesAnios">
+                    <!-- Dinámico -->
                 </div>
+
+                <!-- Selector Desplegable -->
+                <select class="select-festivales" id="selectFestivalesAnio" onchange="seleccionarFestivalDesdeSelect(this.value)">
+                    <option value="">Seleccionar año...</option>
+                </select>
             </div>
 
             <hr class="my-3 text-danger opacity-25">
 
-            <h6 class="text-uppercase fw-bold small mb-2 text-secondary">Vistas del Mapa</h6>
+            <h6 class="text-uppercase fw-bold small mb-3 text-secondary">Vistas y Sinapsis</h6>
 
-            <button type="button" class="btn btn-outline-danger w-100 btn-sm mb-2" onclick="irAlInicio()">
-                <i class="bi bi-skip-backward-circle"></i> Primer Año
+            <button type="button" class="btn btn-outline-danger w-100 btn-sm mb-2" onclick="irAlPrimerAnio()">
+                <i class="bi bi-skip-backward-circle"></i> Ir al Primer Año
             </button>
 
-            <button type="button" class="btn btn-outline-danger w-100 btn-sm" onclick="resetearVista()">
+            <button type="button" class="btn btn-outline-danger w-100 btn-sm mb-2" onclick="resetearVista()">
                 <i class="bi bi-arrows-fullscreen"></i> Ver Todo el Mapa
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary w-100 btn-sm" onclick="reequilibrarRed()">
+                <i class="bi bi-shuffle"></i> Reequilibrar Sinapsis
             </button>
         </aside>
 
@@ -233,39 +264,51 @@
                 <h2 class="fw-bold m-0" style="color: var(--color-borgoña);" th:text="${titulo}">Festivales Registrados</h2>
             </div>
 
-            <!-- Alerta si no hay datos -->
             <div th:if="${#lists.isEmpty(festivales)}" class="alert alert-warning shadow-sm border-danger">
                 No hay festivales registrados actualmente en el sistema.
             </div>
 
             <div th:unless="${#lists.isEmpty(festivales)}">
-                <!-- Tarjeta del Mapa -->
+                <!-- Tarjeta del Mapa Neuronal -->
                 <div class="card card-gourmet shadow-sm mb-4">
                     <div class="card-header-gourmet">
-                        <span class="fw-bold fs-6">Evolución Anual de Festivales (Distribución de 4 por fila)</span>
-                        <div class="small">
-                            <span class="me-3"><span class="leyenda-dot" style="background-color: #fff7ed; border: 2.5px solid #ea580c;"></span>Burbuja Año</span>
-                            <span class="me-3"><span class="leyenda-dot" style="background-color: #ffffff; border: 3px solid #6b1d28;"></span>Festival Activo</span>
-                            <span class="me-3"><span class="leyenda-dot" style="background-color: #ffffff; border: 2px solid #78716c;"></span>Inactivo</span>
-                            <span><i class="bi bi-arrow-right text-warning fw-bold"></i> Flujo Cronológico</span>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold fs-6"><i class="bi bi-activity text-info me-2"></i>Topología de Red Neuronal</span>
+                            <span class="status-badge"><span class="pulse-dot"></span> Sinapsis Activa</span>
+                        </div>
+                        
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-info active" id="btnModoEstructura" onclick="setModo('estructura')">
+                                Topología Libre
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" id="btnModoActividad" onclick="setModo('actividad')">
+                                <i class="bi bi-lightning-charge"></i> Disparo Neuronal (Activos)
+                            </button>
                         </div>
                     </div>
-                    <div class="card-body p-2" style="background-color: #fffaf5;">
+
+                    <div class="card-body p-2" style="background-color: #030712;">
                         <div id="red-festivales"></div>
                     </div>
-                    <div class="card-footer bg-white text-muted small text-center border-top">
-                        Tip: Hacé clic sobre cualquier año en el almanaque lateral para enfocarlo automáticamente. Hacé <strong>doble clic</strong> en un festival para ver sus unidades.
+
+                    <div class="card-footer bg-dark text-secondary small d-flex justify-content-between align-items-center">
+                        <span>Tip: Doble clic en un festival para inspeccionar sus unidades. La red flota de forma orgánica y fluida.</span>
+                        <div class="d-flex gap-3 text-light">
+                            <small><span style="color: #38bdf8;">●</span> Núcleo Anual</small>
+                            <small><span style="color: #f43f5e;">●</span> Festival Activo</small>
+                            <small><span style="color: #64748b;">●</span> Finalizado</small>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Tabla de Festivales -->
-                <div id="seccion-tabla" class="card card-gourmet shadow-sm mb-5">
-                    <div class="card-header-gourmet">
-                        <span class="fw-bold fs-6">Listado Detallado de Festivales</span>
+                <div id="seccion-tabla" class="card shadow-sm mb-5 border-0">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        Listado Detallado de Festivales
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-striped table-hover mb-0 align-middle">
-                            <thead style="background-color: var(--color-borgoña); color: #ffffff;">
+                            <thead class="table-dark">
                                 <tr>
                                     <th>#</th>
                                     <th>Nombre</th>
@@ -286,7 +329,7 @@
                                     <td th:text="${#temporals.format(fest.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
                                     <td th:text="|${fest.duracionDias} días|">15 días</td>
                                     <td>
-                                        <span th:if="${fest.activo}" class="badge" style="background-color: #15803d;">Activo</span>
+                                        <span th:if="${fest.activo}" class="badge bg-success">Activo</span>
                                         <span th:unless="${fest.activo}" class="badge bg-secondary">Finalizado</span>
                                     </td>
                                     <td class="text-center">
@@ -306,11 +349,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script Vis.js con Widget de Calendario Integrado -->
+<!-- Script Vis.js: Red Neuronal Orgánica sin Orden Sucesivo Forzado + Almanaque -->
 <script th:inline="javascript" th:unless="${#lists.isEmpty(festivales)}">
     const listaFestivales = /*[[${festivales}]]*/ [];
 
+    let modoVisual = 'estructura';
     const nodos = [];
+    const aristas = [];
     const gruposPorAnio = {};
 
     // 1. Agrupar festivales por año
@@ -326,238 +371,324 @@
     });
 
     const listaAnios = Object.keys(gruposPorAnio).sort();
-    const centrosAnio = {};
-    const radiosPorAnio = {};
 
-    // 2. Parámetros de distribución: 4 años por fila con carril libre
-    const COLUMNAS = 4;
-    const ESPACIADO_X = 430;
-    const ESPACIADO_Y = 460;
+    // ================= 2. CONSTRUCCIÓN DEL ALMANAQUE =================
+    const gridBotones = document.getElementById('gridBotonesAnios');
+    const selectAnios = document.getElementById('selectFestivalesAnio');
+    const badgeTotal = document.getElementById('badgeTotalAnios');
+    const rangoTexto = document.getElementById('rangoAniosTexto');
 
+    if (badgeTotal) {
+        badgeTotal.textContent = listaAnios.length + (listaAnios.length === 1 ? ' año' : ' años');
+    }
+    if (rangoTexto && listaAnios.length > 0) {
+        rangoTexto.textContent = `${listaAnios[0]} - ${listaAnios[listaAnios.length - 1]}`;
+    }
+
+    if (gridBotones && selectAnios) {
+        gridBotones.innerHTML = '';
+        selectAnios.innerHTML = '';
+
+        listaAnios.forEach((anio, idx) => {
+            const cantFests = gruposPorAnio[anio].length;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-anio';
+            btn.id = 'btn-anio-' + anio;
+            btn.textContent = anio;
+            btn.onclick = () => enfocarAnio(anio);
+            gridBotones.appendChild(btn);
+
+            const opt = document.createElement('option');
+            opt.value = anio;
+            opt.textContent = `Año ${anio} (${cantFests} fest${cantFests === 1 ? '' : 's'})`;
+            selectAnios.appendChild(opt);
+
+            // Activo por defecto en el último año
+            if (idx === listaAnios.length - 1) {
+                btn.classList.add('active');
+                selectAnios.value = anio;
+            }
+        });
+    }
+
+    // ================= 3. GENERACIÓN DE NODOS NEURONALES LIBRES =================
+    // No usamos grillas rígidas; dejamos que la física distribuya los núcleos y satélites de forma orgánica
     listaAnios.forEach((anio, index) => {
-        const col = index % COLUMNAS;
-        const fila = Math.floor(index / COLUMNAS);
+        const anioNodeId = 'anio_' + anio;
+        const cantFests = gruposPorAnio[anio].length;
 
-        const centroX = (col - 1.5) * ESPACIADO_X;
-        const centroY = fila * ESPACIADO_Y;
-        centrosAnio[anio] = { x: centroX, y: centroY, col: col, fila: fila };
+        // Dispersión inicial radial amplia para dar espacio a la física
+        const radioDistribucion = 380;
+        const anguloAnio = (2 * Math.PI / listaAnios.length) * index;
+        const initX = Math.cos(anguloAnio) * radioDistribucion;
+        const initY = Math.sin(anguloAnio) * radioDistribucion;
 
+        // NODO NÚCLEO ANUAL (Totalmente libre, la física lo mueve orgánicamente)
+        nodos.push({
+            id: anioNodeId,
+            x: initX,
+            y: initY,
+            label: `${anio}\n(${cantFests} fest)`,
+            shape: 'dot',
+            size: 32,
+            tipo: 'anio',
+            rawAnio: anio,
+            color: {
+                background: '#0284c7',
+                border: '#38bdf8',
+                highlight: { background: '#38bdf8', border: '#ffffff' }
+            },
+            borderWidth: 3.5,
+            shadow: { enabled: true, color: 'rgba(56, 189, 248, 0.75)', size: 26 },
+            font: { 
+                color: '#ffffff', 
+                size: 13, 
+                face: 'monospace', 
+                bold: true, 
+                multi: true 
+            }
+        });
+
+        // Axón sináptico conectando años
+        if (index > 0) {
+            const anioAnteriorId = 'anio_' + listaAnios[index - 1];
+            aristas.push({
+                id: 'troncal_' + index,
+                from: anioAnteriorId,
+                to: anioNodeId,
+                color: { color: 'rgba(56, 189, 248, 0.40)' },
+                width: 3,
+                smooth: { type: 'continuous' }
+            });
+        }
+
+        // FESTIVALES SATÉLITES CON NOMBRES SIN EMOJIS
         const festsDelAnio = gruposPorAnio[anio];
-        const cantFests = festsDelAnio.length;
-
-        const radioOrbita = cantFests === 1 ? 0 : Math.max(70, cantFests * 12.5);
-        const radioContenedor = radioOrbita + 65;
-        radiosPorAnio[anio] = radioContenedor;
-
         festsDelAnio.forEach((fest, idxFest) => {
             const festId = 'fest_' + fest.id;
+            const esActivo = fest.activo;
+            const colorBase = esActivo ? '#e11d48' : '#334155';
+            const colorBorde = esActivo ? '#fb7185' : '#64748b';
+            const glowColor = esActivo ? 'rgba(244, 63, 94, 0.85)' : 'rgba(100, 116, 139, 0.35)';
 
-            const angulo = cantFests === 1 ? 0 : (2 * Math.PI / cantFests) * idxFest - (Math.PI / 2);
-            const posX = centroX + radioOrbita * Math.cos(angulo);
-            const posYFest = centroY + radioOrbita * Math.sin(angulo);
-
-            let textoNombre = fest.nombre;
-            if (textoNombre.length > 13) {
-                const partes = textoNombre.split(' ');
-                const mitad = Math.ceil(partes.length / 2);
-                textoNombre = partes.slice(0, mitad).join(' ') + '\n' + partes.slice(mitad).join(' ');
+            // Nombre sin ningún emoji, formateado en 2 líneas si es largo
+            let nombreLimpio = fest.nombre || ('Festival ' + fest.id);
+            if (nombreLimpio.length > 16) {
+                const palabras = nombreLimpio.split(' ');
+                const mitad = Math.ceil(palabras.length / 2);
+                nombreLimpio = palabras.slice(0, mitad).join(' ') + '\n' + palabras.slice(mitad).join(' ');
             }
+            const labelCompleto = `${nombreLimpio}\n${esActivo ? '● Activo' : '○ Finalizado'}`;
 
             nodos.push({
                 id: festId,
-                x: posX,
-                y: posYFest,
-                fixed: true,
-                label: "🎪\n" + textoNombre,
-                shape: 'circle',
-                margin: 16,
-                color: {
-                    background: '#ffffff',
-                    border: fest.activo ? '#6b1d28' : '#78716c',
-                    highlight: { background: '#fef2f2', border: '#50131c' }
-                },
-                borderWidth: fest.activo ? 3.5 : 2.5,
-                font: {
-                    color: '#292524',
-                    size: 11,
-                    bold: true,
-                    strokeWidth: 2,
-                    strokeColor: '#ffffff'
-                },
+                label: labelCompleto,
+                shape: 'dot',
+                size: esActivo ? 20 : 15,
                 tipo: 'festival',
                 rawId: fest.id,
-                anio: anio
+                rawAnio: anio,
+                activo: esActivo,
+                color: {
+                    background: colorBase,
+                    border: colorBorde,
+                    highlight: { background: '#ffffff', border: colorBorde }
+                },
+                borderWidth: 2.5,
+                shadow: { enabled: true, color: glowColor, size: esActivo ? 22 : 8 },
+                font: { 
+                    color: '#f8fafc', 
+                    size: 11, 
+                    face: 'system-ui', 
+                    bold: true,
+                    multi: true,
+                    strokeWidth: 3.5, 
+                    strokeColor: '#020617' 
+                }
             });
+
+            // Sinapsis Núcleo Anual -> Festival
+            aristas.push({
+                id: 'edge_' + fest.id,
+                from: anioNodeId,
+                to: festId,
+                color: { color: esActivo ? 'rgba(251, 113, 133, 0.40)' : 'rgba(100, 116, 139, 0.22)' },
+                width: esActivo ? 2 : 1.2,
+                smooth: { type: 'continuous' }
+            });
+
+            // Conexiones sinápticas transversales entre festivales vecinos
+            if (idxFest > 0) {
+                aristas.push({
+                    id: 'edge_inter_' + fest.id,
+                    from: 'fest_' + festsDelAnio[idxFest - 1].id,
+                    to: festId,
+                    color: { color: 'rgba(251, 146, 60, 0.18)' },
+                    width: 1,
+                    dashes: [3, 5]
+                });
+            }
         });
     });
 
     const datasetNodos = new vis.DataSet(nodos);
+    const datasetAristas = new vis.DataSet(aristas);
     const contenedor = document.getElementById('red-festivales');
 
+    // FÍSICA ORGÁNICA SUSPENDIDA (Red Neuronal libre)
     const opciones = {
-        physics: { enabled: false },
+        physics: {
+            solver: 'forceAtlas2Based',
+            forceAtlas2Based: {
+                gravitationalConstant: -110,
+                centralGravity: 0.012,
+                springLength: 130,
+                springConstant: 0.08,
+                damping: 0.45
+            },
+            stabilization: { iterations: 100 }
+        },
         interaction: {
             hover: true,
-            dragNodes: false,
+            dragNodes: true,
             dragView: true,
-            zoomView: true,
-            navigationButtons: false,
-            tooltipDelay: 100
+            zoomView: true
         }
     };
 
-    const red = new vis.Network(contenedor, { nodes: datasetNodos, edges: [] }, opciones);
+    const red = new vis.Network(contenedor, { nodes: datasetNodos, edges: datasetAristas }, opciones);
 
-    // ================= CONSTRUIR EL CALENDARIO DE LA BARRA LATERAL =================
-    const gridCalendario = document.getElementById('calendar-years-grid');
-    const selectRapido = document.getElementById('select-rapido-anio');
-    const badgeTotal = document.getElementById('badge-total-anios');
-    const labelRango = document.getElementById('year-range-label');
-
-    if (listaAnios.length > 0) {
-        badgeTotal.textContent = listaAnios.length + " años";
-        labelRango.textContent = listaAnios[0] + " - " + listaAnios[listaAnios.length - 1];
-
-        listaAnios.forEach(anio => {
-            // Pastilla clickeable del calendario
-            const pill = document.createElement('div');
-            pill.className = 'year-pill';
-            pill.textContent = anio;
-            pill.id = 'pill_' + anio;
-            pill.title = (gruposPorAnio[anio].length) + " festivales registrados";
-            pill.onclick = () => enfocarAnio(anio);
-            gridCalendario.appendChild(pill);
-
-            // Opción en el select
-            const opt = document.createElement('option');
-            opt.value = anio;
-            opt.textContent = "Año " + anio + " (" + gruposPorAnio[anio].length + " fests)";
-            selectRapido.appendChild(opt);
-        });
+    // ================= 4. IMPULSOS LUMINOSOS SINÁPTICOS =================
+    let pulseProgress = 0;
+    function animarRed() {
+        pulseProgress = (pulseProgress + 0.007) % 1;
+        red.redraw();
+        requestAnimationFrame(animarRed);
     }
+    requestAnimationFrame(animarRed);
 
-    setTimeout(() => {
-        const anioReciente = listaAnios[listaAnios.length - 1] || '2026';
-        if (centrosAnio[anioReciente]) {
-            enfocarAnio(anioReciente);
-        } else {
-            red.fit({ animation: { duration: 600 } });
-        }
-    }, 150);
-
-    // ================= DIBUJAR CONTENEDOR Y RÓTULO DEL AÑO =================
-    red.on("beforeDrawing", function (ctx) {
-        listaAnios.forEach(anio => {
-            const centro = centrosAnio[anio];
-            const radio = radiosPorAnio[anio] || 135;
-            if (!centro) return;
-
-            // 1. Círculo envolvente
-            ctx.beginPath();
-            ctx.arc(centro.x, centro.y, radio, 0, 2 * Math.PI, false);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fill();
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = '#ea580c';
-            ctx.stroke();
-
-            // 2. Rótulo del Año ENCIMA del círculo
-            const posYRotulo = centro.y - radio - 16;
-            ctx.font = 'bold 22px sans-serif';
-            const textoAnio = "Año " + anio;
-            const anchoTexto = ctx.measureText(textoAnio).width;
-            const padX = 14;
-
-            ctx.beginPath();
-            ctx.roundRect(centro.x - (anchoTexto / 2) - padX, posYRotulo - 18, anchoTexto + (padX * 2), 28, 8);
-            ctx.fillStyle = '#6b1d28';
-            ctx.fill();
-
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(textoAnio, centro.x, posYRotulo - 4);
-        });
-    });
-
-    // ================= DIBUJAR FLECHAS SIN CORTAR NINGÚN NODO =================
     red.on("afterDrawing", function (ctx) {
+        const posiciones = red.getPositions();
         ctx.save();
 
+        // 1. Partículas recorriendo las sinapsis troncales entre núcleos anuales
         for (let i = 0; i < listaAnios.length - 1; i++) {
-            const anioOrigen = listaAnios[i];
-            const anioDestino = listaAnios[i + 1];
-
-            const cOrigen = centrosAnio[anioOrigen];
-            const cDestino = centrosAnio[anioDestino];
-            const rOrigen = radiosPorAnio[anioOrigen];
-            const rDestino = radiosPorAnio[anioDestino];
-
-            if (!cOrigen || !cDestino) continue;
-
-            const esSaltoDeFila = (cOrigen.fila !== cDestino.fila);
-
-            ctx.strokeStyle = '#ea580c';
-            ctx.fillStyle = '#ea580c';
-            ctx.lineWidth = 3.5;
-
-            if (!esSaltoDeFila) {
-                const startX = cOrigen.x + rOrigen + 4;
-                const startY = cOrigen.y;
-                const endX = cDestino.x - rDestino - 6;
-                const endY = cDestino.y;
+            const pFrom = posiciones['anio_' + listaAnios[i]];
+            const pTo = posiciones['anio_' + listaAnios[i + 1]];
+            if (pFrom && pTo) {
+                const t = (pulseProgress + (i * 0.3)) % 1;
+                const px = pFrom.x + (pTo.x - pFrom.x) * t;
+                const py = pFrom.y + (pTo.y - pFrom.y) * t;
 
                 ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(endX, endY);
-                ctx.stroke();
-
-                dibujarPuntaFlecha(ctx, endX, endY, 1, 0);
-            } else {
-                const startX = cOrigen.x;
-                const startY = cOrigen.y + rOrigen + 4;
-                const endX = cDestino.x - rDestino - 6;
-                const endY = cDestino.y;
-
-                const yCanal = (cOrigen.y + cDestino.y) / 2 + 15;
-                const xExteriorIzquierda = cDestino.x - rDestino - 45;
-
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.arcTo(startX, yCanal, startX - 25, yCanal, 25);
-                ctx.lineTo(xExteriorIzquierda + 25, yCanal);
-                ctx.arcTo(xExteriorIzquierda, yCanal, xExteriorIzquierda, yCanal + 25, 25);
-                ctx.lineTo(xExteriorIzquierda, endY - 25);
-                ctx.arcTo(xExteriorIzquierda, endY, xExteriorIzquierda + 25, endY, 25);
-                ctx.lineTo(endX, endY);
-                ctx.stroke();
-
-                dibujarPuntaFlecha(ctx, endX, endY, 1, 0);
+                ctx.arc(px, py, 4, 0, 2 * Math.PI, false);
+                ctx.fillStyle = '#38bdf8';
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 12;
+                ctx.fill();
             }
         }
+
+        // 2. Partículas hacia los festivales activos
+        listaFestivales.forEach((fest, idx) => {
+            const anio = fest.fechaInicio ? fest.fechaInicio.toString().split("-")[0] : "2026";
+            const pAnio = posiciones['anio_' + anio];
+            const pFest = posiciones['fest_' + fest.id];
+
+            if (pAnio && pFest && fest.activo) {
+                const t = (pulseProgress + (idx * 0.2)) % 1;
+                const px = pAnio.x + (pFest.x - pAnio.x) * t;
+                const py = pAnio.y + (pFest.y - pAnio.y) * t;
+
+                ctx.beginPath();
+                ctx.arc(px, py, 3, 0, 2 * Math.PI, false);
+                ctx.fillStyle = '#fb7185';
+                ctx.shadowColor = '#fb7185';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+
+                if (modoVisual === 'actividad') {
+                    ctx.beginPath();
+                    ctx.arc(pFest.x, pFest.y, 35, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = 'rgba(244, 63, 94, 0.18)';
+                    ctx.shadowColor = '#f43f5e';
+                    ctx.shadowBlur = 22;
+                    ctx.fill();
+                }
+            }
+        });
 
         ctx.restore();
     });
 
-    function dibujarPuntaFlecha(ctx, x, y, ux, uy) {
-        const tamFlecha = 15;
-        const anchoBase = 8;
+    // ================= 5. NAVEGACIÓN Y ENFOQUE REAL AL NODO =================
+    // Ubica el nodo dinámicamente donde sea que haya flotado y traslada la cámara directo a él
+    function enfocarAnio(anio) {
+        const nodeId = 'anio_' + anio;
 
-        const p1x = x - ux * tamFlecha + uy * anchoBase;
-        const p1y = y - uy * tamFlecha - ux * anchoBase;
+        if (!datasetNodos.get(nodeId)) {
+            console.warn("No se encontró el nodo:", nodeId);
+            return;
+        }
 
-        const p2x = x - ux * tamFlecha - uy * anchoBase;
-        const p2y = y - uy * tamFlecha + ux * anchoBase;
+        // Actualizar estado del botón en el widget Almanaque
+        document.querySelectorAll('.btn-anio').forEach(b => b.classList.remove('active'));
+        const botonActivo = document.getElementById('btn-anio-' + anio);
+        if (botonActivo) botonActivo.classList.add('active');
 
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(p1x, p1y);
-        ctx.lineTo(p2x, p2y);
-        ctx.closePath();
-        ctx.fill();
+        // Sincronizar el desplegable
+        const select = document.getElementById('selectFestivalesAnio');
+        if (select) select.value = anio;
+
+        // ENFOQUE DIRECTO AL NODO REAL EN SU COORDENADA ACTUAL
+        red.focus(nodeId, {
+            scale: 1.15,
+            offset: { x: 0, y: 0 },
+            animation: {
+                duration: 700,
+                easingFunction: 'easeInOutCubic'
+            }
+        });
     }
 
-    // Doble clic sobre festival
+    function seleccionarFestivalDesdeSelect(anio) {
+        if (anio) {
+            enfocarAnio(anio);
+        }
+    }
+
+    function irAlPrimerAnio() {
+        if (listaAnios.length > 0) {
+            enfocarAnio(listaAnios[0]);
+        }
+    }
+
+    function resetearVista() {
+        red.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+    }
+
+    function reequilibrarRed() {
+        red.stabilize();
+    }
+
+    function setModo(modo) {
+        modoVisual = modo;
+        document.getElementById('btnModoEstructura').classList.toggle('active', modo === 'estructura');
+        document.getElementById('btnModoActividad').classList.toggle('active', modo === 'actividad');
+
+        datasetNodos.forEach(nodo => {
+            if (nodo.tipo === 'festival') {
+                if (modo === 'actividad' && nodo.activo) {
+                    datasetNodos.update({ id: nodo.id, size: 26, shadow: { color: 'rgba(244, 63, 94, 0.95)', size: 30 } });
+                } else {
+                    datasetNodos.update({ id: nodo.id, size: nodo.activo ? 20 : 15, shadow: { color: nodo.activo ? 'rgba(244, 63, 94, 0.85)' : 'rgba(100, 116, 139, 0.35)', size: nodo.activo ? 22 : 8 } });
+                }
+            }
+        });
+    }
+
     red.on("doubleClick", function (params) {
         if (params.nodes.length > 0) {
             const nodo = datasetNodos.get(params.nodes[0]);
@@ -567,42 +698,17 @@
         }
     });
 
-    // ================= FUNCIONES DE NAVEGACIÓN =================
-
-    function enfocarAnio(anio) {
-        if (!centrosAnio[anio]) return;
-
-        // Actualizar visualmente la pastilla activa del calendario
-        document.querySelectorAll('.year-pill').forEach(el => el.classList.remove('active'));
-        const activePill = document.getElementById('pill_' + anio);
-        if (activePill) activePill.classList.add('active');
-
-        // Sincronizar el select rápido
-        selectRapido.value = anio;
-
-        const centro = centrosAnio[anio];
-        red.moveTo({
-            position: { x: centro.x, y: centro.y },
-            scale: 1.15,
-            animation: { duration: 600, easingFunction: 'easeInOutQuad' }
-        });
-    }
-
-    function irAlInicio() {
-        if (listaAnios.length > 0) {
-            enfocarAnio(listaAnios[0]);
-        }
-    }
-
-    function resetearVista() {
-        document.querySelectorAll('.year-pill').forEach(el => el.classList.remove('active'));
-        selectRapido.value = "";
-        red.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
-    }
-
     function scrollToTabla() {
         document.getElementById('seccion-tabla').scrollIntoView({ behavior: 'smooth' });
     }
+
+    setTimeout(() => {
+        if (listaAnios.length > 0) {
+            enfocarAnio(listaAnios[listaAnios.length - 1]);
+        } else {
+            resetearVista();
+        }
+    }, 250);
 </script>
 </body>
 </html>
