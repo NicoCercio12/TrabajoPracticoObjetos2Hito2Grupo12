@@ -1,12 +1,10 @@
 package com.grupo12.epicentro_gourmet.services.implementation;
-
 import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
 import com.grupo12.epicentro_gourmet.services.IFestivalService;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -63,7 +61,6 @@ public class FestivalService implements IFestivalService {
                 .collect(Collectors.toList());
     }
 
-    @Override
     @Transactional(readOnly = true)
     public FestivalDTO obtenerPorIdDTO(Long id) {
         // Buscamos el festival, si no existe lanzamos una excepción descriptiva
