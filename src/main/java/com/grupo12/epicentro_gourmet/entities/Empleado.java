@@ -17,8 +17,8 @@ public abstract class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    private long idEmpleado;
+    @Column(name = "id_empleado")
+    private Long idEmpleado;
 
 
     private String nombre;
