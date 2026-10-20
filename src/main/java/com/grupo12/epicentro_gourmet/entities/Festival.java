@@ -41,6 +41,9 @@ public class Festival {
     @Column(nullable = false)
     private LocalDate fechaFin;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
