@@ -7,6 +7,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import java.security.Principal;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.Authentication;
 
 @Controller
 @RequestMapping("/responsable")
@@ -38,5 +44,69 @@ public class ResponsableController {
         model.addAttribute("empleado", empleadoService.buscarPorId(idEmpleado));
         model.addAttribute("sueldo", sueldo);
         return "responsable/liquidacion"; // Vista HTML en templates/responsable/liquidacion.html
+    }
+
+    @PostMapping("/empleados/{idEmpleado}/baja")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String darDeBajaEmpleado(
+            @PathVariable Long idEmpleado,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            empleadoService.darDeBaja(idEmpleado, principal.getName());
+
+            redirectAttributes.addFlashAttribute(
+                    "mensaje", "Empleado dado de baja correctamente");
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/responsable/empleados";
+    }
+
+    @PostMapping("/empleados/{idEmpleado}/reactivar")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String reactivarEmpleado(
+            @PathVariable Long idEmpleado,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+
+        empleadoService.reactivar(idEmpleado, principal.getName());
+
+        redirectAttributes.addFlashAttribute(
+                "mensaje", "Empleado reactivado correctamente");
+
+        return "redirect:/responsable/empleados";
+    }
+
+    @GetMapping("/empleados")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String listarEmpleados(
+            @RequestParam(defaultValue = "true") boolean activo,
+            Principal principal,
+            Model model) {
+
+        model.addAttribute(
+                "empleados",
+                empleadoService.listarPorResponsable(
+                        principal.getName(), activo));
+
+        model.addAttribute("activo", activo);
+
+        Authentication authentication = (Authentication) principal;
+
+        java.util.List<String> roles = new java.util.ArrayList<>();
+
+        for (var autoridad : authentication.getAuthorities()) {
+            roles.add(autoridad.getAuthority());
+        }
+
+        model.addAttribute("logueado", true);
+        model.addAttribute("username", principal.getName());
+        model.addAttribute("roles", roles);
+
+        return "responsable/empleados";
     }
 }

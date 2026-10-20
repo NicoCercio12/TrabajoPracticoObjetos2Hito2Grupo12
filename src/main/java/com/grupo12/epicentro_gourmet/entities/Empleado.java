@@ -6,7 +6,7 @@ import org.hibernate.annotations.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.time.Period;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -53,7 +53,14 @@ public abstract class Empleado {
     public abstract double calcularSueldo(Festival festival);
 
     public boolean esMayorDeEdad() {
-        return false;
+        boolean mayorDeEdad = false;
+
+        if (fechaNacimiento != null) {
+            int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
+            mayorDeEdad = edad >= 18;
+        }
+
+        return mayorDeEdad;
     }
     //aca calculamos esMayorDeEdad, calcularAntiguedad, darDeBaja, reactivar...
 
@@ -66,5 +73,13 @@ public abstract class Empleado {
 
     protected double calcularMultiplicadorDias(long dias) {
         return ((int) (dias / 15) + 1) * 0.5;
+    }
+
+    public void darDeBaja() {
+        this.activo = false;
+    }
+
+    public void reactivar() {
+        this.activo = true;
     }
 }
