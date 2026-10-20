@@ -53,12 +53,12 @@ a:hover { color: var(--eg-primary-dark); }
 }
 
 .navbar-eg .nav-link {
-    color: rgba(255, 255, 255, .85);
-    font-weight: 500;
-    border-radius: 8px;
-    padding: .45rem .9rem !important;
-    margin: 0 .1rem;
-    transition: background .2s, color .2s;
+    padding: .5rem .9rem;
+    border-radius: 999px;
+    transition: background .2s;
+}
+.navbar-eg .nav-link:hover {
+    background: rgba(255, 255, 255, .12);
 }
 
 .navbar-eg .nav-link:hover,

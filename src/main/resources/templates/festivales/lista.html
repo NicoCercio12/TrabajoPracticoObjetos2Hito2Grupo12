@@ -7,6 +7,8 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Estilos compartidos de la app (navbar) -->
+    <link th:href="@{/css/estilos.css}" rel="stylesheet">
     <!-- Vis.js Network -->
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
@@ -35,7 +37,7 @@
 
         /* Barra Lateral */
         .sidebar {
-            min-height: calc(100vh - 65px);
+            min-height: calc(100vh - 90px);
             background-color: #ffffff;
             border-right: 2px solid #fecaca;
         }
@@ -184,27 +186,16 @@
 </head>
 <body>
 
-<!-- Navbar Superior -->
-<nav class="navbar navbar-expand-lg navbar-dark navbar-gourmet shadow-sm py-2">
-    <div class="container-fluid px-4">
-        <a class="navbar-brand fw-bold fs-4 text-white" href="/festivales">
-            Epicentro Gourmet
-            <span class="badge bg-danger text-white fs-6 ms-2">Neural Hub</span>
-        </a>
-        <div class="d-flex align-items-center gap-2">
-            <a href="/festivales" class="btn btn-sm btn-outline-light px-3">Inicio</a>
-            <a href="#" class="btn btn-sm btn-dorado px-3">Registrar festival</a>
-        </div>
-    </div>
-</nav>
+<!-- Navbar compartido (Inicio, Festivales, roles, sesión) -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container-fluid">
     <div class="row">
         <!-- BARRA LATERAL -->
         <aside class="col-12 col-md-3 col-xl-2 p-3 sidebar shadow-sm">
             <h6 class="text-uppercase fw-bold small mb-3 text-secondary">Navegación</h6>
-            
-            <a href="/festivales" class="btn btn-menu active w-100">
+
+            <a th:href="@{/festivales}" class="btn btn-menu active w-100">
                 <i class="bi bi-diagram-3"></i> Topología Neuronal
             </a>
 
@@ -276,7 +267,7 @@
                             <span class="fw-bold fs-6"><i class="bi bi-activity text-info me-2"></i>Topología de Red Neuronal</span>
                             <span class="status-badge"><span class="pulse-dot"></span> Sinapsis Activa</span>
                         </div>
-                        
+
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-outline-info active" id="btnModoEstructura" onclick="setModo('estructura')">
                                 Topología Libre
@@ -309,35 +300,35 @@
                     <div class="card-body p-0">
                         <table class="table table-striped table-hover mb-0 align-middle">
                             <thead class="table-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nombre</th>
-                                    <th>Temporada</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Duración</th>
-                                    <th>Estado</th>
-                                    <th class="text-center">Acciones</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Temporada</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Duración</th>
+                                <th>Estado</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="fest, stat : ${festivales}">
-                                    <td th:text="${stat.count}">1</td>
-                                    <td class="fw-bold text-dark" th:text="${fest.nombre}">Primavera Fest</td>
-                                    <td th:text="${fest.temporada}">Primavera</td>
-                                    <td th:text="${#temporals.format(fest.fechaInicio, 'dd/MM/yyyy')}">01/09/2026</td>
-                                    <td th:text="${#temporals.format(fest.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
-                                    <td th:text="|${fest.duracionDias} días|">15 días</td>
-                                    <td>
-                                        <span th:if="${fest.activo}" class="badge bg-success">Activo</span>
-                                        <span th:unless="${fest.activo}" class="badge bg-secondary">Finalizado</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <a th:href="@{/festivales/{id}/unidades(id=${fest.id})}" class="btn btn-sm text-white" style="background-color: var(--color-borgoña);">
-                                            Ver Unidades
-                                        </a>
-                                    </td>
-                                </tr>
+                            <tr th:each="fest, stat : ${festivales}">
+                                <td th:text="${stat.count}">1</td>
+                                <td class="fw-bold text-dark" th:text="${fest.nombre}">Primavera Fest</td>
+                                <td th:text="${fest.temporada}">Primavera</td>
+                                <td th:text="${#temporals.format(fest.fechaInicio, 'dd/MM/yyyy')}">01/09/2026</td>
+                                <td th:text="${#temporals.format(fest.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
+                                <td th:text="|${fest.duracionDias} días|">15 días</td>
+                                <td>
+                                    <span th:if="${fest.activo}" class="badge bg-success">Activo</span>
+                                    <span th:unless="${fest.activo}" class="badge bg-secondary">Finalizado</span>
+                                </td>
+                                <td class="text-center">
+                                    <a th:href="@{/festivales/{id}/unidades(id=${fest.id})}" class="btn btn-sm text-white" style="background-color: var(--color-borgoña);">
+                                        Ver Unidades
+                                    </a>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -352,6 +343,8 @@
 <!-- Script Vis.js: Red Neuronal Orgánica sin Orden Sucesivo Forzado + Almanaque -->
 <script th:inline="javascript" th:unless="${#lists.isEmpty(festivales)}">
     const listaFestivales = /*[[${festivales}]]*/ [];
+    // Base de URLs (respeta el contexto de la aplicación)
+    const urlUnidades = (id) => /*[[@{/festivales/}]]*/ '/festivales/' + id + '/unidades';
 
     let modoVisual = 'estructura';
     const nodos = [];
@@ -442,12 +435,12 @@
             },
             borderWidth: 3.5,
             shadow: { enabled: true, color: 'rgba(56, 189, 248, 0.75)', size: 26 },
-            font: { 
-                color: '#ffffff', 
-                size: 13, 
-                face: 'monospace', 
-                bold: true, 
-                multi: true 
+            font: {
+                color: '#ffffff',
+                size: 13,
+                face: 'monospace',
+                bold: true,
+                multi: true
             }
         });
 
@@ -498,14 +491,14 @@
                 },
                 borderWidth: 2.5,
                 shadow: { enabled: true, color: glowColor, size: esActivo ? 22 : 8 },
-                font: { 
-                    color: '#f8fafc', 
-                    size: 11, 
-                    face: 'system-ui', 
+                font: {
+                    color: '#f8fafc',
+                    size: 11,
+                    face: 'system-ui',
                     bold: true,
                     multi: true,
-                    strokeWidth: 3.5, 
-                    strokeColor: '#020617' 
+                    strokeWidth: 3.5,
+                    strokeColor: '#020617'
                 }
             });
 
@@ -693,7 +686,7 @@
         if (params.nodes.length > 0) {
             const nodo = datasetNodos.get(params.nodes[0]);
             if (nodo && nodo.tipo === 'festival') {
-                window.location.href = '/festivales/' + nodo.rawId + '/unidades';
+                window.location.href = urlUnidades(nodo.rawId);
             }
         }
     });

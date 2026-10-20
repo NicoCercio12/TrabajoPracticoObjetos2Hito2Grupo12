@@ -13,30 +13,48 @@
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark navbar-eg mb-4">
     <div class="container">
         <a class="navbar-brand" th:href="@{/}">Epicentro <span>Gourmet</span></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                aria-controls="menu" aria-expanded="false" aria-label="Abrir menú">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="menu">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/}">Inicio</a></li>
-                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_RESPONSABLE')}">
-                    <a class="nav-link" th:href="@{/responsable/empleados}">
-                        Empleados
-                    </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Inicio</a>
                 </li>
                 <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_PENDIENTE')}">
                     <a class="nav-link" th:href="@{/registro}">Registrar unidad</a>
                 </li>
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_RESPONSABLE')}">
+                    <a class="nav-link" th:href="@{/responsable/unidades}">Mis unidades</a>
+                </li>
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_RESPONSABLE')}">
+                    <a class="nav-link" th:href="@{/responsable/empleados}">Empleados</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/festivales}">Festivales</a>
+                </li>
             </ul>
+
+            <!-- Sin sesión -->
             <div class="d-flex align-items-center gap-2" th:if="${!logueado}">
                 <a class="btn btn-outline-light btn-sm" th:href="@{/login}">Iniciar sesión</a>
                 <a class="btn btn-eg btn-sm" th:href="@{/signup}">Crear cuenta</a>
             </div>
+
+            <!-- Con sesión -->
             <div class="d-flex align-items-center gap-3" th:if="${logueado}">
-                <span class="text-white small">
-                    <b th:text="${username}"></b>
-                    <span class="badge text-bg-warning ms-1" th:each="r : ${roles}" th:text="${#strings.replace(r, 'ROLE_', '')}"></span>
-                </span>
+                <div class="d-flex flex-column align-items-end lh-sm">
+                    <b class="text-white small" th:text="${username}"></b>
+                    <div class="mt-1">
+                        <th:block th:each="r : ${roles}">
+                            <span class="badge text-bg-warning ms-1"
+                                  th:unless="${#strings.startsWith(r, 'FACTOR_')}"
+                                  th:text="${#strings.replace(r, 'ROLE_', '')}"></span>
+                        </th:block>
+                    </div>
+                </div>
                 <form th:action="@{/logout}" method="post" class="m-0">
                     <button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
                 </form>
@@ -52,6 +70,10 @@
            th:classappend="${#fields.hasErrors(nombre)} ? 'is-invalid'">
     <div class="invalid-feedback" th:errors="*{__${nombre}__}"></div>
 </div>
+
+<footer th:fragment="footer" class="text-center text-muted small py-4 mt-5">
+    Epicentro Gourmet · Grupo 12 · Objetos II
+</footer>
 
 </body>
 </html>

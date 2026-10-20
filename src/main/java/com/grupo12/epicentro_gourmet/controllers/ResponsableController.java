@@ -1,5 +1,6 @@
 package com.grupo12.epicentro_gourmet.controllers;
 
+import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
 import com.grupo12.epicentro_gourmet.services.IEmpleadoService;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
 import org.springframework.stereotype.Controller;
@@ -20,10 +21,12 @@ public class ResponsableController {
 
     private final IUnidadDeVentaService unidadDeVentaService;
     private final IEmpleadoService empleadoService;
+    private final IUnidadDeVentaRepository unidadRepository;
 
-    public ResponsableController(IUnidadDeVentaService unidadDeVentaService, IEmpleadoService empleadoService) {
+    public ResponsableController(IUnidadDeVentaService unidadDeVentaService, IEmpleadoService empleadoService, IUnidadDeVentaRepository unidadRepository) {
         this.unidadDeVentaService = unidadDeVentaService;
         this.empleadoService = empleadoService;
+        this.unidadRepository = unidadRepository;
     }
 
     // Endpoint para consultar el Canon a pagar por la Unidad de Venta
@@ -108,5 +111,12 @@ public class ResponsableController {
         model.addAttribute("roles", roles);
 
         return "responsable/empleados";
+    }
+
+    @GetMapping("/unidades")
+    public String misUnidades(Principal principal, Model model) {
+        model.addAttribute("unidades",
+                unidadRepository.findByResponsable_Usuario_Username(principal.getName()));
+        return "responsable/unidades";
     }
 }

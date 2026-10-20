@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mis unidades')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container">
+    <div class="card">
+        <div class="card-header-eg">Mis unidades de venta</div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Código</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${unidades}">
+                <td th:text="${u.id}"></td>
+                <td th:text="${u.codigo}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(unidades)}">
+                <td colspan="2">Todavía no tenés unidades registradas.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

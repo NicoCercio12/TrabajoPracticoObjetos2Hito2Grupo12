@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface IUnidadDeVentaRepository extends JpaRepository<UnidadDeVenta, Long> {
 
+    List<UnidadDeVenta> findByResponsable_Usuario_Username(String username);
+
     boolean existsByCodigoUnico(String codigoUnico);
 
     boolean existsByIdAndResponsable_Usuario_Username(Long idUnidad, String username);
