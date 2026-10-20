@@ -1,8 +1,11 @@
 package com.grupo12.epicentro_gourmet.controllers;
 
+import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
 import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
 import com.grupo12.epicentro_gourmet.services.IEmpleadoService;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
+import com.grupo12.epicentro_gourmet.entities.Empleado;
+import com.grupo12.epicentro_gourmet.entities.Festival;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +25,16 @@ public class ResponsableController {
     private final IUnidadDeVentaService unidadDeVentaService;
     private final IEmpleadoService empleadoService;
     private final IUnidadDeVentaRepository unidadRepository;
+    private final IFestivalRepository festivalRepository;
 
-    public ResponsableController(IUnidadDeVentaService unidadDeVentaService, IEmpleadoService empleadoService, IUnidadDeVentaRepository unidadRepository) {
+    public ResponsableController(IUnidadDeVentaService unidadDeVentaService,
+                                 IEmpleadoService empleadoService,
+                                 IUnidadDeVentaRepository unidadRepository,
+                                 IFestivalRepository festivalRepository) {
         this.unidadDeVentaService = unidadDeVentaService;
         this.empleadoService = empleadoService;
         this.unidadRepository = unidadRepository;
+        this.festivalRepository = festivalRepository;
     }
 
     // Endpoint para consultar el Canon a pagar por la Unidad de Venta
@@ -44,9 +52,15 @@ public class ResponsableController {
                                  @PathVariable Long idFestival,
                                  Model model) {
         double sueldo = empleadoService.calcularLiquidacionHaber(idEmpleado, idFestival);
-        model.addAttribute("empleado", empleadoService.buscarPorId(idEmpleado));
+        Empleado empleado = empleadoService.buscarPorId(idEmpleado);
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() -> new IllegalArgumentException("Festival no encontrado con ID: " + idFestival));
+
+        model.addAttribute("empleado", empleado);
+        model.addAttribute("festival", festival);
         model.addAttribute("sueldo", sueldo);
-        return "responsable/liquidacion"; // Vista HTML en templates/responsable/liquidacion.html
+
+        return "responsable/liquidacion";
     }
 
     @PostMapping("/empleados/{idEmpleado}/baja")

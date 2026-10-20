@@ -2,13 +2,25 @@ spring:
   application:
     name: epicentro-gourmet
   datasource:
-    url: jdbc:mysql://localhost:3306/db_grupo_12_hito_2?serverTimezone=America/Argentina/Buenos_Aires
-    username:
-    password:
+    url: jdbc:mysql://localhost:3306/db_grupo_12_hito_2?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+
   jpa:
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
+    show-sql: true
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
   thymeleaf:
     cache: false
 server:
