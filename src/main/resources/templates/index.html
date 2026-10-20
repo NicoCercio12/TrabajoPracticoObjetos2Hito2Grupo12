@@ -36,8 +36,8 @@
                     <td th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}"></td>
                     <td th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}"></td>
                     <td>
-                        <span th:if="${f.estaActivo()}" class="badge text-bg-success">En curso</span>
-                        <span th:unless="${f.estaActivo()}" class="badge text-bg-secondary">Fuera de fecha</span>
+                        <span th:if="${f.activo}" class="badge text-bg-success">Activo</span>
+                        <span th:unless="${f.activo}" class="badge text-bg-secondary">Inactivo</span>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(festivales)}">
