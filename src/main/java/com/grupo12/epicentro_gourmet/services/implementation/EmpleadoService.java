@@ -133,15 +133,8 @@ public class EmpleadoService implements IEmpleadoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Empleado> listarPorResponsable(String usernameResponsable, boolean activo) {
-
-        if (usernameResponsable == null || usernameResponsable.isBlank()) {
-            throw new AccessDeniedException("No se identificó al responsable");
-        }
-
-        List<Empleado> empleados = repository.findByUnidadAsignada_Responsable_Usuario_UsernameAndActivo(usernameResponsable, activo);
-
-        return empleados;
+    public List<Empleado> listarPorResponsable(String username, boolean activo) {
+        return repository.findByUnidadAsignada_Responsable_Usuario_UsernameAndActivo(username, activo);
     }
 
 }

@@ -15,10 +15,9 @@ public class CuentaDTO {
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 8, message = "Ingresá una contraseña válida")
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     private String password;
 
     @NotBlank(message = "Confirmá la contraseña")
     private String confirmarPassword;
-
 }
