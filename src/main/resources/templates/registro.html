@@ -1,53 +1,55 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Registrar unidad de venta')}"></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Registrar unidad')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<main class="container pb-5" style="max-width: 860px;">
-    <h2 class="mb-1">Registrar unidad de venta</h2>
-    <p class="text-muted mb-4">Cargá los datos de la unidad y de su responsable. Se asocian a la cuenta con la que iniciaste sesión.</p>
+<main class="container pb-5" style="max-width: 900px;">
+
+    <h1 class="h2 fw-bold mb-1" th:text="${tieneResponsable} ? 'Registrar otra unidad de venta' : 'Registrar unidad de venta'"></h1>
+    <p class="text-muted mb-4"
+       th:text="${tieneResponsable}
+                ? 'La unidad se asocia al responsable que ya cargaste con tu cuenta.'
+                : 'Cargá los datos de la unidad y de su responsable. Se asocian a la cuenta con la que iniciaste sesión.'"></p>
 
     <form th:action="@{/registro}" th:object="${registro}" method="post" novalidate>
 
-        <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+        <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
             <strong>Revisá estos datos:</strong>
             <ul class="mb-0">
                 <li th:each="e : ${#fields.allErrors()}" th:text="${e}"></li>
             </ul>
         </div>
 
-        <div class="card mb-4">
+        <!-- 1. Responsable: solo la primera vez -->
+        <div class="card mb-4" th:unless="${tieneResponsable}">
             <div class="card-header card-header-eg">1. Responsable</div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <div class="row g-3">
                     <div th:replace="~{fragments/layout :: campo('Nombre', 'nombre', 'text')}"></div>
                     <div th:replace="~{fragments/layout :: campo('Apellido', 'apellido', 'text')}"></div>
                     <div th:replace="~{fragments/layout :: campo('DNI', 'dni', 'text')}"></div>
-                    <div th:replace="~{fragments/layout :: campo('Email', 'email', 'text')}"></div>
+                    <div th:replace="~{fragments/layout :: campo('Email', 'email', 'email')}"></div>
                     <div th:replace="~{fragments/layout :: campo('Fecha de nacimiento', 'fechaNacimiento', 'date')}"></div>
                     <div th:replace="~{fragments/layout :: campo('Fecha de ingreso', 'fechaIngreso', 'date')}"></div>
 
                     <div class="col-md-6">
                         <label class="form-label" for="tipoEmpleado">Tipo de empleado</label>
-                        <select class="form-select" th:field="*{tipoEmpleado}" id="tipoEmpleado"
-                                th:classappend="${#fields.hasErrors('tipoEmpleado')} ? 'is-invalid'">
-                            <option value="">Elegir...</option>
+                        <select id="tipoEmpleado" class="form-select" th:field="*{tipoEmpleado}">
                             <option th:each="t : ${tiposEmpleado}" th:value="${t}" th:text="${t}"></option>
                         </select>
-                        <div class="invalid-feedback" th:errors="*{tipoEmpleado}"></div>
                     </div>
+
                     <div class="col-md-6" id="bloqueCocinero">
                         <label class="form-label" for="rolCocina">Rol en la cocina</label>
-                        <select class="form-select" th:field="*{rolCocina}" id="rolCocina">
-                            <option value="">Elegir...</option>
+                        <select id="rolCocina" class="form-select" th:field="*{rolCocina}">
                             <option th:each="r : ${rolesCocina}" th:value="${r}" th:text="${r}"></option>
                         </select>
                     </div>
+
                     <div class="col-md-6" id="bloqueCajero">
                         <label class="form-label" for="turno">Turno</label>
-                        <select class="form-select" th:field="*{turno}" id="turno">
-                            <option value="">Elegir...</option>
+                        <select id="turno" class="form-select" th:field="*{turno}">
                             <option th:each="t : ${turnos}" th:value="${t}" th:text="${t}"></option>
                         </select>
                     </div>
@@ -55,36 +57,44 @@
             </div>
         </div>
 
+        <!-- 2. Unidad de venta -->
         <div class="card mb-4">
-            <div class="card-header card-header-eg">2. Unidad de venta</div>
-            <div class="card-body">
+            <div class="card-header card-header-eg" th:text="${tieneResponsable} ? 'Unidad de venta' : '2. Unidad de venta'"></div>
+            <div class="card-body p-4">
                 <div class="row g-3">
                     <div th:replace="~{fragments/layout :: campo('Nombre comercial', 'nombreComercial', 'text')}"></div>
                     <div th:replace="~{fragments/layout :: campo('Código único (10 caracteres, empieza con FT o PD)', 'codigoUnico', 'text')}"></div>
-                    <div th:replace="~{fragments/layout :: campo('Superficie (m²)', 'superficie', 'number')}"></div>
+
+                    <div class="col-md-6">
+                        <label class="form-label" for="superficie">Superficie (m²)</label>
+                        <input type="number" step="0.01" min="0" id="superficie" class="form-control"
+                               th:field="*{superficie}"
+                               th:classappend="${#fields.hasErrors('superficie')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{superficie}"></div>
+                    </div>
 
                     <div class="col-md-6">
                         <label class="form-label" for="tipoUnidad">Tipo de unidad</label>
-                        <select class="form-select" th:field="*{tipoUnidad}" id="tipoUnidad"
-                                th:classappend="${#fields.hasErrors('tipoUnidad')} ? 'is-invalid'">
-                            <option value="">Elegir...</option>
+                        <select id="tipoUnidad" class="form-select" th:field="*{tipoUnidad}">
                             <option th:each="t : ${tiposUnidad}" th:value="${t}" th:text="${t}"></option>
                         </select>
-                        <div class="invalid-feedback" th:errors="*{tipoUnidad}"></div>
                     </div>
 
+                    <!-- Food truck -->
                     <div class="col-12" id="bloqueFoodTruck">
                         <div class="row g-3">
                             <div th:replace="~{fragments/layout :: campo('Patente', 'patente', 'text')}"></div>
                             <div class="col-md-6 d-flex align-items-end">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" th:field="*{requiereElectricidad}" id="requiereElectricidad">
-                                    <label class="form-check-label" for="requiereElectricidad">Requiere conexión eléctrica</label>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" id="requiereElectricidad" class="form-check-input"
+                                           th:field="*{requiereElectricidad}">
+                                    <label class="form-check-label" for="requiereElectricidad">Requiere electricidad</label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Puesto desarmable -->
                     <div class="col-12" id="bloquePuesto">
                         <div class="row g-3">
                             <div th:replace="~{fragments/layout :: campo('Cantidad de carpas', 'cantCarpas', 'number')}"></div>
@@ -96,27 +106,42 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">Registrar</button>
-            <a class="btn btn-outline-secondary btn-lg" th:href="@{/}">Cancelar</a>
+            <button type="submit" class="btn btn-primary px-4">Registrar</button>
+            <a class="btn btn-outline-secondary" th:href="@{/responsable/unidades}" th:if="${tieneResponsable}">Cancelar</a>
+            <a class="btn btn-outline-secondary" th:href="@{/}" th:unless="${tieneResponsable}">Cancelar</a>
         </div>
     </form>
 </main>
 
 <script>
-    function mostrar(id, visible) { document.getElementById(id).style.display = visible ? '' : 'none'; }
-    function actualizar() {
-        var te = document.getElementById('tipoEmpleado').value;
-        var tu = document.getElementById('tipoUnidad').value;
-        mostrar('bloqueCocinero', te === 'COCINERO');
-        mostrar('bloqueCajero', te === 'CAJERO');
-        mostrar('bloqueFoodTruck', tu === 'FOOD_TRUCK');
-        mostrar('bloquePuesto', tu === 'PUESTO_DESARMABLE');
+    function mostrar(id, visible) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = visible ? '' : 'none';
     }
-    document.getElementById('tipoEmpleado').addEventListener('change', actualizar);
-    document.getElementById('tipoUnidad').addEventListener('change', actualizar);
-    document.addEventListener('DOMContentLoaded', actualizar);
+
+    function actualizar() {
+        var tipoEmp = document.getElementById('tipoEmpleado');
+        if (tipoEmp) {
+            var cocinero = tipoEmp.value === 'COCINERO';
+            mostrar('bloqueCocinero', cocinero);
+            mostrar('bloqueCajero', !cocinero);
+        }
+        var tipoUni = document.getElementById('tipoUnidad');
+        if (tipoUni) {
+            var foodTruck = tipoUni.value === 'FOOD_TRUCK';
+            mostrar('bloqueFoodTruck', foodTruck);
+            mostrar('bloquePuesto', !foodTruck);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var a = document.getElementById('tipoEmpleado');
+        var b = document.getElementById('tipoUnidad');
+        if (a) a.addEventListener('change', actualizar);
+        if (b) b.addEventListener('change', actualizar);
+        actualizar();
+    });
     window.addEventListener('pageshow', actualizar);
-    actualizar();
 </script>
 </body>
 </html>

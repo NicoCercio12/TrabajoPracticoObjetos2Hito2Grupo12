@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,37 +19,27 @@ import lombok.Setter;
 @Setter
 public class RegistroUnidadDTO {
 
-    //Responsable
-    @NotBlank(message = "El nombre es obligatorio")
+    // Responsable (solo se pide la primera vez; lo valida RegistroService)
     private String nombre;
-
-    @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
-
-    @NotBlank(message = "El DNI es obligatorio")
     private String dni;
 
-    @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email no es válido")
     private String email;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Past(message = "La fecha de nacimiento debe ser pasada")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaNacimiento;
 
-    @NotNull(message = "La fecha de ingreso es obligatoria")
     @PastOrPresent(message = "La fecha de ingreso no puede ser futura")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaIngreso;
 
-    //Elegimos tipo de empleado (cocinero o cajero)
-    @NotNull(message = "Elegí el tipo de empleado")
     private TipoEmpleado tipoEmpleado;
     private RolCocina rolCocina;
     private Turno turno;
 
-    //Unidad de venta
+    // Unidad de venta
     @NotBlank(message = "El nombre comercial es obligatorio")
     private String nombreComercial;
 
@@ -64,13 +53,11 @@ public class RegistroUnidadDTO {
     @NotNull(message = "Elegí el tipo de unidad")
     private TipoUnidad tipoUnidad;
 
-    //Food truck
+    // Food truck
     private String patente;
     private boolean requiereElectricidad;
 
-    //Puesto desarmable
+    // Puesto desarmable
     private Integer cantCarpas;
     private Integer tiempoMontajeMinutos;
-
-
 }
