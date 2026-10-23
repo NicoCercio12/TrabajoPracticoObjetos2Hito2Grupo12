@@ -37,6 +37,8 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/css/**", "/imgs/**", "/js/**", "/images/**",
                             "/vendor/**", "/webjars/**", "/favicon.ico").permitAll();
 
+                    auth.requestMatchers("/registro/**").hasRole(Roles.RESPONSABLE);
+
                     auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades").permitAll();
 
                     // Permite probar el canon y la liquidación sin pasar por el login

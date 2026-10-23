@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Cuenta pendiente')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
@@ -8,14 +8,16 @@
     <div class="row justify-content-center">
         <div class="col-md-7">
             <div class="card">
-                <div class="card-header card-header-eg">Tu cuenta está lista</div>
+                <div class="card-header card-header-eg">Tu cuenta está pendiente</div>
                 <div class="card-body p-4 text-center">
                     <p class="lead mb-3">Tu cuenta fue creada correctamente.</p>
                     <p class="text-muted mb-4">
-                        Para empezar a operar, registrá tu unidad de venta y tus datos como responsable.
+                        Un administrador tiene que aprobarla antes de que puedas registrar tu unidad de venta.
+                        Cuando esté aprobada, cerrá sesión y volvé a entrar.
                     </p>
-                    <a class="btn btn-primary me-2" th:href="@{/registro}">Registrar mi unidad</a>
-                    <a class="btn btn-outline-secondary" th:href="@{/logout}">Cerrar sesión</a>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-secondary">Cerrar sesión</button>
+                    </form>
                 </div>
             </div>
         </div>

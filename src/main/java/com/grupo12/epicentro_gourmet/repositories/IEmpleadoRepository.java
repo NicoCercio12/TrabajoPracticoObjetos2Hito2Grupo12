@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
 
-
+    Optional<Empleado> findByUsuario(User usuario);
     boolean existsByDni(String dni);
     boolean existsByUsuario(User usuario);
 
