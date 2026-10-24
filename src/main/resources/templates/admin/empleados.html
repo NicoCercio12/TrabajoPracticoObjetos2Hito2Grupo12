@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Todos los empleados')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container pb-5">
+
+    <section class="hero mb-4">
+        <h1>Todos los empleados</h1>
+        <p class="lead mb-0">Personal de todas las unidades de venta, con su unidad y su responsable.</p>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a class="btn" th:classappend="${filtro == null} ? 'btn-eg' : 'btn-outline-secondary'"
+           th:href="@{/admin/empleados}">Todos</a>
+        <a class="btn" th:classappend="${filtro != null and filtro} ? 'btn-eg' : 'btn-outline-secondary'"
+           th:href="@{/admin/empleados(activo=true)}">Activos</a>
+        <a class="btn" th:classappend="${filtro != null and !filtro} ? 'btn-eg' : 'btn-outline-secondary'"
+           th:href="@{/admin/empleados(activo=false)}">Dados de baja</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header card-header-eg d-flex justify-content-between align-items-center">
+            <span>Empleados</span>
+            <span class="badge text-bg-light" th:text="${#lists.size(empleados)}"></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th>
+                    <th scope="col">DNI</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Unidad</th>
+                    <th scope="col">Responsable</th>
+                    <th scope="col">Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${empleados}">
+                    <td class="fw-semibold" th:text="${e.nombre}"></td>
+                    <td th:text="${e.apellido}"></td>
+                    <td th:text="${e.dni}"></td>
+                    <td th:text="${e.email}"></td>
+                    <td th:text="${e.class.simpleName}"></td>
+                    <td th:text="${e.unidadAsignada != null ? e.unidadAsignada.nombreComercial : '-'}"></td>
+                    <td th:text="${e.unidadAsignada != null and e.unidadAsignada.responsable != null
+                                   ? e.unidadAsignada.responsable.nombre + ' ' + e.unidadAsignada.responsable.apellido
+                                   : '-'}"></td>
+                    <td>
+                        <span th:if="${e.activo}" class="badge text-bg-success">Activo</span>
+                        <span th:unless="${e.activo}" class="badge text-bg-secondary">Dado de baja</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(empleados)}">
+                    <td colspan="8" class="text-center text-muted py-5">No hay empleados para mostrar.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
