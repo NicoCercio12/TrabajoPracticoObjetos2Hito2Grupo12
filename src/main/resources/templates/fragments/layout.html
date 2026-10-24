@@ -23,17 +23,27 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/}">Inicio</a>
                 </li>
-                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_PENDIENTE')}">
-                    <a class="nav-link" th:href="@{/registro}">Registrar unidad</a>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/festivales}">Festivales</a>
                 </li>
+
+                <!-- Responsable -->
                 <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_RESPONSABLE')}">
                     <a class="nav-link" th:href="@{/responsable/unidades}">Mis unidades</a>
                 </li>
                 <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_RESPONSABLE')}">
                     <a class="nav-link" th:href="@{/responsable/empleados}">Empleados</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/festivales}">Festivales</a>
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_RESPONSABLE')}">
+                    <a class="nav-link" th:href="@{/registro}">Registrar unidad</a>
+                </li>
+
+                <!-- Administrador -->
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_ADMINISTRADOR')}">
+                    <a class="nav-link" th:href="@{/admin/empleados}">Empleados</a>
+                </li>
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_ADMINISTRADOR')}">
+                    <a class="nav-link" th:href="@{/admin/unidades}">Unidades</a>
                 </li>
             </ul>
 
