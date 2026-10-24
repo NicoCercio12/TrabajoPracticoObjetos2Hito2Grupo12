@@ -1,17 +1,65 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Liquidación de Haberes</title>
-    <link rel="stylesheet" th:href="@{/static.css/estilos.css}">
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Liquidación de Haberes')}"></head>
+
 <body>
-<div style="padding: 20px;">
-    <h2>Liquidación de Haberes</h2>
-    <p><strong>Empleado:</strong> <span th:text="${empleado.nombre + ' ' + empleado.apellido}"></span></p>
-    <p><strong>DNI:</strong> <span th:text="${empleado.dni}"></span></p>
-    <p><strong>Antigüedad:</strong> <span th:text="${empleado.calcularAntiguedad()}"></span> años</p>
-    <h3>Sueldo a Cobrar: $<span th:text="${sueldo}"></span></h3>
-</div>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container pb-5">
+
+    <section class="hero mb-4">
+        <h1>Liquidación de Haberes</h1>
+        <p class="lead mb-4">
+            Resumen de liquidación salarial por evento trabajado.
+        </p>
+
+        <a class="btn btn-outline-light" th:href="@{/responsable/empleados}">
+            Volver a la lista
+        </a>
+    </section>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header card-header-eg d-flex justify-content-between align-items-center">
+            <span class="fw-semibold" th:text="${empleado.nombre + ' ' + empleado.apellido}">Juan Pérez</span>
+            <span class="badge text-bg-light" th:text="${'DNI: ' + empleado.dni}">DNI: 38123456</span>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">Datos del Empleado</h5>
+                    <p class="mb-2"><strong>Función:</strong>
+                        <span class="badge text-bg-info" th:text="${#strings.substringAfter(empleado.class.name, 'entities.')}">Cocinero</span>
+                    </p>
+                    <p class="mb-2" th:if="${empleado.class.simpleName == 'Cocinero'}"><strong>Rol en Cocina:</strong>
+                        <span th:text="${empleado.rolCocina}">LAVAPLATOS</span>
+                    </p>
+                    <p class="mb-2" th:if="${empleado.class.simpleName == 'Cajero'}"><strong>Turno:</strong>
+                        <span th:text="${empleado.turno}">MAÑANA</span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">Evento Asociado</h5>
+                    <p class="mb-2"><strong>Festival:</strong>
+                        <span th:text="${festival.nombre}">Gourmet Spring Fest</span>
+                    </p>
+                    <p class="mb-2"><strong>Duración:</strong>
+                        <span th:text="${festival.duracionEnDias + ' días'}">38 días</span>
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="alert alert-success d-flex justify-content-between align-items-center mb-0 mt-4 p-3 fs-5">
+                <span class="fw-semibold">Sueldo Neto a Cobrar:</span>
+                <span class="fw-bold fs-3" th:text="${'$' + #numbers.formatDecimal(sueldo, 1, 'POINT', 2, 'COMMA')}">$225.000,00</span>
+            </div>
+        </div>
+    </div>
+
+</main>
 </body>
 </html>

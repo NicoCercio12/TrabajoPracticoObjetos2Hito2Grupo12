@@ -72,7 +72,8 @@ public abstract class Empleado {
     }
 
     protected double calcularMultiplicadorDias(long dias) {
-        return ((int) (dias / 15) + 1) * 0.5;
+        if (dias <= 0) return 0.0;
+        return (((dias - 1) / 15) + 1) * 0.5;
     }
 
     public void darDeBaja() {
