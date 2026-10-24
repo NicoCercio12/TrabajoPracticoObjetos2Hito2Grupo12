@@ -31,6 +31,7 @@
                         <th>Tipo</th>
                         <th>Patente</th>
                         <th>Electricidad</th>
+                        <th>Acciones</th>
                     </tr>
                     </thead>
 
@@ -56,10 +57,17 @@
                             </span>
                             <span th:unless="${u.class.simpleName == 'FoodTruck'}" class="text-muted">-</span>
                         </td>
+
+                        <!-- Botón para ver el canon de esta unidad -->
+                        <td>
+                            <a class="btn btn-outline-success btn-sm" th:href="@{/responsable/canon/{id}(id=${u.id})}">
+                                Ver Canon
+                            </a>
+                        </td>
                     </tr>
 
                     <tr th:if="${#lists.isEmpty(unidades)}">
-                        <td colspan="6" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center text-muted py-4">
                             <p class="mb-3">No tenés unidades de venta registradas.</p>
                             <a class="btn btn-primary btn-sm" th:href="@{/registro}">Registrar mi unidad</a>
                         </td>

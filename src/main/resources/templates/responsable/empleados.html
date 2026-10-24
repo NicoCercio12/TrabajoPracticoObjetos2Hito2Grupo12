@@ -102,29 +102,41 @@
                     </td>
 
                     <td class="text-end">
-                        <form th:if="${empleado.activo}"
-                              th:action="@{/responsable/empleados/{id}/baja(id=${empleado.idEmpleado})}"
-                              method="post"
-                              class="m-0"
-                              onsubmit="return confirm('¿Querés dar de baja a este empleado?');">
+                        <div class="d-flex justify-content-end gap-1 align-items-center">
 
-                            <button type="submit"
-                                    class="btn btn-outline-danger btn-sm">
-                                Dar de baja
-                            </button>
-                        </form>
+                            <!-- Botón para ver la Liquidación de Haberes -->
+                            <a class="btn btn-outline-info btn-sm"
+                               th:href="@{/responsable/liquidacion/empleado/{idEmp}/festival/1(idEmp=${empleado.idEmpleado})}">
+                                Liquidación
+                            </a>
 
-                        <form th:unless="${empleado.activo}"
-                              th:action="@{/responsable/empleados/{id}/reactivar(id=${empleado.idEmpleado})}"
-                              method="post"
-                              class="m-0"
-                              onsubmit="return confirm('¿Querés reactivar a este empleado?');">
+                            <!-- Botón de Dar de baja -->
+                            <form th:if="${empleado.activo}"
+                                  th:action="@{/responsable/empleados/{id}/baja(id=${empleado.idEmpleado})}"
+                                  method="post"
+                                  class="m-0"
+                                  onsubmit="return confirm('¿Querés dar de baja a este empleado?');">
 
-                            <button type="submit"
-                                    class="btn btn-outline-success btn-sm">
-                                Reactivar
-                            </button>
-                        </form>
+                                <button type="submit"
+                                        class="btn btn-outline-danger btn-sm">
+                                    Dar de baja
+                                </button>
+                            </form>
+
+                            <!-- Botón de Reactivar -->
+                            <form th:unless="${empleado.activo}"
+                                  th:action="@{/responsable/empleados/{id}/reactivar(id=${empleado.idEmpleado})}"
+                                  method="post"
+                                  class="m-0"
+                                  onsubmit="return confirm('¿Querés reactivar a este empleado?');">
+
+                                <button type="submit"
+                                        class="btn btn-outline-success btn-sm">
+                                    Reactivar
+                                </button>
+                            </form>
+
+                        </div>
                     </td>
                 </tr>
 

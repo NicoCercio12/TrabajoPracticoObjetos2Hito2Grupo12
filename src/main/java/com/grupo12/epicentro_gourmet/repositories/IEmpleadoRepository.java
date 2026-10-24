@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     Optional<Empleado> findByUsuario(User usuario);
+
     boolean existsByDni(String dni);
     boolean existsByUsuario(User usuario);
 
