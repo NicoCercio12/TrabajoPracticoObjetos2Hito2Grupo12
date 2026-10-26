@@ -17,6 +17,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
+import com.grupo12.epicentro_gourmet.dtos.AltaEmpleadoDTO;
+import com.grupo12.epicentro_gourmet.enums.TipoEmpleado;
+import com.grupo12.epicentro_gourmet.enums.Turno;
+import com.grupo12.epicentro_gourmet.enums.RolCocina;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.mail.MailException;
 
 @Controller
 @RequestMapping("/responsable")
@@ -129,8 +137,70 @@ public class ResponsableController {
 
     @GetMapping("/unidades")
     public String misUnidades(Principal principal, Model model) {
-        model.addAttribute("unidades",
-                unidadRepository.findByResponsable_Usuario_Username(principal.getName()));
+        model.addAttribute("unidades", unidadRepository.findByResponsable_Usuario_Username(principal.getName()));
         return "responsable/unidades";
+    }
+
+    @GetMapping("/empleados/nuevo")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String formularioAltaEmpleado(Authentication authentication, Model model) {
+
+        model.addAttribute("empleadoDTO", new AltaEmpleadoDTO());
+
+        cargarDatosFormularioEmpleado(authentication, model);
+
+        return "responsable/empleado-formulario";
+    }
+
+    @PostMapping("/empleados/nuevo")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String registrarEmpleado(@Valid @ModelAttribute("empleadoDTO") AltaEmpleadoDTO dto, BindingResult result, Authentication authentication, Model model, RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            cargarDatosFormularioEmpleado(authentication, model);
+            return "responsable/empleado-formulario";
+        }
+
+        try {
+            empleadoService.darDeAlta(dto, authentication.getName());
+
+        } catch (IllegalArgumentException e) {
+            result.reject("alta.invalida", e.getMessage());
+
+            cargarDatosFormularioEmpleado(authentication, model);
+            return "responsable/empleado-formulario";
+
+        } catch (MailException e) {
+            result.reject("correo.error", "No se pudo enviar el correo. El alta no se completó. " + "Revisá la configuración de correo e intentá nuevamente.");
+
+            cargarDatosFormularioEmpleado(authentication, model);
+            return "responsable/empleado-formulario";
+        }
+
+        redirectAttributes.addFlashAttribute("mensaje", "Empleado registrado. Se enviaron sus datos de acceso por correo.");
+
+        return "redirect:/responsable/empleados";
+    }
+
+    private void cargarDatosFormularioEmpleado(Authentication authentication, Model model) {
+
+        model.addAttribute(
+                "unidades",
+                unidadRepository.findByResponsable_Usuario_Username(authentication.getName()));
+
+        model.addAttribute("tiposEmpleado", TipoEmpleado.values());
+        model.addAttribute("turnos", Turno.values());
+        model.addAttribute("rolesCocina", RolCocina.values());
+
+        // Datos para la barra de navegación compartida.
+        java.util.List<String> roles = new java.util.ArrayList<>();
+
+        for (var autoridad : authentication.getAuthorities()) {
+            roles.add(autoridad.getAuthority());
+        }
+
+        model.addAttribute("logueado", true);
+        model.addAttribute("username", authentication.getName());
+        model.addAttribute("roles", roles);
     }
 }

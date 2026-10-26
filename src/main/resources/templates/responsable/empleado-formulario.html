@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Alta de empleado')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container pb-5">
+
+    <section class="hero mb-4">
+        <h1>Registrar empleado</h1>
+        <p class="lead mb-0">
+            Agregá personal a tu unidad de venta.
+            Recibirá sus datos de acceso por correo.
+        </p>
+    </section>
+
+    <div class="alert alert-warning"
+         th:if="${#lists.isEmpty(unidades)}">
+        No tenés unidades asignadas para registrar empleados.
+    </div>
+
+    <div class="card">
+        <div class="card-header card-header-eg">
+            Datos del empleado
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/responsable/empleados/nuevo}"
+                  th:object="${empleadoDTO}"
+                  method="post">
+
+                <div class="alert alert-danger"
+                     role="alert"
+                     th:if="${#fields.hasAnyErrors()}">
+
+                    <p class="mb-2">Revisá los siguientes errores:</p>
+
+                    <ul class="mb-0">
+                        <li th:each="error : ${#fields.allErrors()}"
+                            th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label">
+                            Nombre
+                        </label>
+                        <input type="text" id="nombre"
+                               class="form-control"
+                               th:field="*{nombre}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="apellido" class="form-label">
+                            Apellido
+                        </label>
+                        <input type="text" id="apellido"
+                               class="form-control"
+                               th:field="*{apellido}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="dni" class="form-label">
+                            DNI
+                        </label>
+                        <input type="text" id="dni"
+                               class="form-control"
+                               th:field="*{dni}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">
+                            Email
+                        </label>
+                        <input type="email" id="email"
+                               class="form-control"
+                               th:field="*{email}"
+                               maxlength="45" required>
+                        <div class="form-text">
+                            Será su usuario y recibirá aquí la contraseña.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="fechaNacimiento" class="form-label">
+                            Fecha de nacimiento
+                        </label>
+                        <input type="date" id="fechaNacimiento"
+                               class="form-control"
+                               th:field="*{fechaNacimiento}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="fechaIngreso" class="form-label">
+                            Fecha de ingreso
+                        </label>
+                        <input type="date" id="fechaIngreso"
+                               class="form-control"
+                               th:field="*{fechaIngreso}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="idUnidad" class="form-label">
+                            Unidad de venta
+                        </label>
+                        <select id="idUnidad" class="form-select"
+                                th:field="*{idUnidad}" required>
+                            <option value="">Seleccioná una unidad</option>
+                            <option th:each="unidad : ${unidades}"
+                                    th:value="${unidad.id}"
+                                    th:text="${unidad.nombreComercial}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="tipoEmpleado" class="form-label">
+                            Tipo de empleado
+                        </label>
+                        <select id="tipoEmpleado" class="form-select"
+                                th:field="*{tipoEmpleado}" required>
+                            <option value="">Seleccioná un tipo</option>
+                            <option th:each="tipo : ${tiposEmpleado}"
+                                    th:value="${tipo}"
+                                    th:text="${tipo}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6" id="campoTurno">
+                        <label for="turno" class="form-label">
+                            Turno del cajero
+                        </label>
+                        <select id="turno" class="form-select"
+                                th:field="*{turno}">
+                            <option value="">Seleccioná un turno</option>
+                            <option th:each="opcion : ${turnos}"
+                                    th:value="${opcion}"
+                                    th:text="${opcion.name() == 'MANIANA'
+                                        ? 'Mañana' : 'Noche'}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6" id="campoRolCocina">
+                        <label for="rolCocina" class="form-label">
+                            Categoría de cocina
+                        </label>
+                        <select id="rolCocina" class="form-select"
+                                th:field="*{rolCocina}">
+                            <option value="">Seleccioná una categoría</option>
+                            <option th:each="rol : ${rolesCocina}"
+                                    th:value="${rol}"
+                                    th:text="${#strings.replace(
+                                        rol.name(), '_', ' ')}">
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <p class="text-muted mt-4">
+                    La contraseña se genera automáticamente.
+                    Si el empleado está dado de baja, usá la opción
+                    Reactivar desde el listado.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-eg"
+                            th:disabled="${#lists.isEmpty(unidades)}">
+                        Registrar y enviar correo
+                    </button>
+
+                    <a class="btn btn-outline-secondary"
+                       th:href="@{/responsable/empleados}">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    const tipoEmpleado = document.getElementById("tipoEmpleado");
+    const turno = document.getElementById("turno");
+    const rolCocina = document.getElementById("rolCocina");
+
+    function actualizarCampos() {
+        const esCajero = tipoEmpleado.value === "CAJERO";
+        const esCocinero = tipoEmpleado.value === "COCINERO";
+
+        document.getElementById("campoTurno").hidden = !esCajero;
+        turno.disabled = !esCajero;
+        turno.required = esCajero;
+
+        document.getElementById("campoRolCocina").hidden = !esCocinero;
+        rolCocina.disabled = !esCocinero;
+        rolCocina.required = esCocinero;
+    }
+
+    tipoEmpleado.addEventListener("change", actualizarCampos);
+    actualizarCampos();
+</script>
+
+</body>
+</html>
