@@ -324,8 +324,14 @@
                                     <span th:unless="${fest.activo}" class="badge bg-secondary">Finalizado</span>
                                 </td>
                                 <td class="text-center">
-                                    <a th:href="@{/festivales/{id}/unidades(id=${fest.id})}" class="btn btn-sm text-white" style="background-color: var(--color-borgoña);">
+                                    <!-- Botón existente para ver unidades -->
+                                    <a th:href="@{/festivales/{id}/unidades(id=${fest.id})}" class="btn btn-sm text-white mb-1" style="background-color: var(--color-borgoña);">
                                         Ver Unidades
+                                    </a>
+
+                                    <!-- Botón de recaudación -->
+                                    <a th:href="@{/reportes/recaudacion/{id}(id=${fest.id})}" class="btn btn-sm btn-outline-dark mb-1">
+                                        <i class="bi bi-cash-stack"></i> Recaudación
                                     </a>
                                 </td>
                             </tr>
