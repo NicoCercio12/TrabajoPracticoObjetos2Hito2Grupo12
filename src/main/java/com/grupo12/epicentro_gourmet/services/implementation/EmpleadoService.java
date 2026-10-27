@@ -4,6 +4,7 @@ import com.grupo12.epicentro_gourmet.entities.Empleado;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 import com.grupo12.epicentro_gourmet.repositories.IEmpleadoRepository;
 import com.grupo12.epicentro_gourmet.repositories.IFestivalRepository;
+import com.grupo12.epicentro_gourmet.repositories.IUserRepository;
 import com.grupo12.epicentro_gourmet.services.IEmpleadoService;
 import org.springframework.stereotype.Service;
 import com.grupo12.epicentro_gourmet.entities.User;
@@ -28,13 +29,15 @@ public class EmpleadoService implements IEmpleadoService {
     private final IUnidadDeVentaRepository unidadDeVentaRepository;
     private final CuentaService cuentaService;
     private final EmailService emailService;
+    private final IUserRepository userRepository;
 
-    public EmpleadoService(IEmpleadoRepository repository, IFestivalRepository festivalRepository,  IUnidadDeVentaRepository unidadDeVentaRepository, CuentaService cuentaService, EmailService emailService) {
+    public EmpleadoService(IEmpleadoRepository repository, IFestivalRepository festivalRepository, IUnidadDeVentaRepository unidadDeVentaRepository, CuentaService cuentaService, EmailService emailService, IUserRepository userRepository) {
         this.repository = repository;
         this.festivalRepository = festivalRepository;
         this.unidadDeVentaRepository = unidadDeVentaRepository;
         this.cuentaService = cuentaService;
         this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -127,6 +130,30 @@ public class EmpleadoService implements IEmpleadoService {
         }
 
         repository.save(empleado);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Empleado buscarPorUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario inexistente"));
+        return repository.findByUsuario(user)
+                .orElseThrow(() -> new IllegalArgumentException("\"Tu usuario no está asociado a un empleado"));
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Festival> festivalesDelEmpleado(Empleado empleado) {
+        if (empleado.getUnidadAsignada() == null) {
+            return List.of();
+        }
+
+        return festivalRepository
+                .findByLstUdvContainingOrderByFechaInicioDesc(empleado.getUnidadAsignada())
+                .stream()
+                .filter(f -> !f.getFechaFin().isBefore(empleado.getFechaIngreso()))
+                .toList();
     }
 
     @Override
@@ -225,5 +252,7 @@ public class EmpleadoService implements IEmpleadoService {
 
         return empleadoGuardado;
     }
+
+
 
 }

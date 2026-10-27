@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cierre de caja')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <h1 class="h3 mb-3">Cerrar caja</h1>
+
+    <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card mb-4" th:unless="${error}">
+        <div class="card-body">
+            <p class="mb-1 text-muted">Recaudado hoy</p>
+            <p class="display-6" th:text="${'$ ' + #numbers.formatDecimal(total, 1, 'POINT', 2, 'COMMA')}"></p>
+
+            <form th:action="@{/cajero/cierre}" method="post" th:unless="${yaCerro}">
+                <button type="submit" class="btn btn-primary">Cerrar caja del día</button>
+            </form>
+            <p class="text-success mb-0" th:if="${yaCerro}">La caja de hoy ya fue cerrada.</p>
+        </div>
+    </div>
+
+    <h2 class="h5">Cierres anteriores</h2>
+    <table class="table table-striped" th:if="${historial != null}">
+        <thead><tr><th>Fecha</th><th>Total recaudado</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${historial}">
+            <td th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}"></td>
+            <td th:text="${'$ ' + #numbers.formatDecimal(c.totalRecaudado, 1, 'POINT', 2, 'COMMA')}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(historial)}">
+            <td colspan="2" class="text-center text-muted">Todavía no hay cierres.</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
