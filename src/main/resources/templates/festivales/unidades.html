@@ -272,34 +272,51 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="udv : ${unidades}">
-                                    <td><code class="fw-bold text-danger" th:text="${udv.codigoUnico}">ABC1234567</code></td>
-                                    <td class="fw-bold text-dark" th:text="${udv.nombreComercial}">Burger Truck</td>
-                                    <td>
-                                        <span th:if="${udv.tipoUnidad == 'Food Truck'}" class="badge bg-info text-dark">
-                                            <i class="bi bi-truck me-1"></i>Food Truck
-                                        </span>
-                                        <span th:if="${udv.tipoUnidad == 'Puesto Desarmable'}" class="badge bg-warning text-dark">
-                                            <i class="bi bi-shop me-1"></i>Puesto Desarmable
-                                        </span>
-                                    </td>
-                                    <td th:text="|${udv.superficie} m²|">25 m²</td>
-                                    <td th:text="${udv.responsable}">Juan Pérez</td>
-                                    <td>
-                                        <div th:if="${udv.tipoUnidad == 'Food Truck'}">
-                                            <small><strong>Patente:</strong> <span th:text="${udv.patente}">AB123CD</span></small><br>
-                                            <small><strong>Electricidad:</strong> 
-                                                <span th:if="${udv.requiereElectricidad}" class="badge bg-success">Sí</span>
-                                                <span th:unless="${udv.requiereElectricidad}" class="badge bg-secondary">No</span>
-                                            </small>
-                                        </div>
+                            <!-- Dentro del bloque <tbody> de la tabla en unidades.html -->
+                            <tr th:each="udv : ${unidades}">
+                                <td><code class="fw-bold text-danger" th:text="${udv.codigoUnico}">ABC1234567</code></td>
+                                <td class="fw-bold text-dark" th:text="${udv.nombreComercial}">Burger Truck</td>
+                                <td>
+        <span th:if="${udv.tipoUnidad == 'Food Truck'}" class="badge bg-info text-dark">
+            <i class="bi bi-truck me-1"></i>Food Truck
+        </span>
+                                    <span th:if="${udv.tipoUnidad == 'Puesto Desarmable'}" class="badge bg-warning text-dark">
+            <i class="bi bi-shop me-1"></i>Puesto Desarmable
+        </span>
+                                </td>
+                                <td th:text="|${udv.superficie} m²|">25 m²</td>
+                                <td th:text="${udv.responsable}">Juan Pérez</td>
+                                <td>
+                                    <!-- Tus detalles existentes -->
+                                    <div th:if="${udv.tipoUnidad == 'Food Truck'}">
+                                        <small><strong>Patente:</strong> <span th:text="${udv.patente}">AB123CD</span></small><br>
+                                        <small><strong>Electricidad:</strong>
+                                            <span th:if="${udv.requiereElectricidad}" class="badge bg-success">Sí</span>
+                                            <span th:unless="${udv.requiereElectricidad}" class="badge bg-secondary">No</span>
+                                        </small>
+                                    </div>
 
-                                        <div th:if="${udv.tipoUnidad == 'Puesto Desarmable'}">
-                                            <small><strong>Carpas:</strong> <span th:text="${udv.cantCarpas}">2</span></small><br>
-                                            <small><strong>Montaje:</strong> <span th:text="|${udv.tiempoMontajeMinutos} min|">45 min</span></small>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    <div th:if="${udv.tipoUnidad == 'Puesto Desarmable'}">
+                                        <small><strong>Carpas:</strong> <span th:text="${udv.cantCarpas}">2</span></small><br>
+                                        <small><strong>Montaje:</strong> <span th:text="|${udv.tiempoMontajeMinutos} min|">45 min</span></small>
+                                    </div>
+
+                                    <!-- 👉 NUEVO: Plato Estrella calculado para esta unidad en este festival -->
+                                    <div class="mt-2 pt-2 border-top border-secondary border-opacity-25"
+                                         th:with="platoEstrella=${pedidoService.obtenerPlatoEstrella(festival.id, udv.id)}">
+                                        <small class="fw-bold text-danger">
+                                            <i class="bi bi-star-fill text-warning me-1"></i> Plato Estrella:
+                                        </small>
+                                        <span class="small" th:if="${platoEstrella != null}"
+                                              th:text="|${platoEstrella.nombre} ($ ${platoEstrella.precioVenta})|">
+                Milanesa ( $ 5000 )
+            </span>
+                                        <span class="small text-muted fst-italic" th:unless="${platoEstrella != null}">
+                Sin ventas registradas
+            </span>
+                                    </div>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
