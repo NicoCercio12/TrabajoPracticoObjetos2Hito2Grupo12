@@ -1,40 +1,88 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
 <head th:replace="~{fragments/layout :: head('Cierre de caja')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<main class="container py-4">
-    <h1 class="h3 mb-3">Cerrar caja</h1>
+<main class="container pb-5">
 
-    <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
-    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <header class="page-header">
+        <div class="badge-kicker"><i class="bi bi-cash-coin"></i> CAJA</div>
+        <h1 class="page-title">Cierre de <span class="highlight">caja</span></h1>
+        <p class="page-sub">Cerrá la caja al finalizar el día y revisá tus cierres anteriores.</p>
+    </header>
 
-    <div class="card mb-4" th:unless="${error}">
-        <div class="card-body">
-            <p class="mb-1 text-muted">Recaudado hoy</p>
-            <p class="display-6" th:text="${'$ ' + #numbers.formatDecimal(total, 1, 'POINT', 2, 'COMMA')}"></p>
-
-            <form th:action="@{/cajero/cierre}" method="post" th:unless="${yaCerro}">
-                <button type="submit" class="btn btn-primary">Cerrar caja del día</button>
-            </form>
-            <p class="text-success mb-0" th:if="${yaCerro}">La caja de hoy ya fue cerrada.</p>
-        </div>
+    <div class="alert-eg alert-eg-ok" th:if="${mensaje}">
+        <i class="bi bi-check-circle-fill"></i><span th:text="${mensaje}"></span>
+    </div>
+    <div class="alert-eg alert-eg-error" th:if="${error}">
+        <i class="bi bi-exclamation-triangle-fill"></i><span th:text="${error}"></span>
     </div>
 
-    <h2 class="h5">Cierres anteriores</h2>
-    <table class="table table-striped" th:if="${historial != null}">
-        <thead><tr><th>Fecha</th><th>Total recaudado</th></tr></thead>
-        <tbody>
-        <tr th:each="c : ${historial}">
-            <td th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}"></td>
-            <td th:text="${'$ ' + #numbers.formatDecimal(c.totalRecaudado, 1, 'POINT', 2, 'COMMA')}"></td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(historial)}">
-            <td colspan="2" class="text-center text-muted">Todavía no hay cierres.</td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- Resumen del día -->
+    <section class="enterprise-card mb-4" th:unless="${error}">
+        <div class="enterprise-card-header">
+            <div>
+                <h5 class="fw-bold text-white m-0 fs-5">Recaudado hoy</h5>
+                <p class="m-0 mt-1" style="color: #cbd5e1; font-size: 0.88rem;"
+                   th:text="${#temporals.format(#temporals.createToday(), 'dd/MM/yyyy')}">01/01/2026</p>
+            </div>
+            <span class="badge-live" th:if="${yaCerro}">● Caja cerrada</span>
+            <span class="badge-next" th:unless="${yaCerro}">Caja abierta</span>
+        </div>
+        <div class="enterprise-card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <p class="stat-value coral mb-0" style="font-size: 2.6rem;"
+               th:text="${'$ ' + #numbers.formatDecimal(total, 1, 'POINT', 2, 'COMMA')}">$ 0,00</p>
+
+            <form th:action="@{/cajero/cierre}" method="post" class="m-0" th:unless="${yaCerro}">
+                <button type="submit" class="btn-palo-primary">
+                    Cerrar caja del día <i class="bi bi-lock-fill"></i>
+                </button>
+            </form>
+            <p class="m-0" style="color: #4ade80;" th:if="${yaCerro}">
+                <i class="bi bi-check2-circle"></i> La caja de hoy ya fue cerrada.
+            </p>
+        </div>
+    </section>
+
+    <!-- Historial -->
+    <section th:if="${historial != null}">
+        <div class="enterprise-card">
+            <div class="enterprise-card-header">
+                <div>
+                    <h5 class="fw-bold text-white m-0 fs-5">Cierres anteriores</h5>
+                    <p class="m-0 mt-1" style="color: #cbd5e1; font-size: 0.88rem;">Historial de tu caja</p>
+                </div>
+                <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                      th:text="|${#lists.size(historial)} cierres|">0 cierres</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table custom-table align-middle">
+                    <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th class="text-end">Total recaudado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${historial}">
+                        <td class="fw-bold text-white" th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}"></td>
+                        <td class="text-end"
+                            th:text="${'$ ' + #numbers.formatDecimal(c.totalRecaudado, 1, 'POINT', 2, 'COMMA')}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(historial)}">
+                        <td colspan="2" class="empty-state">
+                            <i class="bi bi-inbox fs-3 d-block mb-2 text-white"></i>
+                            Todavía no hay cierres.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 </main>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>

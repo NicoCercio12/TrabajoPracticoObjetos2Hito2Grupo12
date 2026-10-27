@@ -1,7 +1,11 @@
 package com.grupo12.epicentro_gourmet.services;
 
 import com.grupo12.epicentro_gourmet.entities.Empleado;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 import com.grupo12.epicentro_gourmet.dtos.AltaEmpleadoDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
 
@@ -15,5 +19,6 @@ public interface IEmpleadoService {
     Empleado buscarPorUsername(String username);
     List<Festival> festivalesDelEmpleado(Empleado empleado);
     List<Empleado> listarPorResponsable(String usernameResponsable, boolean activo);
+    Optional<Festival> festivalActivoDelEmpleado(Empleado empleado, LocalDate fecha);
 
 }

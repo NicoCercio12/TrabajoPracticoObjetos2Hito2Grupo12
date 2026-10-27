@@ -11,6 +11,8 @@ import com.grupo12.epicentro_gourmet.entities.User;
 import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
@@ -160,6 +162,19 @@ public class EmpleadoService implements IEmpleadoService {
     @Transactional(readOnly = true)
     public List<Empleado> listarPorResponsable(String username, boolean activo) {
         return repository.findByUnidadAsignada_Responsable_Usuario_UsernameAndActivo(username, activo);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Festival> festivalActivoDelEmpleado(Empleado empleado, LocalDate fecha) {
+        if (!empleado.isActivo() || empleado.getUnidadAsignada() == null) {
+            return Optional.empty();
+        }
+        return festivalRepository
+                .findByLstUdvContainingOrderByFechaInicioDesc(empleado.getUnidadAsignada())
+                .stream()
+                .filter(f -> !fecha.isBefore(f.getFechaInicio()) && !fecha.isAfter(f.getFechaFin()))
+                .findFirst();
     }
 
     @Override
