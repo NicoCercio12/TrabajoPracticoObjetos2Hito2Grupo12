@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="es">
 <head>
     <meta charset="UTF-8">
@@ -26,9 +26,9 @@
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.1) 0%, transparent 45%),
-                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.08) 0%, transparent 45%);
+            background-image:
+                    radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.1) 0%, transparent 45%),
+                    radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.08) 0%, transparent 45%);
             background-attachment: fixed;
             min-height: 100vh;
             display: flex;
@@ -40,6 +40,20 @@
             background: rgba(8, 11, 17, 0.88);
             border-bottom: 1px solid var(--border-card);
             backdrop-filter: blur(12px);
+        }
+
+        .nav-link-eg {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+        .nav-link-eg:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
         }
 
         /* Hero */
@@ -207,7 +221,28 @@
             <span style="color: var(--coral-primary); font-size: 1.4rem;">❖</span> EPICENTRO GOURMET
         </a>
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center flex-wrap gap-2">
+
+            <!-- Links según el rol -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center flex-wrap gap-1">
+                <a th:href="@{/festivales}" class="nav-link-eg">Festivales</a>
+
+                <th:block sec:authorize="hasRole('RESPONSABLE')">
+                    <a th:href="@{/responsable/unidades}" class="nav-link-eg">Mis unidades</a>
+                    <a th:href="@{/responsable/empleados}" class="nav-link-eg">Empleados</a>
+                    <a th:href="@{/registro}" class="nav-link-eg">Registrar unidad</a>
+                </th:block>
+
+                <a sec:authorize="hasRole('CAJERO')" th:href="@{/cajero/cierre}" class="nav-link-eg">Cerrar caja</a>
+
+                <a sec:authorize="hasAnyRole('CAJERO','COCINERO')" th:href="@{/empleado/mi-perfil}" class="nav-link-eg">Mi perfil</a>
+
+                <th:block sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/empleados}" class="nav-link-eg">Empleados</a>
+                    <a th:href="@{/admin/unidades}" class="nav-link-eg">Unidades</a>
+                </th:block>
+            </div>
+
             <!-- Si no inició sesión -->
             <div sec:authorize="isAnonymous()" class="d-flex gap-2">
                 <a th:href="@{/login}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: rgba(255,255,255,0.3);">
@@ -218,7 +253,7 @@
                 </a>
             </div>
 
-            <!-- Si ya inició sesión (solo muestra su email y botón Salir) -->
+            <!-- Si ya inició sesión -->
             <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-3">
                 <span class="small text-secondary d-none d-sm-inline" sec:authentication="name">usuario</span>
                 <form th:action="@{/logout}" method="post" class="m-0">
@@ -252,8 +287,14 @@
                     <a href="#cartelera" class="btn-palo-primary">
                         Ver Festivales <i class="bi bi-arrow-down-short fs-5"></i>
                     </a>
-                    <a th:href="@{/login}" class="btn-palo-outline">
+                    <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn-palo-outline">
                         Acceso a Unidades de Venta
+                    </a>
+                    <a sec:authorize="hasRole('RESPONSABLE')" th:href="@{/responsable/unidades}" class="btn-palo-outline">
+                        Mis unidades de venta
+                    </a>
+                    <a sec:authorize="hasAnyRole('CAJERO','COCINERO')" th:href="@{/empleado/mi-perfil}" class="btn-palo-outline">
+                        Mi perfil
                     </a>
                 </div>
             </div>
@@ -291,7 +332,7 @@
                     <h5 class="fw-bold text-white m-0 fs-5">Cartelera de Festivales</h5>
                     <p class="m-0 mt-1" style="color: #cbd5e1; font-size: 0.88rem;">Fechas confirmadas y temporadas de apertura</p>
                 </div>
-                <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small" 
+                <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
                       th:text="|${#lists.size(festivales)} festivales|">
                     0 festivales
                 </span>
@@ -300,41 +341,41 @@
             <div class="table-responsive">
                 <table class="table custom-table align-middle">
                     <thead>
-                        <tr>
-                            <th>Festival</th>
-                            <th>Temporada</th>
-                            <th>Apertura</th>
-                            <th>Cierre</th>
-                            <th>Estado</th>
-                            <th class="text-end">Predio</th>
-                        </tr>
+                    <tr>
+                        <th>Festival</th>
+                        <th>Temporada</th>
+                        <th>Apertura</th>
+                        <th>Cierre</th>
+                        <th>Estado</th>
+                        <th class="text-end">Predio</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="f : ${festivales}">
-                            <td class="fw-bold text-white" th:text="${f.nombre}">Primavera Sound</td>
-                            <td>
-                                <span style="color: #f8fafc; font-weight: 500;" th:text="${f.temporada}">Primavera</span>
-                            </td>
-                            <td style="color: #e2e8f0;" th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/09/2026</td>
-                            <td style="color: #e2e8f0;" th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
-                            <td>
-                                <span th:if="${f.activo}" class="badge-live">● Activo</span>
-                                <span th:unless="${f.activo}" class="badge-past">Finalizado</span>
-                            </td>
-                            <td class="text-end">
-                                <a th:href="@{/festivales/{id}/unidades(id=${f.id})}" 
-                                   class="btn btn-sm btn-outline-light rounded-pill px-3" 
-                                   style="font-size: 0.82rem; font-weight: 600; border-color: rgba(255,255,255,0.35);">
-                                    Ver Puestos <i class="bi bi-chevron-right ms-1"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(festivales)}">
-                            <td colspan="6" class="text-center py-5" style="color: #cbd5e1;">
-                                <i class="bi bi-calendar-x fs-3 d-block mb-2 text-white"></i>
-                                No hay festivales programados por el momento.
-                            </td>
-                        </tr>
+                    <tr th:each="f : ${festivales}">
+                        <td class="fw-bold text-white" th:text="${f.nombre}">Primavera Sound</td>
+                        <td>
+                            <span style="color: #f8fafc; font-weight: 500;" th:text="${f.temporada}">Primavera</span>
+                        </td>
+                        <td style="color: #e2e8f0;" th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}">01/09/2026</td>
+                        <td style="color: #e2e8f0;" th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}">15/09/2026</td>
+                        <td>
+                            <span th:if="${f.activo}" class="badge-live">● Activo</span>
+                            <span th:unless="${f.activo}" class="badge-past">Finalizado</span>
+                        </td>
+                        <td class="text-end">
+                            <a th:href="@{/festivales/{id}/unidades(id=${f.id})}"
+                               class="btn btn-sm btn-outline-light rounded-pill px-3"
+                               style="font-size: 0.82rem; font-weight: 600; border-color: rgba(255,255,255,0.35);">
+                                Ver Puestos <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(festivales)}">
+                        <td colspan="6" class="text-center py-5" style="color: #cbd5e1;">
+                            <i class="bi bi-calendar-x fs-3 d-block mb-2 text-white"></i>
+                            No hay festivales programados por el momento.
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
