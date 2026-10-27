@@ -45,6 +45,20 @@ public class ResponsableController {
         this.festivalRepository = festivalRepository;
     }
 
+
+
+@GetMapping({"", "/"})
+public String dashboard(Model model, Authentication authentication) {
+    if (authentication != null) {
+        model.addAttribute("username", authentication.getName());
+       
+    }
+    
+    // Muestra src/main/resources/templates/responsable/dashboard.html
+    return "responsable/dashboard";
+}
+
+
     // Endpoint para consultar el Canon a pagar por la Unidad de Venta
     @GetMapping("/canon/{idUnidad}")
     public String verCanon(@PathVariable Long idUnidad, Model model) {

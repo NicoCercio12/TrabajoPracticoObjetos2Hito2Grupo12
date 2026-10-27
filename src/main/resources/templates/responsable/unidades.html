@@ -1,91 +1,423 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Mis unidades')}"></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Unidades de Venta | Epicentro Responsable</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <style>
+        :root {
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .sidebar-menu {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-sidebar-module {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.90rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* ÁREA CENTRAL */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-palo-primary {
+            background-color: var(--coral-primary);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 9px 20px;
+            border-radius: 50px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 16px rgba(255, 77, 45, 0.35);
+            font-size: 0.86rem;
+        }
+
+        .btn-palo-primary:hover {
+            background-color: var(--coral-hover);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 45, 0.45);
+        }
+
+        .admin-content {
+            padding: 35px 40px;
+        }
+
+        /* TARJETAS CUADRADAS ESTILO FESTIVALES ADMIN */
+        .card-dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--coral-primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .card-dashboard:hover {
+            border-color: var(--coral-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 34px rgba(255, 77, 45, 0.22);
+        }
+
+        .card-dashboard:hover::before {
+            opacity: 1;
+        }
+
+        .card-title-lg {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .card-info-item {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-info-item strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-circle-action {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 1.05rem;
+        }
+
+        .btn-circle-action:hover {
+            background: var(--coral-primary);
+            border-color: var(--coral-primary);
+            color: #ffffff;
+            transform: scale(1.08);
+        }
+    </style>
+</head>
 <body>
 
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<!-- SIDEBAR RESPONSABLE -->
+<aside class="admin-sidebar">
+    <a th:href="@{/responsable}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">RESPONSABLE</span></span>
+    </a>
 
-<main class="container py-4">
-
-    <div class="card shadow-sm">
-        <div class="card-header-eg">
-            Mis unidades de venta
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Operaciones
         </div>
 
-        <div class="card-body">
+        <a th:href="@{/responsable}" class="btn-sidebar-module">
+            <i class="bi bi-grid-fill" style="color: #38bdf8;"></i>
+            <span>Dashboard</span>
+        </a>
 
-            <div class="alert alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+        <a th:href="@{/responsable/unidades}" class="btn-sidebar-module active">
+            <i class="bi bi-shop" style="color: var(--coral-primary);"></i>
+            <span>Mis Unidades</span>
+        </a>
 
-            <a class="btn btn-primary btn-sm mb-3" th:href="@{/registro}">+ Registrar otra unidad</a>
+        <a th:href="@{/responsable/empleados}" class="btn-sidebar-module">
+            <i class="bi bi-people-fill" style="color: #4ade80;"></i>
+            <span>Personal Asignado</span>
+        </a>
 
-            <div class="table-responsive">
+        <a th:href="@{/responsable/empleados/nuevo}" class="btn-sidebar-module">
+            <i class="bi bi-person-plus-fill" style="color: #fbbf24;"></i>
+            <span>Alta de Empleado</span>
+        </a>
+    </div>
 
-                <table class="table table-hover align-middle mb-0">
+    <!-- SESIÓN FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username != null ? username : 'responsable'}">responsable</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">RESPONSABLE</div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
 
-                    <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Código</th>
-                        <th>Nombre Comercial</th>
-                        <th>Tipo</th>
-                        <th>Patente</th>
-                        <th>Electricidad</th>
-                        <th>Acciones</th>
-                    </tr>
-                    </thead>
+<!-- MAIN WRAPPER -->
+<div class="admin-main">
+    
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-shop-window"></i> GESTIÓN DE PUNTOS DE VENTA</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Vista Pública
+            </a>
+            <a th:href="@{/registro}" class="btn-palo-primary">
+                <i class="bi bi-plus-lg"></i> Registrar Otra Unidad
+            </a>
+        </div>
+    </header>
 
-                    <tbody>
+    <!-- CONTENIDO -->
+    <main class="admin-content">
 
-                    <tr th:each="u : ${unidades}">
-                        <td th:text="${u.id}"></td>
+        <!-- ALERTA DE ÉXITO -->
+        <div th:if="${mensaje}" class="alert alert-success border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center gap-2" 
+             style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3) !important;">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span th:text="${mensaje}">Operación completada con éxito.</span>
+        </div>
 
-                        <td th:text="${u.codigoUnico}"></td>
+        <!-- HEADER SECCIÓN -->
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="fw-bold text-white m-0">Mis Unidades Registradas</h2>
+                <p class="text-secondary small m-0 mt-1">Listado general de Food Trucks y Puestos Desarmables a tu cargo</p>
+            </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="|Total: ${unidades != null ? #lists.size(unidades) : 0}|">
+                Total: 0
+            </span>
+        </div>
 
-                        <td th:text="${u.nombreComercial}"></td>
-
-                        <td th:text="${u.class.simpleName == 'FoodTruck' ? 'Food truck' : 'Puesto desarmable'}"></td>
-
-                        <!-- patente existe solo en FoodTruck -->
-                        <td th:text="${u.class.simpleName == 'FoodTruck' ? u.patente : '-'}"></td>
-
-                        <td>
-                            <span th:if="${u.class.simpleName == 'FoodTruck'}"
-                                  class="badge"
-                                  th:classappend="${u.requiereElectricidad} ? 'bg-success' : 'bg-secondary'"
-                                  th:text="${u.requiereElectricidad} ? 'Sí' : 'No'">
+        <!-- GRILLA DE CUADRADOS (ESTILO DASHBOARD ADMIN) -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
+            
+            <div class="col" th:each="u : ${unidades}">
+                <div class="card-dashboard">
+                    <div>
+                        <!-- HEADER CUADRADO: TIPO & ID -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge" 
+                                  th:style="${u.class.simpleName == 'FoodTruck'} ? 'background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);' : 'background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);'"
+                                  th:text="${u.class.simpleName == 'FoodTruck' ? 'Food Truck' : 'Puesto Desarmable'}">
+                                Food Truck
                             </span>
-                            <span th:unless="${u.class.simpleName == 'FoodTruck'}" class="text-muted">-</span>
-                        </td>
+                            <span class="text-secondary small">
+                                ID: <span class="text-white fw-bold" th:text="${u.id}">1</span>
+                            </span>
+                        </div>
 
-                        <!-- Botón para ver el canon de esta unidad -->
-                        <td>
-                            <a class="btn btn-outline-success btn-sm" th:href="@{/responsable/canon/{id}(id=${u.id})}">
-                                Ver Canon
-                            </a>
-                        </td>
-                    </tr>
+                        <!-- NOMBRE COMERCIAL -->
+                        <h4 class="card-title-lg" th:text="${u.nombreComercial}">Mi Food Truck</h4>
 
-                    <tr th:if="${#lists.isEmpty(unidades)}">
-                        <td colspan="7" class="text-center text-muted py-4">
-                            <p class="mb-3">No tenés unidades de venta registradas.</p>
-                            <a class="btn btn-primary btn-sm" th:href="@{/registro}">Registrar mi unidad</a>
-                        </td>
-                    </tr>
+                        <!-- CÓDIGO ÚNICO -->
+                        <div class="card-info-item">
+                            <i class="bi bi-upc-scan text-secondary"></i>
+                            <span>Código: <strong class="text-warning" th:text="${u.codigoUnico}">UDV-001</strong></span>
+                        </div>
 
-                    </tbody>
+                        <!-- DATOS ESPECÍFICOS SEGÚN TIPO -->
+                        <div th:if="${u.class.simpleName == 'FoodTruck'}">
+                            <div class="card-info-item">
+                                <i class="bi bi-truck text-secondary"></i>
+                                <span>Patente: <strong th:text="${u.patente}">AB123CD</strong></span>
+                            </div>
+                            <div class="card-info-item">
+                                <i class="bi bi-lightning-charge text-secondary"></i>
+                                <span>Electricidad: 
+                                    <span class="badge rounded-pill px-2 py-1 ms-1"
+                                          th:style="${u.requiereElectricidad} ? 'background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);' : 'background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2);'"
+                                          th:text="${u.requiereElectricidad} ? 'Sí' : 'No'">
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
 
-                </table>
+                        <div th:unless="${u.class.simpleName == 'FoodTruck'}">
+                            <div class="card-info-item">
+                                <i class="bi bi-aspect-ratio text-secondary"></i>
+                                <span>Superficie: <strong th:text="|${u.superficie} m²|">25 m²</strong></span>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- FOOTER CUADRADO: BOTONES DE ACCIÓN -->
+                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                        <a th:href="@{/responsable/canon/{id}(id=${u.id})}" 
+                           class="btn btn-sm btn-outline-warning rounded-pill px-3" 
+                           style="font-size: 0.8rem;">
+                            <i class="bi bi-cash-coin me-1"></i> Ver Canon
+                        </a>
+
+                        <a th:href="@{/responsable/canon/{id}(id=${u.id})}" 
+                           class="btn-circle-action" 
+                           title="Consultar canon">
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADO VACÍO -->
+            <div class="col-12" th:if="${#lists.isEmpty(unidades)}">
+                <div class="p-5 text-center rounded-4" style="background: var(--bg-card); border: 1px dashed var(--border-subtle);">
+                    <i class="bi bi-shop fs-1 text-secondary mb-3 d-block"></i>
+                    <h6 class="text-white fw-bold mb-1">No tenés unidades de venta registradas</h6>
+                    <p class="text-secondary small mb-3">Podés dar de alta tu puesto para comenzar a operar.</p>
+                    <a class="btn btn-palo-primary btn-sm" th:href="@{/registro}">
+                        <i class="bi bi-plus-lg me-1"></i> Registrar Mi Unidad
+                    </a>
+                </div>
             </div>
 
         </div>
 
-    </div>
+    </main>
+</div>
 
-</main>
-
-<footer th:replace="~{fragments/layout :: footer}"></footer>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -41,7 +41,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/cajero/**").hasRole(Roles.CAJERO);
                     auth.requestMatchers("/empleado/**").hasAnyRole(Roles.CAJERO, Roles.COCINERO);
 
-                    auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades").permitAll();
+                    auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades","/cuenta-pendiente").permitAll();
 
                     // Permite probar el canon y la liquidación sin pasar por el login
                     auth.requestMatchers("/responsable/canon/**", "/responsable/liquidacion/**");

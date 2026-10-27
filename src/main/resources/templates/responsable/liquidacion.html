@@ -1,65 +1,384 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|Liquidación - ${empleado.nombre} ${empleado.apellido}|">Liquidación de Haberes | Epicentro Responsable</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<head th:replace="~{fragments/layout :: head('Liquidación de Haberes')}"></head>
+    <style>
+        :root {
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
 
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .sidebar-menu {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-sidebar-module {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.90rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* ÁREA CENTRAL */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-content {
+            padding: 35px 40px;
+        }
+
+        /* CARD DE DETALLE */
+        .dark-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .dark-card-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .card-title-lg {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .data-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 18px 20px;
+            height: 100%;
+        }
+
+        .data-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .data-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        /* BANNER DE SUELDO NETO */
+        .sueldo-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(56, 189, 248, 0.10) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            border-radius: 16px;
+            padding: 24px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+        }
+
+        .sueldo-amount {
+            color: #4ade80;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+    </style>
+</head>
 <body>
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<main class="container pb-5">
+<!-- SIDEBAR RESPONSABLE -->
+<aside class="admin-sidebar">
+    <a th:href="@{/responsable}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">RESPONSABLE</span></span>
+    </a>
 
-    <section class="hero mb-4">
-        <h1>Liquidación de Haberes</h1>
-        <p class="lead mb-4">
-            Resumen de liquidación salarial por evento trabajado.
-        </p>
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Operaciones
+        </div>
 
-        <a class="btn btn-outline-light" th:href="@{/responsable/empleados}">
-            Volver a la lista
+        <a th:href="@{/responsable}" class="btn-sidebar-module">
+            <i class="bi bi-grid-fill" style="color: #38bdf8;"></i>
+            <span>Dashboard</span>
         </a>
-    </section>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-header card-header-eg d-flex justify-content-between align-items-center">
-            <span class="fw-semibold" th:text="${empleado.nombre + ' ' + empleado.apellido}">Juan Pérez</span>
-            <span class="badge text-bg-light" th:text="${'DNI: ' + empleado.dni}">DNI: 38123456</span>
-        </div>
+        <a th:href="@{/responsable/unidades}" class="btn-sidebar-module">
+            <i class="bi bi-shop" style="color: #38bdf8;"></i>
+            <span>Mis Unidades</span>
+        </a>
 
-        <div class="card-body p-4">
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">Datos del Empleado</h5>
-                    <p class="mb-2"><strong>Función:</strong>
-                        <span class="badge text-bg-info" th:text="${#strings.substringAfter(empleado.class.name, 'entities.')}">Cocinero</span>
-                    </p>
-                    <p class="mb-2" th:if="${empleado.class.simpleName == 'Cocinero'}"><strong>Rol en Cocina:</strong>
-                        <span th:text="${empleado.rolCocina}">LAVAPLATOS</span>
-                    </p>
-                    <p class="mb-2" th:if="${empleado.class.simpleName == 'Cajero'}"><strong>Turno:</strong>
-                        <span th:text="${empleado.turno}">MAÑANA</span>
-                    </p>
-                </div>
+        <a th:href="@{/responsable/empleados}" class="btn-sidebar-module active">
+            <i class="bi bi-people-fill" style="color: var(--coral-primary);"></i>
+            <span>Personal Asignado</span>
+        </a>
 
-                <div class="col-md-6">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">Evento Asociado</h5>
-                    <p class="mb-2"><strong>Festival:</strong>
-                        <span th:text="${festival.nombre}">Gourmet Spring Fest</span>
-                    </p>
-                    <p class="mb-2"><strong>Duración:</strong>
-                        <span th:text="${festival.duracionEnDias + ' días'}">38 días</span>
-                    </p>
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="alert alert-success d-flex justify-content-between align-items-center mb-0 mt-4 p-3 fs-5">
-                <span class="fw-semibold">Sueldo Neto a Cobrar:</span>
-                <span class="fw-bold fs-3" th:text="${'$' + #numbers.formatDecimal(sueldo, 1, 'POINT', 2, 'COMMA')}">$225.000,00</span>
-            </div>
-        </div>
+        <a th:href="@{/responsable/empleados/nuevo}" class="btn-sidebar-module">
+            <i class="bi bi-person-plus-fill" style="color: #fbbf24;"></i>
+            <span>Alta de Empleado</span>
+        </a>
     </div>
 
-</main>
+    <!-- SESIÓN FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username != null ? username : 'responsable'}">responsable</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">RESPONSABLE</div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="admin-main">
+    
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-receipt"></i> RECIBO DE SUELDOS</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/responsable/empleados}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Personal
+            </a>
+            <a href="/" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Vista Pública
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="admin-content">
+
+        <!-- HEADER SECCIÓN -->
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="fw-bold text-white m-0">Liquidación de Haberes</h2>
+                <p class="text-secondary small m-0 mt-1">Resumen de liquidación salarial correspondiente al evento y funciones asignadas</p>
+            </div>
+            <a th:href="@{/responsable/empleados}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 text-light">
+                <i class="bi bi-arrow-left me-1"></i> Volver a la lista
+            </a>
+        </div>
+
+        <!-- TARJETA PRINCIPAL -->
+        <div class="dark-card mb-5">
+            <div class="dark-card-header">
+                <div class="d-flex align-items-center gap-3">
+                    <h3 class="card-title-lg" th:text="|${empleado.nombre} ${empleado.apellido}|">Juan Pérez</h3>
+                    <span class="badge rounded-pill" 
+                          th:style="${empleado.class.simpleName == 'Cocinero'} ? 'background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);' : 'background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);'"
+                          th:text="${empleado.class.simpleName}">
+                        Cocinero
+                    </span>
+                </div>
+                <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-warning fw-bold fs-6">
+                    <i class="bi bi-upc-scan me-1"></i> DNI: <span th:text="${empleado.dni}">38123456</span>
+                </span>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <!-- SECCIÓN 1: DATOS LABORALES -->
+                <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-workspace" style="color: var(--coral-primary);"></i> Perfil Operativo del Empleado
+                </h5>
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-briefcase me-1"></i> Función Registrada</span>
+                            <div class="data-value" th:text="${#strings.substringAfter(empleado.class.name, 'entities.')}">Cocinero</div>
+                        </div>
+                    </div>
+
+                    <!-- Si es Cocinero -->
+                    <div class="col-12 col-md-6" th:if="${empleado.class.simpleName == 'Cocinero'}">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-fire me-1"></i> Rol en Cocina</span>
+                            <div class="data-value text-warning" th:text="${empleado.rolCocina}">LAVAPLATOS</div>
+                        </div>
+                    </div>
+
+                    <!-- Si es Cajero -->
+                    <div class="col-12 col-md-6" th:if="${empleado.class.simpleName == 'Cajero'}">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-clock-history me-1"></i> Turno Designado</span>
+                            <div class="data-value text-info" th:text="${empleado.turno}">MAÑANA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: DATOS DEL EVENTO -->
+                <h5 class="fw-bold text-white mb-3 mt-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-event" style="color: #38bdf8;"></i> Evento y Base de Cálculo
+                </h5>
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-flag me-1"></i> Festival Asociado</span>
+                            <div class="data-value text-white" th:text="${festival.nombre}">Gourmet Spring Fest</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-hourglass-split me-1"></i> Duración del Evento</span>
+                            <div class="data-value" th:text="${festival.duracionEnDias + ' días'}">38 días</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BANNER DE TOTAL A COBRAR -->
+                <div class="sueldo-banner mt-4">
+                    <div>
+                        <span class="text-uppercase fw-bold small text-white-50 d-block mb-1" style="letter-spacing: 0.1em;">
+                            Liquidación Salarial
+                        </span>
+                        <h4 class="fw-bold text-white m-0">Sueldo Neto a Cobrar:</h4>
+                    </div>
+                    <div class="sueldo-amount" th:text="${'$' + #numbers.formatDecimal(sueldo, 1, 'POINT', 2, 'COMMA')}">
+                        $225.000,00
+                    </div>
+                </div>
+
+                <!-- ACCIONES INFERIORES -->
+                <div class="mt-4 pt-3 d-flex justify-content-end gap-3">
+                    <a th:href="@{/responsable/empleados}" class="btn btn-outline-light rounded-pill px-4" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al Personal
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

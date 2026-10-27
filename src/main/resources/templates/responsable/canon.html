@@ -1,71 +1,387 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|Canon - ${unidad.nombreComercial}|">Cálculo de Canon | Epicentro Responsable</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<head th:replace="~{fragments/layout :: head('Cálculo de Canon')}"></head>
+    <style>
+        :root {
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
 
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .sidebar-menu {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-sidebar-module {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.90rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* MAIN */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-content {
+            padding: 35px 40px;
+        }
+
+        /* CARD DE DETALLE */
+        .dark-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .dark-card-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .card-title-lg {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .data-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px 20px;
+            height: 100%;
+        }
+
+        .data-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .data-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        /* RECUADRO DE TOTAL */
+        .canon-banner {
+            background: linear-gradient(135deg, rgba(255, 77, 45, 0.15) 0%, rgba(251, 191, 36, 0.10) 100%);
+            border: 1px solid rgba(255, 77, 45, 0.4);
+            border-radius: 16px;
+            padding: 24px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(255, 77, 45, 0.12);
+        }
+
+        .canon-amount {
+            color: #fbbf24;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+    </style>
+</head>
 <body>
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<main class="container pb-5">
+<!-- SIDEBAR RESPONSABLE -->
+<aside class="admin-sidebar">
+    <a th:href="@{/responsable}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">RESPONSABLE</span></span>
+    </a>
 
-    <section class="hero mb-4">
-        <h1>Detalle de Canon a Pagar</h1>
-        <p class="lead mb-4">
-            Consultá el desglose del canon calculado para tu unidad de venta.
-        </p>
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Operaciones
+        </div>
 
-        <a class="btn btn-outline-light" th:href="@{/responsable/empleados}">
-            Volver a la lista
+        <a th:href="@{/responsable}" class="btn-sidebar-module">
+            <i class="bi bi-grid-fill" style="color: #38bdf8;"></i>
+            <span>Dashboard</span>
         </a>
-    </section>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-header card-header-eg d-flex justify-content-between align-items-center">
-            <span class="fw-semibold" th:text="${unidad.nombreComercial}">Burger Zone Truck</span>
-            <span class="badge text-bg-light" th:text="${#strings.substringAfter(unidad.class.name, 'entities.')}">FoodTruck</span>
-        </div>
+        <a th:href="@{/responsable/unidades}" class="btn-sidebar-module active">
+            <i class="bi bi-shop" style="color: var(--coral-primary);"></i>
+            <span>Mis Unidades</span>
+        </a>
 
-        <div class="card-body p-4">
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <p class="text-muted mb-1">Código Único</p>
-                    <h6 class="fw-bold" th:text="${unidad.codigoUnico}">FT-001</h6>
-                </div>
-                <div class="col-md-6">
-                    <p class="text-muted mb-1">Superficie</p>
-                    <h6 class="fw-bold" th:text="${unidad.superficie + ' m²'}">12.5 m²</h6>
-                </div>
+        <a th:href="@{/responsable/empleados}" class="btn-sidebar-module">
+            <i class="bi bi-people-fill" style="color: #4ade80;"></i>
+            <span>Personal Asignado</span>
+        </a>
 
-                <!-- Detalles específicos según el tipo de unidad -->
-                <div class="col-md-6" th:if="${unidad.class.simpleName == 'FoodTruck'}">
-                    <p class="text-muted mb-1">Patente</p>
-                    <h6 class="fw-bold" th:text="${unidad.patente}">AB123CD</h6>
-                </div>
-                <div class="col-md-6" th:if="${unidad.class.simpleName == 'FoodTruck'}">
-                    <p class="text-muted mb-1">Conexión Eléctrica</p>
-                    <span th:if="${unidad.requiereElectricidad}" class="badge text-bg-success">Sí (+ $2.000)</span>
-                    <span th:unless="${unidad.requiereElectricidad}" class="badge text-bg-secondary">No</span>
-                </div>
-
-                <div class="col-md-6" th:if="${unidad.class.simpleName == 'PuestoDesarmable'}">
-                    <p class="text-muted mb-1">Cantidad de Carpas</p>
-                    <h6 class="fw-bold" th:text="${unidad.cantCarpas}">2</h6>
-                </div>
-                <div class="col-md-6" th:if="${unidad.class.simpleName == 'PuestoDesarmable'}">
-                    <p class="text-muted mb-1">Tiempo Montaje</p>
-                    <h6 class="fw-bold" th:text="${unidad.tiempoMontajeMinutos + ' min'}">30 min</h6>
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="alert alert-success d-flex justify-content-between align-items-center mb-0 mt-4 p-3 fs-5">
-                <span class="fw-semibold">Monto Total a Pagar:</span>
-                <span class="fw-bold fs-3" th:text="${'$' + #numbers.formatDecimal(canon, 1, 'POINT', 2, 'COMMA')}">$8.250,00</span>
-            </div>
-        </div>
+        <a th:href="@{/responsable/empleados/nuevo}" class="btn-sidebar-module">
+            <i class="bi bi-person-plus-fill" style="color: #fbbf24;"></i>
+            <span>Alta de Empleado</span>
+        </a>
     </div>
 
-</main>
+    <!-- SESIÓN FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username != null ? username : 'responsable'}">responsable</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">RESPONSABLE</div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="admin-main">
+    
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-cash-coin"></i> LIQUIDACIÓN DE CANON</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/responsable/unidades}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-arrow-left me-1"></i> Volver a Mis Unidades
+            </a>
+            <a href="/" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Vista Pública
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="admin-content">
+
+        <!-- HEADER SECCIÓN -->
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="fw-bold text-white m-0">Detalle de Canon a Pagar</h2>
+                <p class="text-secondary small m-0 mt-1">Desglose paramétrico y costo operativo liquidado para este punto comercial</p>
+            </div>
+            <a th:href="@{/responsable/unidades}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 text-light">
+                <i class="bi bi-arrow-left me-1"></i> Volver al listado
+            </a>
+        </div>
+
+        <!-- TARJETA PRINCIPAL -->
+        <div class="dark-card mb-5">
+            <div class="dark-card-header">
+                <div class="d-flex align-items-center gap-3">
+                    <h3 class="card-title-lg" th:text="${unidad.nombreComercial}">Burger Zone Truck</h3>
+                    <span class="badge rounded-pill" 
+                          th:style="${unidad.class.simpleName == 'FoodTruck'} ? 'background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);' : 'background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);'"
+                          th:text="${unidad.class.simpleName == 'FoodTruck' ? 'Food Truck' : 'Puesto Desarmable'}">
+                        FoodTruck
+                    </span>
+                </div>
+                <code class="text-warning fw-bold fs-6" th:text="${unidad.codigoUnico}">FT-001</code>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <!-- GRILLA DE ATRIBUTOS -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-upc-scan me-1"></i> Identificador Único</span>
+                            <div class="data-value text-warning" th:text="${unidad.codigoUnico}">FT-001</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-aspect-ratio me-1"></i> Superficie Ocupada</span>
+                            <div class="data-value" th:text="${unidad.superficie + ' m²'}">12.5 m²</div>
+                        </div>
+                    </div>
+
+                    <!-- ATRIBUTOS FOOD TRUCK -->
+                    <div class="col-12 col-md-6" th:if="${unidad.class.simpleName == 'FoodTruck'}">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-truck me-1"></i> Patente del Rodado</span>
+                            <div class="data-value" th:text="${unidad.patente}">AB123CD</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6" th:if="${unidad.class.simpleName == 'FoodTruck'}">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-lightning-charge me-1"></i> Conexión Eléctrica</span>
+                            <div>
+                                <span th:if="${unidad.requiereElectricidad}" class="badge rounded-pill px-3 py-2" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);">
+                                    <i class="bi bi-check2 me-1"></i> Sí (+ $2.000)
+                                </span>
+                                <span th:unless="${unidad.requiereElectricidad}" class="badge rounded-pill px-3 py-2" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2);">
+                                    No
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ATRIBUTOS PUESTO DESARMABLE -->
+                    <div class="col-12 col-md-6" th:if="${unidad.class.simpleName == 'PuestoDesarmable'}">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-shop me-1"></i> Cantidad de Carpas</span>
+                            <div class="data-value" th:text="${unidad.cantCarpas}">2</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6" th:if="${unidad.class.simpleName == 'PuestoDesarmable'}">
+                        <div class="data-block">
+                            <span class="data-label"><i class="bi bi-stopwatch me-1"></i> Tiempo Estimado de Montaje</span>
+                            <div class="data-value" th:text="${unidad.tiempoMontajeMinutos + ' min'}">30 min</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BANNER DE TOTAL A PAGAR -->
+                <div class="canon-banner mt-4">
+                    <div>
+                        <span class="text-uppercase fw-bold small text-white-50 d-block mb-1" style="letter-spacing: 0.1em;">
+                            Liquidación Total
+                        </span>
+                        <h4 class="fw-bold text-white m-0">Monto Final del Canon:</h4>
+                    </div>
+                    <div class="canon-amount" th:text="${'$' + #numbers.formatDecimal(canon, 1, 'POINT', 2, 'COMMA')}">
+                        $8.250,00
+                    </div>
+                </div>
+
+                <!-- ACCIONES INFERIORES -->
+                <div class="mt-4 pt-3 d-flex justify-content-end gap-3">
+                    <a th:href="@{/responsable/unidades}" class="btn btn-outline-light rounded-pill px-4" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                        <i class="bi bi-arrow-left me-1"></i> Volver a Mis Unidades
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

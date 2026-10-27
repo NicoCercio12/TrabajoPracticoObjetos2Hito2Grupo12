@@ -14,28 +14,43 @@ import java.util.stream.Collectors;
 public class LoginController {
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return ViewRouteHelper.LOGIN;
     }
 
     @GetMapping("/loginsuccess")
     public String loginSuccess(Authentication auth) {
-        Set<String> roles = auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+        if (auth == null) {
+            return "redirect:/login";
+        }
 
-        if (roles.contains("ROLE_" + Roles.ADMINISTRADOR) || roles.contains("ROLE_" + Roles.RESPONSABLE)) {
-            return "redirect:/";
+        // 1. Administrador -> Centro de control general
+        if (tieneRol(auth, Roles.ADMINISTRADOR)) {
+            return "redirect:/admin";
         }
-        if (roles.contains("ROLE_" + Roles.CAJERO) || roles.contains("ROLE_" + Roles.COCINERO)) {
-            return "redirect:/empleado/mi-perfil";
+
+        // 2. Responsable de puesto -> Gestión de su unidad / personal / menú
+        if (tieneRol(auth, Roles.RESPONSABLE)) {
+            return "redirect:/responsable";
         }
-        if (roles.contains("ROLE_" + Roles.PENDIENTE)) {
+
+        // 3. Empleado -> Vista operativa / registro de pedidos / jornada
+        if (tieneRol(auth, Roles.EMPLEADO)) {
+            return "redirect:/empleado";
+        }
+
+        // 4. Pendiente -> Pantalla de espera o alta de unidad de venta
+        if (tieneRol(auth, Roles.PENDIENTE)) {
             return "redirect:/cuenta-pendiente";
         }
+
         return "redirect:/";
     }
+
+    // Método auxiliar para comparar roles con o sin el prefijo "ROLE_"
+    private boolean tieneRol(Authentication auth, String rol) {
+        return auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_" + rol) || a.equals(rol));
+    }
 }
-
-
-
