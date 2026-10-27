@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consola Operativa | Epicentro Responsable</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.1) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.06) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* BARRA LATERAL (SIDEBAR) */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .sidebar-menu {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-sidebar-module {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* CONTENIDO DERECHO */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-palo-primary {
+            background-color: var(--coral-primary);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 18px rgba(255, 77, 45, 0.35);
+            font-size: 0.88rem;
+        }
+
+        .btn-palo-primary:hover {
+            background-color: var(--coral-hover);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(255, 77, 45, 0.45);
+        }
+
+        .admin-content {
+            padding: 40px;
+        }
+
+        /* TARJETAS DE PUESTOS / UNIDADES */
+        .unit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        .unit-card:hover {
+            border-color: var(--coral-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(255, 77, 45, 0.2);
+        }
+
+        .unit-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 14px;
+            line-height: 1.25;
+        }
+
+        .unit-field {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unit-field strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .badge-live {
+            background: rgba(16, 185, 129, 0.25);
+            color: #4ade80;
+            border: 1px solid #22c55e;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<!-- BARRA LATERAL (SIDEBAR) -->
+<aside class="admin-sidebar">
+    <a th:href="@{/responsable}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">RESPONSABLE</span></span>
+    </a>
+
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-2 px-1" style="color: #cbd5e1; font-size: 0.78rem; letter-spacing: 0.1em;">
+            Gestión de Puestos
+        </div>
+
+        <a th:href="@{/responsable}" class="btn-sidebar-module active">
+            <i class="bi bi-shop" style="color: var(--coral-primary); font-size: 1.25rem;"></i>
+            <span>Mis Puestos</span>
+        </a>
+
+        <a th:href="@{/responsable/empleados}" class="btn-sidebar-module">
+            <i class="bi bi-people-fill" style="color: #4ade80; font-size: 1.25rem;"></i>
+            <span>Personal Asignado</span>
+        </a>
+
+        <a th:href="@{/responsable/empleados/nuevo}" class="btn-sidebar-module">
+            <i class="bi bi-person-plus-fill" style="color: #38bdf8; font-size: 1.25rem;"></i>
+            <span>Alta de Empleado</span>
+        </a>
+    </div>
+
+    <!-- SESIÓN / FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username}">responsable@gmail.com</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">RESPONSABLE</div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- PANEL CENTRAL DERECHO -->
+<div class="admin-main">
+    
+    <!-- TOPBAR SUPERIOR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-sliders"></i> GESTIÓN OPERATIVA</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Vista Pública
+            </a>
+            <a th:href="@{/responsable/empleados/nuevo}" class="btn-palo-primary">
+                <i class="bi bi-person-plus-fill"></i> Registrar Empleado
+            </a>
+        </div>
+    </header>
+
+    <!-- ÁREA CENTRAL DE PUESTOS -->
+    <main class="admin-content">
+        
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="fw-bold text-white m-0">Mis Puestos de Venta</h2>
+                <p class="text-secondary small m-0 mt-1">Unidades comerciales bajo tu administración activa.</p>
+            </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="|Total: ${unidades != null ? #lists.size(unidades) : 0}|">
+                Total: 0
+            </span>
+        </div>
+
+        <!-- GRILLA DE CUADRADITOS DE PUESTOS -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            
+            <div class="col" th:each="u : ${unidades}">
+                <div class="unit-card">
+                    <div>
+                        <!-- ESTADO & CODIGO -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge-live">● Asignado</span>
+                            <span class="badge bg-secondary-subtle text-light px-2 py-1" style="font-size: 0.78rem;"
+                                  th:text="${#strings.contains(u.class.simpleName, 'Food') ? 'Food Truck' : 'Puesto Desarmable'}">
+                                Puesto
+                            </span>
+                        </div>
+
+                        <!-- NOMBRE COMERCIAL -->
+                        <div class="unit-name" th:text="${u.nombreComercial}">Nombre Puesto</div>
+
+                        <!-- CÓDIGO ÚNICO -->
+                        <div class="unit-field">
+                            <i class="bi bi-upc-scan text-secondary"></i>
+                            <span>Código: <strong class="text-warning" th:text="${u.codigoUnico}">UDV-001</strong></span>
+                        </div>
+
+                        <!-- SUPERFICIE -->
+                        <div class="unit-field">
+                            <i class="bi bi-aspect-ratio text-secondary"></i>
+                            <span>Superficie: <strong th:text="|${u.superficie} m²|">25 m²</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- ACCIONES -->
+                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                        <a th:href="@{/responsable/canon/{id}(id=${u.id})}" 
+                           class="btn btn-sm btn-outline-warning rounded-pill px-3" 
+                           style="font-size: 0.8rem;">
+                            <i class="bi bi-cash-coin me-1"></i> Consultar Canon
+                        </a>
+                        <a th:href="@{/responsable/empleados}" 
+                           class="btn btn-sm btn-outline-light rounded-pill px-3" 
+                           style="font-size: 0.8rem; border-color: var(--border-subtle);">
+                            Ver Personal <i class="bi bi-chevron-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MENSAJE SI LA LISTA ESTÁ VACÍA -->
+            <div class="col-12" th:if="${unidades == null or #lists.isEmpty(unidades)}">
+                <div class="p-5 text-center rounded-4" style="background: var(--bg-card); border: 1px dashed var(--border-subtle);">
+                    <i class="bi bi-shop fs-1 text-secondary mb-3 d-block"></i>
+                    <h5 class="text-white fw-bold">No tenés puestos comerciales asignados actualmente</h5>
+                    <p class="text-secondary small mb-0">Comunicate con el administrador para que te asigne una unidad de venta en el predio.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

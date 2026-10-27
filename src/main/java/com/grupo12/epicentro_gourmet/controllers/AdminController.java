@@ -2,6 +2,8 @@ package com.grupo12.epicentro_gourmet.controllers;
 
 import com.grupo12.epicentro_gourmet.repositories.IEmpleadoRepository;
 import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
+import com.grupo12.epicentro_gourmet.services.implementation.FestivalService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +16,27 @@ public class AdminController {
 
     private final IEmpleadoRepository empleadoRepository;
     private final IUnidadDeVentaRepository unidadRepository;
+    private final FestivalService festivalService;
 
-    public AdminController(IEmpleadoRepository empleadoRepository, IUnidadDeVentaRepository unidadRepository) {
+    public AdminController(IEmpleadoRepository empleadoRepository, 
+                           IUnidadDeVentaRepository unidadRepository,
+                           FestivalService festivalService) {
         this.empleadoRepository = empleadoRepository;
         this.unidadRepository = unidadRepository;
+        this.festivalService = festivalService;
+    }
+
+    // Ruta principal: http://localhost:8080/admin
+    @GetMapping({"", "/"})
+    public String dashboard(Model model, Authentication authentication) {
+        if (authentication != null) {
+            model.addAttribute("username", authentication.getName());
+        }
+        // Carga los festivales para la tabla del centro de comando
+        model.addAttribute("festivales", festivalService.getAll());
+        
+        // Muestra src/main/resources/templates/admin/dashboard.html
+        return "admin/dashboard";
     }
 
     @GetMapping("/empleados")
