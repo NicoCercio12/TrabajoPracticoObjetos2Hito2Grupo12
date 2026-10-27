@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Gestión de platos')}"></head>
+
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container pb-5">
+
+    <section class="hero mb-4">
+        <h1>Gestión de platos</h1>
+        <p class="lead">
+            Registrá platos y consultá el menú de tus unidades de venta.
+        </p>
+
+        <a class="btn btn-outline-light" th:href="@{/}">
+            Volver al inicio
+        </a>
+    </section>
+
+    <div id="mensaje" class="alert" role="status" hidden></div>
+
+    <div class="alert alert-warning"
+         th:if="${#lists.isEmpty(unidades)}">
+        No tenés unidades asignadas para registrar platos.
+    </div>
+
+    <section class="card mb-4">
+        <div class="card-header card-header-eg">
+            Registrar plato
+        </div>
+
+        <div class="card-body">
+            <form id="formPlato"
+                  th:action="@{/responsable/platos}"
+                  method="post">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label">
+                            Nombre
+                        </label>
+                        <input id="nombre" name="nombre"
+                               class="form-control"
+                               type="text" maxlength="255" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="idUnidad" class="form-label">
+                            Unidad de venta
+                        </label>
+                        <select id="idUnidad" name="idUnidad"
+                                class="form-select" required>
+                            <option value="">Seleccioná una unidad</option>
+                            <option th:each="unidad : ${unidades}"
+                                    th:value="${unidad.id}"
+                                    th:text="${unidad.nombreComercial}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="precioVenta" class="form-label">
+                            Precio de venta ($)
+                        </label>
+                        <input id="precioVenta" name="precioVenta"
+                               class="form-control"
+                               type="number" min="0.01"
+                               step="0.01" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="costoProduccion" class="form-label">
+                            Costo de producción ($)
+                        </label>
+                        <input id="costoProduccion" name="costoProduccion"
+                               class="form-control"
+                               type="number" min="0"
+                               step="0.01" required>
+                    </div>
+                </div>
+
+                <button id="btnGuardar" type="submit"
+                        class="btn btn-eg mt-4"
+                        th:disabled="${#lists.isEmpty(unidades)}">
+                    Registrar plato
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-header card-header-eg
+                    d-flex justify-content-between align-items-center">
+            <span>Platos de mis unidades</span>
+            <span id="cantidad" class="badge text-bg-light">0</span>
+        </div>
+
+        <p id="estadoListado" class="text-muted px-3 pt-3"
+           role="status">
+            Cargando platos…
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Unidad</th>
+                    <th scope="col" class="text-end">Precio de venta</th>
+                    <th scope="col" class="text-end">Costo de producción</th>
+                </tr>
+                </thead>
+                <tbody id="tablaPlatos"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script>
+    const formulario = document.getElementById("formPlato");
+    const boton = document.getElementById("btnGuardar");
+    const mensaje = document.getElementById("mensaje");
+    const tabla = document.getElementById("tablaPlatos");
+    const estado = document.getElementById("estadoListado");
+    const cantidad = document.getElementById("cantidad");
+
+    const moneda = new Intl.NumberFormat("es-AR", {
+        style: "currency",
+        currency: "ARS"
+    });
+
+    function mostrarMensaje(texto, tipo) {
+        mensaje.textContent = texto;
+        mensaje.className = "alert alert-" + tipo;
+        mensaje.hidden = false;
+    }
+
+    async function leerRespuesta(respuesta) {
+        if (respuesta.redirected) {
+            throw new Error(
+                "La sesión pudo haber vencido. Volvé a iniciar sesión.");
+        }
+
+        const tipo = respuesta.headers.get("content-type") || "";
+
+        if (!tipo.includes("application/json")) {
+            throw new Error(
+                "El servidor devolvió una respuesta inesperada. HTTP "
+                + respuesta.status);
+        }
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            const errores = Array.isArray(datos.errores)
+                ? datos.errores.join(" ")
+                : "No se pudo completar la operación. HTTP "
+                  + respuesta.status;
+
+            throw new Error(errores);
+        }
+
+        return datos;
+    }
+
+    function agregarCelda(fila, texto, clase) {
+        const celda = document.createElement("td");
+        celda.textContent = texto;
+
+        if (clase) {
+            celda.className = clase;
+        }
+
+        fila.appendChild(celda);
+    }
+
+    async function cargarPlatos() {
+        estado.hidden = false;
+        estado.textContent = "Cargando platos…";
+
+        try {
+            const respuesta = await fetch(formulario.action, {
+                credentials: "same-origin",
+                headers: { "Accept": "application/json" }
+            });
+
+            const platos = await leerRespuesta(respuesta);
+
+            if (!Array.isArray(platos)) {
+                throw new Error("El listado recibido no tiene el formato esperado.");
+            }
+
+            tabla.replaceChildren();
+            cantidad.textContent = platos.length;
+
+            for (const plato of platos) {
+                const fila = document.createElement("tr");
+
+                agregarCelda(fila, plato.nombre);
+                agregarCelda(fila, plato.nombreUnidad);
+                agregarCelda(
+                    fila, moneda.format(plato.precioVenta), "text-end");
+                agregarCelda(
+                    fila, moneda.format(plato.costoProduccion), "text-end");
+
+                tabla.appendChild(fila);
+            }
+
+            estado.textContent = platos.length === 0
+                ? "Todavía no hay platos registrados en tus unidades."
+                : "";
+
+            estado.hidden = platos.length > 0;
+
+        } catch (error) {
+            estado.textContent = "No se pudo actualizar el listado: "
+                + error.message;
+        }
+    }
+
+    formulario.addEventListener("submit", async function (evento) {
+        evento.preventDefault();
+
+        if (!formulario.reportValidity() || boton.disabled) {
+            return;
+        }
+
+        const datos = {
+            nombre: document.getElementById("nombre").value.trim(),
+            precioVenta: Number(
+                document.getElementById("precioVenta").value),
+            costoProduccion: Number(
+                document.getElementById("costoProduccion").value),
+            idUnidad: Number(
+                document.getElementById("idUnidad").value)
+        };
+
+        boton.disabled = true;
+        boton.textContent = "Registrando…";
+        mensaje.hidden = true;
+
+        try {
+            const respuesta = await fetch(formulario.action, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await leerRespuesta(respuesta);
+
+            formulario.reset();
+            mostrarMensaje(resultado.mensaje, "success");
+            await cargarPlatos();
+
+        } catch (error) {
+            mostrarMensaje(error.message, "danger");
+
+        } finally {
+            boton.disabled = false;
+            boton.textContent = "Registrar plato";
+        }
+    });
+
+    cargarPlatos();
+</script>
+</body>
+</html>
