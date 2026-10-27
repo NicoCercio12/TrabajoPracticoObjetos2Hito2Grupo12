@@ -38,6 +38,16 @@
                     <a class="nav-link" th:href="@{/registro}">Registrar unidad</a>
                 </li>
 
+                <!-- Cajero -->
+                <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_CAJERO')}">
+                    <a class="nav-link" th:href="@{/cajero/cierre}">Cerrar caja</a>
+                </li>
+
+                <!-- Empleado (cajero o cocinero) -->
+                <li class="nav-item" th:if="${logueado and (#lists.contains(roles, 'ROLE_CAJERO') or #lists.contains(roles, 'ROLE_COCINERO'))}">
+                    <a class="nav-link" th:href="@{/empleado/mi-perfil}">Mi perfil</a>
+                </li>
+
                 <!-- Administrador -->
                 <li class="nav-item" th:if="${logueado and #lists.contains(roles, 'ROLE_ADMINISTRADOR')}">
                     <a class="nav-link" th:href="@{/admin/empleados}">Empleados</a>

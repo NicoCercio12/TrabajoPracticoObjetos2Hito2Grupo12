@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mi perfil')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container pb-5">
+    <h1 class="h3 mb-4">Mi perfil</h1>
+
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <th:block th:unless="${error}">
+
+        <!-- Aviso de festival en curso -->
+        <div class="alert alert-success d-flex align-items-center gap-2" th:if="${festivalEnCurso != null}">
+            <span class="fs-5">&#9679;</span>
+            <div>
+                Hoy trabajás en <b th:text="${festivalEnCurso.nombre}"></b>
+                <span th:if="${empleado.unidadAsignada != null}">
+                    en la unidad <b th:text="${empleado.unidadAsignada.nombreComercial}"></b>
+                </span>
+                (hasta el <span th:text="${#temporals.format(festivalEnCurso.fechaFin, 'dd/MM/yyyy')}"></span>).
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Festivales</p>
+                        <p class="display-6 mb-0" th:text="${#lists.size(festivales)}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Festival en curso</p>
+                        <p class="h5 mb-0"
+                           th:text="${festivalEnCurso != null} ? ${festivalEnCurso.nombre} : 'Ninguno por ahora'"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="text-muted small mb-1">Total de sueldos</p>
+                        <p class="display-6 mb-0"
+                           th:text="${'$ ' + #numbers.formatDecimal(totalSueldos, 1, 'POINT', 2, 'COMMA')}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos personales -->
+        <div class="card mb-4">
+            <div class="card-header card-header-eg">Mis datos</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Nombre</dt>
+                            <dd class="col-sm-8" th:text="${empleado.nombre + ' ' + empleado.apellido}"></dd>
+
+                            <dt class="col-sm-4">DNI</dt>
+                            <dd class="col-sm-8" th:text="${empleado.dni}"></dd>
+
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8" th:text="${empleado.email}"></dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Puesto</dt>
+                            <dd class="col-sm-8" th:text="${empleado.class.simpleName}"></dd>
+
+                            <th:block th:if="${empleado.class.simpleName == 'Cajero'}">
+                                <dt class="col-sm-4">Turno</dt>
+                                <dd class="col-sm-8" th:text="${empleado.turno}"></dd>
+                            </th:block>
+                            <th:block th:if="${empleado.class.simpleName == 'Cocinero'}">
+                                <dt class="col-sm-4">Rol de cocina</dt>
+                                <dd class="col-sm-8" th:text="${empleado.rolCocina}"></dd>
+                            </th:block>
+
+                            <dt class="col-sm-4">Ingreso</dt>
+                            <dd class="col-sm-8" th:text="${#temporals.format(empleado.fechaIngreso, 'dd/MM/yyyy')}"></dd>
+
+                            <dt class="col-sm-4">Unidad</dt>
+                            <dd class="col-sm-8"
+                                th:text="${empleado.unidadAsignada != null} ? ${empleado.unidadAsignada.nombreComercial + ' (' + empleado.unidadAsignada.codigoUnico + ')'} : 'Sin unidad asignada'"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Festivales -->
+        <h2 class="h5 mb-3">Festivales en los que trabajé</h2>
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>Festival</th>
+                        <th>Temporada</th>
+                        <th>Desde</th>
+                        <th>Hasta</th>
+                        <th>Unidad</th>
+                        <th>Estado</th>
+                        <th class="text-end">Sueldo</th>
+                        <th class="text-end">Recibo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="f : ${festivales}">
+                        <td class="fw-semibold" th:text="${f.nombre}"></td>
+                        <td th:text="${f.temporada}"></td>
+                        <td th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${empleado.unidadAsignada != null} ? ${empleado.unidadAsignada.nombreComercial} : '—'"></td>
+                        <td>
+                            <span class="badge text-bg-success"
+                                  th:if="${!hoy.isBefore(f.fechaInicio) and !hoy.isAfter(f.fechaFin)}">En curso</span>
+                            <span class="badge text-bg-info"
+                                  th:if="${hoy.isBefore(f.fechaInicio)}">Próximo</span>
+                            <span class="badge text-bg-secondary"
+                                  th:if="${hoy.isAfter(f.fechaFin)}">Finalizado</span>
+                        </td>
+                        <td class="text-end"
+                            th:text="${sueldos[f.id] != null} ? ${'$ ' + #numbers.formatDecimal(sueldos[f.id], 1, 'POINT', 2, 'COMMA')} : '—'"></td>
+                        <td class="text-end">
+                            <a class="btn btn-outline-primary btn-sm"
+                               th:if="${sueldos[f.id] != null}"
+                               th:href="@{/empleado/recibo/{id}(id=${f.id})}">Descargar PDF</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(festivales)}">
+                        <td colspan="8" class="text-center text-muted py-4">
+                            Todavía no tenés festivales registrados.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </th:block>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

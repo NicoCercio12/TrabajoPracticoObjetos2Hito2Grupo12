@@ -38,11 +38,13 @@ public class SecurityConfiguration {
                             "/vendor/**", "/webjars/**", "/favicon.ico").permitAll();
 
                     auth.requestMatchers("/registro/**").hasRole(Roles.RESPONSABLE);
+                    auth.requestMatchers("/cajero/**").hasRole(Roles.CAJERO);
+                    auth.requestMatchers("/empleado/**").hasAnyRole(Roles.CAJERO, Roles.COCINERO);
 
                     auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades","/cuenta-pendiente").permitAll();
 
                     // Permite probar el canon y la liquidación sin pasar por el login
-                    auth.requestMatchers("/responsable/canon/**", "/responsable/liquidacion/**").permitAll();
+                    auth.requestMatchers("/responsable/canon/**", "/responsable/liquidacion/**");
 
                     auth.requestMatchers("/admin/**").hasRole(Roles.ADMINISTRADOR);
                     auth.requestMatchers("/reportes/**", "/unidades/**", "/empleados/**", "/platos/**")

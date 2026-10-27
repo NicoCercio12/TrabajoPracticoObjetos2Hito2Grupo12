@@ -9,6 +9,8 @@ public final class Roles {
     public static final String EMPLEADO = "EMPLEADO";
     //estado en que permanece un usuario hasta que le asigna un rol
     public static final String PENDIENTE = "PENDIENTE";
+    public static final String CAJERO = "CAJERO";
+    public static final String COCINERO = "COCINERO";
 
 
 

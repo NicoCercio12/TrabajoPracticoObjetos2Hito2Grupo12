@@ -34,8 +34,23 @@ public class Cajero extends Empleado {
 
         return multiplicador * (sueldoBase + montoAntiguedad);
     }
-    public CierreCaja cerrarCaja(LocalDate fecha) {
-        // Metodo para el cierre de caja del cajero
-        return null;
+    public CierreCaja cerrarCaja(LocalDate fecha, double totalRecaudado) {
+        if (fecha == null) {
+            throw new IllegalArgumentException("La fecha es obligatoria");
+        }
+        if (totalRecaudado < 0) {
+            throw new IllegalArgumentException("El total recaudado no puede ser negativo");
+        }
+        boolean yaCerrado = lstCierres.stream().anyMatch(c -> fecha.equals(c.getFecha()));
+        if (yaCerrado) {
+            throw new IllegalArgumentException("Ya existe un cierre de caja para esa fecha");
+        }
+
+        CierreCaja cierre = new CierreCaja();
+        cierre.setFecha(fecha);
+        cierre.setTotalRecaudado(totalRecaudado);
+        cierre.setCajero(this);
+        lstCierres.add(cierre);
+        return cierre;
     }
 }
