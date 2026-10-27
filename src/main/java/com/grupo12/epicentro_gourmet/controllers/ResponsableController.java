@@ -203,4 +203,24 @@ public class ResponsableController {
         model.addAttribute("username", authentication.getName());
         model.addAttribute("roles", roles);
     }
+
+    @GetMapping("/platos/vista")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String verPlatos(Authentication authentication, Model model) {
+
+        model.addAttribute("unidades", unidadRepository.findByResponsable_Usuario_Username(authentication.getName()));
+
+        java.util.List<String> roles = new java.util.ArrayList<>();
+
+        for (var autoridad : authentication.getAuthorities()) {
+            roles.add(autoridad.getAuthority());
+        }
+
+        model.addAttribute("logueado", true);
+        model.addAttribute("username", authentication.getName());
+        model.addAttribute("roles", roles);
+
+        return "responsable/platos";
+    }
+
 }
