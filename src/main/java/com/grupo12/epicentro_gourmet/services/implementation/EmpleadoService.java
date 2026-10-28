@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
 import com.grupo12.epicentro_gourmet.dtos.AltaEmpleadoDTO;
+import com.grupo12.epicentro_gourmet.dtos.ModificarEmpleadoDTO;
 import com.grupo12.epicentro_gourmet.entities.Cajero;
 import com.grupo12.epicentro_gourmet.entities.Cocinero;
 import com.grupo12.epicentro_gourmet.entities.UnidadDeVenta;
@@ -268,6 +269,135 @@ public class EmpleadoService implements IEmpleadoService {
         return empleadoGuardado;
     }
 
+    private Empleado obtenerEmpleadoEditable(Long idEmpleado, String usernameResponsable) {
 
+        if (usernameResponsable == null || usernameResponsable.isBlank()) {
+            throw new AccessDeniedException("No se identificó al responsable");
+        }
+
+        if (idEmpleado == null || idEmpleado <= 0) {throw new IllegalArgumentException("El ID del empleado no es válido");
+        }
+
+        Empleado empleado = buscarPorId(idEmpleado);
+
+        if (empleado.getUnidadAsignada() == null || !unidadDeVentaRepository.existsByIdAndResponsable_Usuario_Username(empleado.getUnidadAsignada().getId(), usernameResponsable)) {
+
+            throw new AccessDeniedException("No podés modificar empleados de otro responsable");
+        }
+
+        if (!empleado.isActivo()) {
+            throw new IllegalArgumentException("Primero debés reactivar al empleado");
+        }
+
+        if (empleado.getUsuario() != null && usernameResponsable.equals(empleado.getUsuario().getUsername())) {
+
+            throw new IllegalArgumentException("No podés modificar tu propia cuenta desde este módulo");
+        }
+
+        return empleado;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ModificarEmpleadoDTO obtenerParaModificar(Long idEmpleado, String usernameResponsable) {
+
+        Empleado empleado = obtenerEmpleadoEditable(idEmpleado, usernameResponsable);
+
+        ModificarEmpleadoDTO dto = new ModificarEmpleadoDTO();
+
+        dto.setNombre(empleado.getNombre());
+        dto.setApellido(empleado.getApellido());
+        dto.setDni(empleado.getDni());
+        dto.setFechaNacimiento(empleado.getFechaNacimiento());
+        dto.setFechaIngreso(empleado.getFechaIngreso());
+
+        return dto;
+    }
+
+    @Override
+    @Transactional
+    public void modificar(Long idEmpleado, ModificarEmpleadoDTO dto, String usernameResponsable) {
+
+        Empleado empleado = obtenerEmpleadoEditable(idEmpleado, usernameResponsable);
+
+        if (dto == null
+                || dto.getNombre() == null || dto.getNombre().isBlank()
+                || dto.getApellido() == null || dto.getApellido().isBlank()
+                || dto.getDni() == null || dto.getDni().isBlank()
+                || dto.getFechaNacimiento() == null
+                || dto.getFechaIngreso() == null) {
+
+            throw new IllegalArgumentException("Completá los datos obligatorios del empleado");
+        }
+
+        String nombre = dto.getNombre().trim();
+        String apellido = dto.getApellido().trim();
+        String dni = dto.getDni().trim();
+
+        if (nombre.length() > 255 || apellido.length() > 255 || dni.length() > 255) {
+
+            throw new IllegalArgumentException("Nombre, apellido y DNI no pueden superar los 255 caracteres");
+        }
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate nacimiento = dto.getFechaNacimiento();
+        LocalDate ingreso = dto.getFechaIngreso();
+
+        if (nacimiento.isAfter(hoy.minusYears(18))) {
+            throw new IllegalArgumentException("El empleado debe ser mayor de edad");
+        }
+
+        if (ingreso.isAfter(hoy)) {
+            throw new IllegalArgumentException("La fecha de ingreso no puede ser futura");
+        }
+
+        if (ingreso.isBefore(nacimiento.plusYears(18))) {
+            throw new IllegalArgumentException("El empleado debe tener al menos 18 años al ingresar");
+        }
+
+        Optional<Empleado> existente = repository.findByDni(dni);
+
+        if (existente.isPresent() && existente.get().getIdEmpleado() != idEmpleado.longValue())  {
+
+            throw new IllegalArgumentException("Ya existe otro empleado con ese DNI, activo o dado de baja");
+        }
+
+        empleado.setNombre(nombre);
+        empleado.setApellido(apellido);
+        empleado.setDni(dni);
+        empleado.setFechaNacimiento(nacimiento);
+        empleado.setFechaIngreso(ingreso);
+
+        repository.saveAndFlush(empleado);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Empleado> filtrarActivosPorResponsable(String usernameResponsable, String texto, Long idUnidad) {
+
+        if (usernameResponsable == null || usernameResponsable.isBlank()) {
+            throw new AccessDeniedException("No se identificó al responsable");
+        }
+
+        if (idUnidad != null) {
+            if (idUnidad <= 0) {
+                throw new IllegalArgumentException("La unidad seleccionada no es válida");
+            }
+
+            boolean esResponsable = unidadDeVentaRepository.existsByIdAndResponsable_Usuario_Username(idUnidad, usernameResponsable);
+
+            if (!esResponsable) {
+                throw new AccessDeniedException("No podés consultar empleados de otra unidad");
+            }
+        }
+
+        String textoBusqueda = texto == null ? "" : texto.trim();
+
+        if (textoBusqueda.length() > 255) {
+            throw new IllegalArgumentException("La búsqueda no puede superar los 255 caracteres");
+        }
+
+        return repository.filtrarActivosPorResponsable(usernameResponsable, textoBusqueda, idUnidad);
+    }
 
 }

@@ -25,6 +25,7 @@ import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.mail.MailException;
+import com.grupo12.epicentro_gourmet.dtos.ModificarEmpleadoDTO;
 
 @Controller
 @RequestMapping("/responsable")
@@ -120,35 +121,6 @@ public String dashboard(Model model, Authentication authentication) {
         return "redirect:/responsable/empleados";
     }
 
-    @GetMapping("/empleados")
-    @PreAuthorize("hasRole('RESPONSABLE')")
-    public String listarEmpleados(
-            @RequestParam(defaultValue = "true") boolean activo,
-            Principal principal,
-            Model model) {
-
-        model.addAttribute(
-                "empleados",
-                empleadoService.listarPorResponsable(
-                        principal.getName(), activo));
-
-        model.addAttribute("activo", activo);
-
-        Authentication authentication = (Authentication) principal;
-
-        java.util.List<String> roles = new java.util.ArrayList<>();
-
-        for (var autoridad : authentication.getAuthorities()) {
-            roles.add(autoridad.getAuthority());
-        }
-
-        model.addAttribute("logueado", true);
-        model.addAttribute("username", principal.getName());
-        model.addAttribute("roles", roles);
-
-        return "responsable/empleados";
-    }
-
     @GetMapping("/unidades")
     public String misUnidades(Principal principal, Model model) {
         model.addAttribute("unidades", unidadRepository.findByResponsable_Usuario_Username(principal.getName()));
@@ -235,6 +207,118 @@ public String dashboard(Model model, Authentication authentication) {
         model.addAttribute("roles", roles);
 
         return "responsable/platos";
+    }
+
+    @GetMapping("/empleados/{idEmpleado}/editar")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String formularioModificarEmpleado(
+            @PathVariable Long idEmpleado,
+            Authentication authentication,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            ModificarEmpleadoDTO dto = empleadoService.obtenerParaModificar(
+                    idEmpleado, authentication.getName());
+
+            model.addAttribute("empleadoDTO", dto);
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/responsable/empleados";
+        }
+
+        cargarDatosEdicionEmpleado(idEmpleado, authentication, model);
+
+        return "responsable/empleado-editar";
+    }
+
+    @PostMapping("/empleados/{idEmpleado}/editar")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String modificarEmpleado(
+            @PathVariable Long idEmpleado,
+            @Valid @ModelAttribute("empleadoDTO") ModificarEmpleadoDTO dto,
+            BindingResult result,
+            Authentication authentication,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        // Verificar permisos y estado incluso si el formulario tiene errores.
+        try {
+            empleadoService.obtenerParaModificar(idEmpleado, authentication.getName());
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/responsable/empleados";
+        }
+
+        if (!result.hasErrors()) {
+            try {
+                empleadoService.modificar(idEmpleado, dto, authentication.getName());
+
+                redirectAttributes.addFlashAttribute(
+                        "mensaje", "Empleado modificado correctamente");
+
+                return "redirect:/responsable/empleados";
+
+            } catch (IllegalArgumentException e) {
+                result.reject("modificacion.invalida", e.getMessage());
+            }
+        }
+
+        cargarDatosEdicionEmpleado(idEmpleado, authentication, model);
+
+        return "responsable/empleado-editar";
+    }
+
+    private void cargarDatosEdicionEmpleado(Long idEmpleado, Authentication authentication, Model model) {
+
+        model.addAttribute("idEmpleado", idEmpleado);
+        model.addAttribute("username", authentication.getName());
+    }
+
+    @GetMapping("/empleados")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String listarEmpleados(
+            @RequestParam(defaultValue = "true") boolean activo,
+            @RequestParam(defaultValue = "") String texto,
+            @RequestParam(required = false) Long idUnidad,
+            Authentication authentication,
+            Model model) {
+
+        if (activo) {
+            try {
+                model.addAttribute(
+                        "empleados",
+                        empleadoService.filtrarActivosPorResponsable(authentication.getName(), texto, idUnidad));
+
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("error", e.getMessage());
+                model.addAttribute("empleados", java.util.List.of());
+            }
+
+        } else {
+            model.addAttribute("empleados",
+                    empleadoService.listarPorResponsable(authentication.getName(), false));
+        }
+
+        model.addAttribute("activo", activo);
+        model.addAttribute("texto", texto);
+        model.addAttribute("idUnidad", idUnidad);
+
+        model.addAttribute("unidades", unidadRepository.findByResponsable_Usuario_Username(authentication.getName()));
+
+        java.util.List<String> roles = new java.util.ArrayList<>();
+
+        for (var autoridad : authentication.getAuthorities()) {
+            roles.add(autoridad.getAuthority());
+        }
+
+        model.addAttribute("logueado", true);
+        model.addAttribute("username", authentication.getName());
+        model.addAttribute("roles", roles);
+
+        return "responsable/empleados";
     }
 
 }
