@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,46 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
     List<Plato> encontrarPlatoEstrella(@Param("festivalId") Long festivalId,
                                        @Param("unidadId") Long unidadId,
                                        Pageable pageable);
+
+    // Rentabilidad: recaudación total por festival y unidad
+    @Query("SELECT COALESCE(SUM(item.cantidad * item.plato.precioVenta), 0) " +
+            "FROM Pedido p JOIN p.lstItems item " +
+            "WHERE p.festival.id = :festivalId " +
+            "AND p.unidadDeVenta.id = :unidadId")
+    Double calcularRecaudacionPorFestivalYUnidad(
+            @Param("festivalId") Long festivalId,
+            @Param("unidadId") Long unidadId);
+
+    // Rentabilidad: costo de producción de platos por festival y unidad
+    @Query("SELECT COALESCE(SUM(item.cantidad * item.plato.costoProduccion), 0) " +
+            "FROM Pedido p JOIN p.lstItems item " +
+            "WHERE p.festival.id = :festivalId " +
+            "AND p.unidadDeVenta.id = :unidadId")
+    Double calcularCostoPlatosPorFestivalYUnidad(
+            @Param("festivalId") Long festivalId,
+            @Param("unidadId") Long unidadId);
+
+    // Rentabilidad entre fechas: recaudación
+    @Query("SELECT COALESCE(SUM(item.cantidad * item.plato.precioVenta), 0) " +
+            "FROM Pedido p JOIN p.lstItems item " +
+            "WHERE p.festival.id = :festivalId " +
+            "AND p.unidadDeVenta.id = :unidadId " +
+            "AND p.fecha BETWEEN :fechaInicio AND :fechaFin")
+    Double calcularRecaudacionPorFechas(
+            @Param("festivalId") Long festivalId,
+            @Param("unidadId") Long unidadId,
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin);
+
+    // Rentabilidad entre fechas: costo de producción de platos
+    @Query("SELECT COALESCE(SUM(item.cantidad * item.plato.costoProduccion), 0) " +
+            "FROM Pedido p JOIN p.lstItems item " +
+            "WHERE p.festival.id = :festivalId " +
+            "AND p.unidadDeVenta.id = :unidadId " +
+            "AND p.fecha BETWEEN :fechaInicio AND :fechaFin")
+    Double calcularCostoPlatosPorFechas(
+            @Param("festivalId") Long festivalId,
+            @Param("unidadId") Long unidadId,
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin);
 }
