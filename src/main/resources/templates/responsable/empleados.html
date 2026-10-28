@@ -491,6 +491,23 @@
                             </button>
                         </form>
 
+                        <!-- Reasignar Unidad -->
+                        <form th:if="${empleado.activo}"
+                              th:action="@{/responsable/empleados/{id}/reasignar(id=${empleado.idEmpleado})}"
+                              method="post"
+                              class="d-flex align-items-center gap-2 mt-2 w-100">
+                            <select name="idNuevaUnidad" class="form-select form-select-sm bg-dark text-white border-secondary" required style="font-size: 0.75rem;">
+                                <option value="" disabled selected>Reasignar a unidad...</option>
+                                <option th:each="u : ${unidades}"
+                                        th:value="${u.id}"
+                                        th:text="${u.nombreComercial}">
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-warning text-nowrap rounded-pill px-2" style="font-size: 0.75rem;">
+                                <i class="bi bi-arrow-left-right"></i> Mover
+                            </button>
+                        </form>
+
                         <!-- Reactivar -->
                         <form th:unless="${empleado.activo}"
                               th:action="@{/responsable/empleados/{id}/reactivar(id=${empleado.idEmpleado})}"

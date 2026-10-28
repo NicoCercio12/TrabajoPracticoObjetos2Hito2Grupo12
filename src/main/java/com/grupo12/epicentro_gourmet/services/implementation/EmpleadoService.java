@@ -399,5 +399,31 @@ public class EmpleadoService implements IEmpleadoService {
 
         return repository.filtrarActivosPorResponsable(usernameResponsable, textoBusqueda, idUnidad);
     }
+    //reasignar empleado a una unidad de venta diferente
+    @Override
+    @Transactional
+    public void reasignarUnidad(Long idEmpleado, Long idNuevaUnidad, String usernameResponsable) {
+        if (usernameResponsable == null || usernameResponsable.isBlank()) {
+            throw new AccessDeniedException("No se identificó al responsable");
+        }
+
+        Empleado empleado = buscarPorId(idEmpleado);
+
+        if (!empleado.isActivo()) {
+            throw new IllegalArgumentException("No se puede reasignar un empleado que no está activo");
+        }
+
+        // Validar que la unidad actual (si tiene) o la nueva pertenezcan al responsable
+        boolean esResponsableNueva = unidadDeVentaRepository.existsByIdAndResponsable_Usuario_Username(idNuevaUnidad, usernameResponsable);
+        if (!esResponsableNueva) {
+            throw new AccessDeniedException("No podés reasignar empleados a una unidad que no te pertenece");
+        }
+
+        UnidadDeVenta nuevaUnidad = unidadDeVentaRepository.findById(idNuevaUnidad)
+                .orElseThrow(() -> new IllegalArgumentException("La nueva unidad de venta no existe"));
+
+        empleado.setUnidadAsignada(nuevaUnidad);
+        repository.saveAndFlush(empleado);
+    }
 
 }

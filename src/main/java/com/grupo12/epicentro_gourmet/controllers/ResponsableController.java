@@ -321,4 +321,20 @@ public String dashboard(Model model, Authentication authentication) {
         return "responsable/empleados";
     }
 
+    @PostMapping("/empleados/{idEmpleado}/reasignar")
+    @PreAuthorize("hasRole('RESPONSABLE')")
+    public String reasignarUnidad(
+            @PathVariable Long idEmpleado,
+            @RequestParam Long idNuevaUnidad,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        try {
+            empleadoService.reasignarUnidad(idEmpleado, idNuevaUnidad, authentication.getName());
+            redirectAttributes.addFlashAttribute("mensaje", "Empleado reasignado de unidad correctamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/responsable/empleados";
+    }
+
 }
