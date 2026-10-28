@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
@@ -19,6 +21,28 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
     Optional<Empleado> findByDni(String dni);
     boolean existsByUsuario(User usuario);
 
-    List<Empleado> findByUnidadAsignada_Responsable_Usuario_UsernameAndActivo(
-            String username, boolean activo);
+    List<Empleado> findByUnidadAsignada_Responsable_Usuario_UsernameAndActivo(String username, boolean activo);
+
+    @Query("""
+        SELECT e
+        FROM Empleado e
+        JOIN FETCH e.unidadAsignada u
+        WHERE u.responsable.usuario.username = :username
+          AND e.activo = true
+          AND (:idUnidad IS NULL OR u.id = :idUnidad)
+          AND (
+              :texto = ''
+              OR LOWER(e.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+              OR LOWER(e.apellido) LIKE LOWER(CONCAT('%', :texto, '%'))
+              OR e.dni LIKE CONCAT('%', :texto, '%')
+          )
+        ORDER BY e.apellido, e.nombre
+        """)
+    List<Empleado> filtrarActivosPorResponsable(
+            @Param("username") String username,
+            @Param("texto") String texto,
+            @Param("idUnidad") Long idUnidad);
+
 }
+
+

@@ -363,9 +363,65 @@
             </div>
         </div>
 
+            <form th:if="${activo}"
+                  th:action="@{/responsable/empleados}"
+                  method="get"
+                  class="p-3 mb-4 rounded-4"
+                  style="background: var(--bg-card);
+             border: 1px solid var(--border-subtle);">
+
+                <input type="hidden" name="activo" value="true">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-5">
+                        <label for="texto" class="form-label text-white">
+                            Nombre, apellido o DNI
+                        </label>
+
+                        <input id="texto"
+                               name="texto"
+                               type="search"
+                               class="form-control bg-dark text-white border-secondary"
+                               maxlength="255"
+                               th:value="${texto}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="filtroUnidad" class="form-label text-white">
+                            Unidad de venta
+                        </label>
+
+                        <select id="filtroUnidad"
+                                name="idUnidad"
+                                class="form-select bg-dark text-white border-secondary">
+
+                            <option value="">Todas mis unidades</option>
+
+                            <option th:each="unidad : ${unidades}"
+                                    th:value="${unidad.id}"
+                                    th:text="${unidad.nombreComercial}"
+                                    th:selected="${idUnidad != null and idUnidad == unidad.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn-palo-primary">
+                            Buscar
+                        </button>
+
+                        <a th:href="@{/responsable/empleados(activo=true)}"
+                           class="btn btn-outline-light rounded-pill">
+                            Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+
         <!-- GRILLA DE RECUADROS / TARJETAS (ESTILO DASHBOARD ADMIN) -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
-            
+
             <div class="col" th:each="empleado : ${empleados}">
                 <div class="card-dashboard">
                     <div>
@@ -410,7 +466,13 @@
                     </div>
 
                     <!-- ACCIONES INFERIORES -->
-                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-10 d-flex flex-wrap gap-2 align-items-center">
+                        <a th:if="${empleado.activo}"
+                           th:href="@{/responsable/empleados/{id}/editar(id=${empleado.idEmpleado})}"
+                           class="btn btn-sm btn-outline-warning rounded-pill px-3"
+                           style="font-size: 0.8rem;">
+                            <i class="bi bi-pencil-square me-1"></i> Editar
+                        </a>
                         <!-- Liquidación -->
                         <a class="btn btn-sm btn-outline-info rounded-pill px-3"
                            style="font-size: 0.8rem;"

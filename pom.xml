@@ -52,6 +52,8 @@
 
         </dependency>
 
+        <!-- Hito 2: envío de mails -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -88,18 +90,6 @@
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
 
         </dependency>
-
-        <!-- Hito 2: envío de mails -->
-
-        <dependency>
-
-            <groupId>org.springframework.boot</groupId>
-
-            <artifactId>spring-boot-starter-mail</artifactId>
-
-        </dependency>
-
-
 
         <!-- Hito 2: PDF del recibo de sueldo -->
 

@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.grupo12.epicentro_gourmet.dtos.AltaEmpleadoDTO;
+import com.grupo12.epicentro_gourmet.dtos.ModificarEmpleadoDTO;
 import com.grupo12.epicentro_gourmet.entities.Festival;
+
 
 public interface IEmpleadoService {
 
@@ -20,5 +22,7 @@ public interface IEmpleadoService {
     List<Festival> festivalesDelEmpleado(Empleado empleado);
     List<Empleado> listarPorResponsable(String usernameResponsable, boolean activo);
     Optional<Festival> festivalActivoDelEmpleado(Empleado empleado, LocalDate fecha);
-
+    ModificarEmpleadoDTO obtenerParaModificar(Long idEmpleado, String usernameResponsable);
+    void modificar(Long idEmpleado, ModificarEmpleadoDTO dto, String usernameResponsable);
+    List<Empleado> filtrarActivosPorResponsable(String usernameResponsable, String texto, Long idUnidad);
 }
