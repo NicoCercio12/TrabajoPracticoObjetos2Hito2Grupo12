@@ -343,10 +343,16 @@
             Navegación
         </div>
 
-        <a th:href="@{/festivales/{id}/unidades(id=${festival.id})}" class="btn-sidebar-module">
-            <i class="bi bi-shop" style="color: #ff6448; font-size: 1.2rem;"></i>
-            <span>Unidades del festival</span>
+         <a th:href="@{/admin}" class="btn-sidebar-module">
+            <i class="bi bi-bezier2" style="color: #a78bfa;"></i>
+            <span>Festivales</span>
         </a>
+
+        <a th:href="@{/admin/{id}/unidades(id=${festival.id})}" class="btn-sidebar-module">
+            <i class="bi bi-shop" style="color: var(--coral-primary);"></i>
+            <span>Unidades del Festival</span>
+        </a>
+
 
         <div class="text-uppercase fw-bold mt-3 mb-2 px-1" style="color: #cbd5e1; font-size: 0.78rem; letter-spacing: 0.1em;">
             Reportes del Evento

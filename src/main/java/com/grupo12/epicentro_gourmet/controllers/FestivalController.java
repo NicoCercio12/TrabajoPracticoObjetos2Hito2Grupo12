@@ -26,25 +26,8 @@ public class FestivalController {
 
     @GetMapping
     public String listarFestivales(Model model) {
-        List<FestivalDTO> festivales = festivalService.obtenerTodosDTO();
-        model.addAttribute("festivales", festivales);
-        model.addAttribute("titulo", "Listado de Festivales");
-        return "festivales/lista";
-    }
+            return "redirect:/#cartelera";
+        }
 
-    @GetMapping("/{id}/unidades")
-    public String verUnidadesDeFestival(@PathVariable("id") Long id, Model model) {
-        FestivalDTO festival = festivalService.obtenerPorIdDTO(id);
-        List<UnidadDeVentaDTO> unidades = unidadDeVentaService.obtenerUnidadesPorFestivalId(id);
-
-        // 👉 Opcional: Si quieres inyectar el plato estrella por cada unidad para mostrarlo en el HTML,
-        // puedes recorrerlas o consultar según lo necesites en tu lógica.
-
-        model.addAttribute("festival", festival);
-        model.addAttribute("unidades", unidades);
-        model.addAttribute("pedidoService", pedidoService);
-        model.addAttribute("titulo", "Unidades de Venta - " + festival.getNombre());
-
-        return "festivales/unidades";
-    }
+  
 }

@@ -1,920 +1,534 @@
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ranking de unidades | Epicentro Gourmet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking de Unidades | Epicentro Gourmet</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-          rel="stylesheet">
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         :root {
-            --borgona: #6b1d28;
-            --borgona-oscuro: #50131c;
-            --borgona-claro: #8e3543;
-            --crema: #faf6f0;
-            --blanco: #ffffff;
-            --dorado: #f59e0b;
-            --rosa: #f8e6e5;
-            --texto: #54202a;
-            --texto-secundario: #8b6b71;
-            --borde: #ead9d5;
-        }
-
-        * {
-            box-sizing: border-box;
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+            --accent-gold: #f59e0b;
         }
 
         body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
             margin: 0;
-            background: var(--crema);
-            color: var(--texto);
-            font-family: "Segoe UI", Arial, sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
         }
 
-        /* BARRA SUPERIOR */
-
-        .topbar {
-            background: var(--borgona);
-            color: white;
-            min-height: 72px;
-            padding: 14px 28px;
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            box-shadow: 0 3px 12px #50131c18;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: Georgia, serif;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .brand i {
-            font-size: 29px;
-        }
-
-        .top-actions {
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .btn-top {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 15px;
-            border: 1px solid #ffffff70;
-            border-radius: 8px;
-            color: white;
-            background: transparent;
             text-decoration: none;
-            font-size: 13px;
-            transition: background .2s;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
         }
 
-        .btn-top:hover {
-            background: #ffffff18;
-            color: white;
-        }
-
-        .btn-logout {
-            background: var(--dorado);
-            border-color: var(--dorado);
-            color: var(--borgona-oscuro);
-        }
-
-        .btn-logout:hover {
-            background: #ffc04d;
-            color: var(--borgona-oscuro);
-        }
-
-        /* DISTRIBUCIÓN GENERAL */
-
-        .layout {
-            display: grid;
-            grid-template-columns: 225px minmax(0, 1fr);
-            min-height: calc(100vh - 72px);
-        }
-
-        .sidebar {
-            background: #fffaf6;
-            border-right: 1px solid var(--borde);
-            padding: 27px 15px;
+        .sidebar-menu {
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
         }
 
-        .sidebar-heading {
-            margin: 5px 10px 16px;
-            color: var(--texto-secundario);
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-link-custom {
+        .btn-sidebar-module {
             display: flex;
             align-items: center;
-            gap: 11px;
-            margin-bottom: 5px;
-            padding: 12px 13px;
-            border-radius: 8px;
-            color: var(--texto);
+            gap: 12px;
+            padding: 11px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
             text-decoration: none;
-            font-size: 14px;
-            transition: background .2s;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: left;
         }
 
-        .nav-link-custom i {
-            font-size: 18px;
-        }
-
-        .nav-link-custom:hover {
-            background: var(--rosa);
-            color: var(--borgona);
-        }
-
-        .nav-link-custom.active {
-            background: var(--borgona);
-            color: white;
-        }
-
-        .sidebar-divider {
-            border: 0;
-            border-top: 1px solid var(--borde);
-            margin: 19px 8px;
-        }
-
-        .festival-info {
-            margin: 0 5px;
-            padding: 15px;
-            background: var(--rosa);
-            border-left: 3px solid var(--borgona);
-            border-radius: 5px;
-        }
-
-        .festival-info-label {
-            color: var(--texto-secundario);
-            font-size: 12px;
-            margin-bottom: 6px;
-        }
-
-        .festival-info-name {
-            color: var(--borgona);
-            font-weight: 700;
-            font-size: 15px;
-            overflow-wrap: anywhere;
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
         }
 
         .sidebar-footer {
             margin-top: auto;
-            padding: 20px 10px 0;
-            color: var(--texto-secundario);
-            font-size: 12px;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
         }
 
-        /* CONTENIDO */
-
-        .main-content {
-            min-width: 0;
-            padding: 30px;
-        }
-
-        .page-heading {
+        /* ÁREA CENTRAL */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
             display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
-            padding-bottom: 23px;
-            border-bottom: 2px solid var(--borgona);
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
         }
 
-        .breadcrumb-text {
-            color: var(--texto-secundario);
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
-
-        .breadcrumb-text a {
-            color: var(--borgona);
-            text-decoration: none;
-        }
-
-        .page-heading h1 {
-            color: var(--borgona);
-            font-family: Georgia, serif;
-            font-size: 34px;
-            font-weight: 700;
-            margin: 0 0 10px;
-        }
-
-        .page-description {
-            color: var(--texto-secundario);
-            font-size: 14px;
-            margin: 0;
-            line-height: 1.6;
-        }
-
-        .report-label {
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            border: 1px solid var(--borde);
-            background: white;
-            border-radius: 7px;
-            padding: 9px 12px;
-            color: var(--borgona);
-            font-size: 12px;
-            white-space: nowrap;
+            gap: 6px;
         }
 
-        /* INDICADORES */
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 17px;
-            margin: 25px 0 30px;
+        .admin-content {
+            padding: 35px 40px;
         }
 
-        .stat-card {
+        /* TARJETAS DE INDICADORES (MÉTRICAS) */
+        .card-dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 22px;
+            height: 100%;
             display: flex;
             align-items: center;
-            gap: 15px;
-            min-width: 0;
-            padding: 20px;
-            background: white;
-            border: 1px solid var(--borde);
-            border-radius: 10px;
-            box-shadow: 0 3px 10px #50131c05;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: var(--rosa);
-            color: var(--borgona);
-            font-size: 22px;
-        }
-
-        .stat-card:nth-child(2) .stat-icon {
-            background: #f4e8d4;
-            color: #976000;
-        }
-
-        .stat-card:nth-child(3) .stat-icon {
-            background: #eee7e5;
-            color: var(--borgona);
-        }
-
-        .stat-label {
-            margin-bottom: 5px;
-            color: var(--texto-secundario);
-            font-size: 12px;
-        }
-
-        .stat-value {
-            color: var(--borgona);
-            font-size: 21px;
-            font-weight: 700;
-            overflow-wrap: anywhere;
-        }
-
-        /* TABLA */
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .section-header h2 {
-            margin: 0 0 5px;
-            color: var(--borgona);
-            font-family: Georgia, serif;
-            font-size: 23px;
-            font-weight: 700;
-        }
-
-        .section-header p {
-            margin: 0;
-            color: var(--texto-secundario);
-            font-size: 13px;
-        }
-
-        .result-count {
-            color: var(--borgona);
-            background: var(--rosa);
-            border-radius: 6px;
-            padding: 7px 11px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .table-panel {
-            background: white;
-            border: 1px solid var(--borde);
-            border-radius: 10px;
+            gap: 16px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+            position: relative;
             overflow: hidden;
         }
 
-        .table-panel-header {
+        .card-dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--coral-primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .card-dashboard:hover {
+            border-color: var(--coral-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 34px rgba(255, 77, 45, 0.22);
+        }
+
+        .card-dashboard:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 17px 21px;
-            background: #fffdfb;
-            border-bottom: 1px solid var(--borde);
-        }
-
-        .table-panel-title {
-            color: var(--borgona);
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .table-panel-subtitle {
-            color: var(--texto-secundario);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .table-responsive {
-            padding: 0 15px 10px;
-        }
-
-        .ranking-table {
-            margin: 0;
-            vertical-align: middle;
-            --bs-table-bg: transparent;
-        }
-
-        .ranking-table thead th {
-            padding: 16px 14px;
-            color: var(--texto-secundario);
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-            white-space: nowrap;
-            border-bottom: 1px solid var(--borde);
-        }
-
-        .ranking-table tbody td {
-            padding: 17px 14px;
-            border-bottom: 1px solid #f1e8e5;
-            color: var(--texto);
-            font-size: 14px;
-        }
-
-        .ranking-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .ranking-table tbody tr:hover {
-            background: #fffaf7;
-        }
-
-        .position-number {
-            display: inline-flex;
-            align-items: center;
             justify-content: center;
-            width: 31px;
-            height: 31px;
-            background: #f5e8e6;
-            border-radius: 6px;
-            color: var(--borgona);
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 1.4rem;
+            flex-shrink: 0;
         }
 
-        .unit-name {
-            color: var(--borgona);
-            font-weight: 600;
+        .icon-coral  { background: rgba(255, 77, 45, 0.15); color: #ff6448; }
+        .icon-blue   { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+        .icon-gold   { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+
+        .stat-meta-label {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            margin-bottom: 4px;
+            font-weight: 500;
         }
 
-        .unit-code {
-            display: inline-block;
-            padding: 5px 8px;
-            border: 1px solid var(--borde);
-            border-radius: 5px;
-            color: var(--texto-secundario);
-            background: #fffdfb;
-            font-size: 12px;
+        .stat-meta-value {
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.2;
             overflow-wrap: anywhere;
         }
 
-        .revenue {
-            color: var(--borgona);
-            font-weight: 700;
-            white-space: nowrap;
+        /* PANEL Y TABLA */
+        .table-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 45px 20px;
-            color: var(--texto-secundario);
-        }
-
-        .empty-state i {
-            color: #bd9297;
-            font-size: 37px;
-        }
-
-        .empty-state h3 {
-            color: var(--borgona);
-            font-family: Georgia, serif;
-            font-size: 20px;
-            margin: 12px 0 7px;
-        }
-
-        .table-note {
+        .table-panel-header {
+            padding: 20px 24px;
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid var(--border-subtle);
             display: flex;
-            align-items: flex-start;
-            gap: 9px;
-            padding: 13px 16px;
-            margin-top: 15px;
-            background: #f5eae7;
-            border-radius: 7px;
-            color: var(--texto-secundario);
-            font-size: 12px;
-            line-height: 1.6;
-        }
-
-        .table-note i {
-            color: var(--borgona);
-            font-size: 16px;
-        }
-
-        /* NAVEGACIÓN INFERIOR */
-
-        .bottom-actions {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 25px;
+            align-items: center;
         }
 
-        .action-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        .table-dark-custom {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--text-main);
+            --bs-table-border-color: var(--border-subtle);
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
+            margin: 0;
+            vertical-align: middle;
         }
 
-        .btn-outline-borgona,
-        .btn-gold {
+        .table-dark-custom thead th {
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid var(--border-subtle);
+            background: rgba(8, 11, 17, 0.5);
+        }
+
+        .table-dark-custom tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.92rem;
+        }
+
+        .position-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+        }
+
+        .podium-1 { background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); color: #fbbf24; }
+        .podium-2 { background: rgba(148, 163, 184, 0.2); border-color: rgba(148, 163, 184, 0.5); color: #e2e8f0; }
+        .podium-3 { background: rgba(180, 83, 9, 0.2); border-color: rgba(180, 83, 9, 0.5); color: #f97316; }
+
+        .unit-code-badge {
+            font-family: monospace;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: #fbbf24;
+            font-size: 0.82rem;
+        }
+
+        .btn-action-custom {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 15px;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
             text-decoration: none;
-            transition: .2s;
+            transition: all 0.25s ease;
         }
 
-        .btn-outline-borgona {
-            color: var(--borgona);
-            border: 1px solid var(--borgona);
+        .btn-outline-custom {
             background: transparent;
+            color: #cbd5e1;
+            border: 1px solid var(--border-subtle);
         }
 
-        .btn-outline-borgona:hover {
-            background: var(--rosa);
-            color: var(--borgona);
+        .btn-outline-custom:hover {
+            border-color: var(--coral-primary);
+            color: #ffffff;
+            background: rgba(255, 77, 45, 0.1);
         }
 
-        .btn-gold {
-            color: var(--borgona-oscuro);
-            border: 1px solid var(--dorado);
-            background: var(--dorado);
+        .btn-primary-custom {
+            background: var(--coral-primary);
+            border: 1px solid var(--coral-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(255, 77, 45, 0.35);
         }
 
-        .btn-gold:hover {
-            background: #ffc04d;
-            color: var(--borgona-oscuro);
-        }
-
-        .footer-note {
-            color: var(--texto-secundario);
-            font-size: 12px;
-        }
-
-        @media (max-width: 1050px) {
-            .layout {
-                grid-template-columns: 195px minmax(0, 1fr);
-            }
-
-            .main-content {
-                padding: 22px;
-            }
-
-            .stats-grid {
-                gap: 10px;
-            }
-
-            .stat-card {
-                padding: 15px;
-            }
-
-            .stat-icon {
-                width: 42px;
-                height: 42px;
-            }
-        }
-
-        @media (max-width: 760px) {
-            .topbar {
-                padding: 13px 15px;
-                flex-wrap: wrap;
-            }
-
-            .brand {
-                font-size: 19px;
-            }
-
-            .brand i {
-                font-size: 24px;
-            }
-
-            .layout {
-                display: block;
-            }
-
-            .sidebar {
-                padding: 10px;
-                border-right: none;
-                border-bottom: 1px solid var(--borde);
-            }
-
-            .sidebar-heading,
-            .sidebar-divider,
-            .festival-info,
-            .sidebar-footer {
-                display: none;
-            }
-
-            .sidebar nav {
-                display: flex;
-                overflow-x: auto;
-                gap: 5px;
-            }
-
-            .nav-link-custom {
-                white-space: nowrap;
-                padding: 10px;
-                font-size: 12px;
-            }
-
-            .main-content {
-                padding: 17px 13px;
-            }
-
-            .page-heading {
-                display: block;
-            }
-
-            .page-heading h1 {
-                font-size: 29px;
-            }
-
-            .report-label {
-                margin-top: 15px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-                margin: 18px 0 25px;
-            }
-
-            .stat-card {
-                padding: 16px;
-            }
-
-            .section-header {
-                align-items: flex-start;
-            }
-
-            .section-header h2 {
-                font-size: 20px;
-            }
-
-            .table-panel-header {
-                padding: 15px;
-            }
-
-            .table-responsive {
-                padding: 0 7px 7px;
-            }
-
-            .ranking-table thead th,
-            .ranking-table tbody td {
-                padding: 13px 9px;
-            }
-
-            .bottom-actions {
-                align-items: flex-start;
-            }
+        .btn-primary-custom:hover {
+            background: var(--coral-hover);
+            border-color: var(--coral-hover);
+            color: #ffffff;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 
 <body>
 
-<header class="topbar">
-    <div class="brand">
-        <i class="bi bi-shop-window"></i>
-        <span>Epicentro Gourmet</span>
-    </div>
+<!-- SIDEBAR -->
+<aside class="admin-sidebar">
+    <a th:href="@{/admin}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">GOURMET</span></span>
+    </a>
 
-    <div class="top-actions">
-        <a th:href="@{/festivales}" class="btn-top">
-            <i class="bi bi-arrow-left"></i>
-            Festivales
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Navegación
+        </div>
+
+       
+
+        <a th:href="@{/admin}" class="btn-sidebar-module">
+            <i class="bi bi-bezier2" style="color: #a78bfa;"></i>
+            <span>Festivales</span>
         </a>
 
-        <form th:action="@{/logout}" method="post" class="m-0">
-            <button type="submit" class="btn-top btn-logout">
-                <i class="bi bi-box-arrow-right"></i>
-                Salir
-            </button>
-        </form>
+        <a th:href="@{/admin/{id}/unidades(id=${festival.id})}" class="btn-sidebar-module">
+            <i class="bi bi-shop" style="color: var(--coral-primary);"></i>
+            <span>Unidades del Festival</span>
+        </a>
+
+        <div class="text-uppercase fw-bold mt-3 mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Reportes
+        </div>
+
+        <a th:href="@{/reportes/ranking(idFestival=${festival.id})}" class="btn-sidebar-module active">
+            <i class="bi bi-bar-chart-line" style="color: #f43f5e;"></i>
+            <span>Ranking Ventas</span>
+        </a>
+
+        <a th:href="@{/reportes/canones(idFestival=${festival.id}, cantidad=5)}" class="btn-sidebar-module">
+            <i class="bi bi-cash-coin" style="color: #fb923c;"></i>
+            <span>Mayores Cánones</span>
+        </a>
     </div>
-</header>
 
-<div class="layout">
-
-    <aside class="sidebar">
-        <div class="sidebar-heading">Navegación</div>
-
-        <nav>
-            <a th:href="@{/festivales}" class="nav-link-custom">
-                <i class="bi bi-calendar-event"></i>
-                Todos los festivales
-            </a>
-
-            <a th:href="@{/festivales/{id}/unidades(id=${festival.id})}"
-               class="nav-link-custom">
-                <i class="bi bi-shop"></i>
-                Unidades del festival
-            </a>
-
-            <a th:href="@{/reportes/ranking(idFestival=${festival.id})}"
-               class="nav-link-custom active">
-                <i class="bi bi-bar-chart-line"></i>
-                Ranking de unidades
-            </a>
-        </nav>
-
-        <hr class="sidebar-divider">
-
-        <div class="sidebar-heading">Festival seleccionado</div>
-
-        <div class="festival-info">
-            <div class="festival-info-label">
-                <i class="bi bi-calendar-check me-1"></i>
-                Reporte actual
+    <!-- SESIÓN FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username != null ? username : 'usuario'}">admin</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">SESIÓN ACTIVA</div>
             </div>
-
-            <div class="festival-info-name"
-                 th:text="${festival.nombre}">
-                Nombre del festival
-            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
         </div>
+    </div>
+</aside>
 
-        <div class="sidebar-footer">
-            Epicentro Gourmet
-            <br>
-            Sistema de gestión
+<!-- MAIN WRAPPER -->
+<div class="admin-main">
+
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-file-earmark-bar-graph"></i> REPORTE DE RECAUDACIÓN POR UNIDAD</span>
         </div>
-    </aside>
+       
+    </header>
 
-    <main class="main-content">
+    <!-- CONTENIDO -->
+    <main class="admin-content">
 
-        <!-- ENCABEZADO DEL REPORTE -->
-
-        <section class="page-heading">
+        <!-- HEADER SECCIÓN -->
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-secondary border-opacity-25">
             <div>
-                <div class="breadcrumb-text">
-                    <a th:href="@{/festivales}">Festivales</a>
-                    <span class="mx-1">/</span>
-                    <span>Reportes</span>
-                    <span class="mx-1">/</span>
-                    <span>Ranking</span>
-                </div>
-
-                <h1>Ranking de unidades</h1>
-
-                <p class="page-description">
-                    Recaudación por unidad de venta del festival
-                    <strong th:text="${festival.nombre}">Festival</strong>.
-                    Los resultados se presentan en orden descendente.
+                <h2 class="fw-bold text-white m-0">Ranking de Recaudación</h2>
+                <p class="text-secondary small m-0 mt-1">
+                    Ingresos generados por unidad en el festival 
+                    <strong class="text-light" th:text="${festival.nombre}">Festival</strong> (orden descendente).
                 </p>
             </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="${ranking.size()} + ' Unidades Registradas'">
+                0 Unidades
+            </span>
+        </div>
 
-            <div class="report-label">
-                <i class="bi bi-file-earmark-bar-graph"></i>
-                Informe de recaudación
-            </div>
-        </section>
-
-        <!-- INDICADORES RESUMIDOS -->
-
-        <section class="stats-grid">
-
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-calendar-event"></i>
-                </div>
-
-                <div>
-                    <div class="stat-label">Festival</div>
-                    <div class="stat-value"
-                         th:text="${festival.nombre}">
-                        Festival
+        <!-- INDICADORES RESUMIDOS (STATS) -->
+        <div class="row g-4 mb-4">
+            
+            <div class="col-12 col-md-4">
+                <div class="card-dashboard">
+                    <div class="stat-icon-wrapper icon-coral">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div>
+                        <div class="stat-meta-label">Festival Evaluado</div>
+                        <div class="stat-meta-value text-truncate" th:text="${festival.nombre}">Nombre Festival</div>
                     </div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-shop"></i>
-                </div>
-
-                <div>
-                    <div class="stat-label">Unidades participantes</div>
-                    <div class="stat-value"
-                         th:text="${ranking.size()}">
-                        0
+            <div class="col-12 col-md-4">
+                <div class="card-dashboard">
+                    <div class="stat-icon-wrapper icon-blue">
+                        <i class="bi bi-shop"></i>
+                    </div>
+                    <div>
+                        <div class="stat-meta-label">Unidades Participantes</div>
+                        <div class="stat-meta-value" th:text="${ranking.size()}">0</div>
                     </div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-currency-dollar"></i>
-                </div>
-
-                <div>
-                    <div class="stat-label">Mayor recaudación</div>
-
-                    <div class="stat-value"
-                         th:if="${!ranking.isEmpty()}"
-                         th:text="${'$ ' + #numbers.formatDecimal(ranking[0].recaudacion, 1, 2, 'COMMA')}">
-                        $ 0,00
+            <div class="col-12 col-md-4">
+                <div class="card-dashboard">
+                    <div class="stat-icon-wrapper icon-gold">
+                        <i class="bi bi-currency-dollar"></i>
                     </div>
-
-                    <div class="stat-value" th:if="${ranking.isEmpty()}">
-                        $ 0,00
+                    <div>
+                        <div class="stat-meta-label">Mayor Recaudación</div>
+                        <div class="stat-meta-value text-warning"
+                             th:if="${!ranking.isEmpty()}"
+                             th:text="${'$ ' + #numbers.formatDecimal(ranking[0].recaudacion, 1, 2, 'COMMA')}">
+                            $ 0,00
+                        </div>
+                        <div class="stat-meta-value text-secondary" th:if="${ranking.isEmpty()}">
+                            $ 0,00
+                        </div>
                     </div>
                 </div>
             </div>
 
-        </section>
+        </div>
 
         <!-- TABLA DEL RANKING -->
-
-        <section>
-            <div class="section-header">
+        <div class="table-panel mb-4">
+            <div class="table-panel-header">
                 <div>
-                    <h2>Detalle de recaudación</h2>
-                    <p>
-                        Comparación de los ingresos registrados por cada unidad.
-                    </p>
+                    <h3 class="h6 fw-bold text-white mb-1">
+                        <i class="bi bi-list-ol text-warning me-2"></i>Tabla de Posiciones
+                    </h3>
+                    <p class="text-secondary small mb-0">Total consolidado a partir de ventas confirmadas</p>
                 </div>
-
-                <span class="result-count"
-                      th:text="${ranking.size()} + ' unidades'">
-                    0 unidades
+                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                    Balance en tiempo real
                 </span>
             </div>
 
-            <div class="table-panel">
+            <!-- ESTADO VACÍO -->
+            <div th:if="${ranking.isEmpty()}" class="p-5 text-center">
+                <i class="bi bi-clipboard-x fs-1 text-secondary mb-3 d-block"></i>
+                <h5 class="text-white fw-bold mb-1">No hay datos para mostrar</h5>
+                <p class="text-secondary small mb-0">El festival seleccionado todavía no posee recaudaciones registradas para sus unidades.</p>
+            </div>
 
-                <div class="table-panel-header">
-                    <div>
-                        <div class="table-panel-title">
-                            <i class="bi bi-list-ol me-2"></i>
-                            Ranking por unidad de venta
-                        </div>
-
-                        <div class="table-panel-subtitle">
-                            Ordenado de mayor a menor recaudación
-                        </div>
-                    </div>
-
-                    <i class="bi bi-bar-chart-line fs-4"
-                       style="color: var(--borgona);"></i>
-                </div>
-
-                <div th:if="${ranking.isEmpty()}" class="empty-state">
-                    <i class="bi bi-clipboard-data"></i>
-                    <h3>No hay datos para mostrar</h3>
-                    <p class="mb-0">
-                        El festival seleccionado todavía no tiene
-                        unidades de venta asociadas.
-                    </p>
-                </div>
-
-                <div th:if="${!ranking.isEmpty()}" class="table-responsive">
-                    <table class="table ranking-table">
-                        <thead>
+            <!-- GRILLA DE TABLA -->
+            <div th:if="${!ranking.isEmpty()}" class="table-responsive">
+                <table class="table table-dark-custom">
+                    <thead>
                         <tr>
-                            <th scope="col">Posición</th>
-                            <th scope="col">Nombre comercial</th>
-                            <th scope="col">Código único</th>
-                            <th scope="col" class="text-end">Recaudación</th>
+                            <th scope="col" style="width: 100px;">Posición</th>
+                            <th scope="col">Nombre Comercial</th>
+                            <th scope="col">Código Único</th>
+                            <th scope="col" class="text-end">Total Recaudado</th>
                         </tr>
-                        </thead>
-
-                        <tbody>
+                    </thead>
+                    <tbody>
                         <tr th:each="unidad, estado : ${ranking}">
                             <td>
-                                <span class="position-number"
+                                <span class="position-badge"
+                                      th:classappend="${estado.count == 1} ? 'podium-1' : (${estado.count == 2} ? 'podium-2' : (${estado.count == 3} ? 'podium-3' : ''))"
                                       th:text="${estado.count}">
                                     1
                                 </span>
                             </td>
-
                             <td>
-                                <span class="unit-name"
-                                      th:text="${unidad.nombreComercial}">
-                                    Nombre de la unidad
-                                </span>
+                                <span class="fw-bold text-white" th:text="${unidad.nombreComercial}">Nombre de la unidad</span>
                             </td>
-
                             <td>
-                                <span class="unit-code"
-                                      th:text="${unidad.codigoUnico}">
-                                    COD-001
-                                </span>
+                                <span class="unit-code-badge" th:text="${unidad.codigoUnico}">COD-001</span>
                             </td>
-
                             <td class="text-end">
-                                <span class="revenue"
+                                <span class="fw-bold text-warning"
                                       th:text="${'$ ' + #numbers.formatDecimal(unidad.recaudacion, 1, 2, 'COMMA')}">
                                     $ 0,00
                                 </span>
                             </td>
                         </tr>
-                        </tbody>
-                    </table>
-                </div>
-
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <div class="table-note" th:if="${!ranking.isEmpty()}">
-                <i class="bi bi-info-circle"></i>
-                <span>
-                    El listado se genera para el festival seleccionado.
-                    Las unidades están ordenadas de acuerdo con su recaudación,
-                    de mayor a menor.
-                </span>
-            </div>
-        </section>
+        <!-- NOTA INFORMATIVA -->
+        <div class="p-3 rounded-4 mb-4 d-flex align-items-center gap-3" 
+             style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle);"
+             th:if="${!ranking.isEmpty()}">
+            <i class="bi bi-info-circle text-warning fs-5"></i>
+            <span class="text-secondary small">
+                El listado se genera automáticamente consolidando los pedidos cerrados de cada puesto o food truck habilitado en el predio.
+            </span>
+        </div>
 
-        <!-- ACCIONES -->
-
-        <div class="bottom-actions">
-            <div class="action-group">
-                <a th:href="@{/festivales}" class="btn-outline-borgona">
-                    <i class="bi bi-arrow-left"></i>
-                    Volver a festivales
-                </a>
-
-                <a th:href="@{/festivales/{id}/unidades(id=${festival.id})}"
-                   class="btn-gold">
-                    <i class="bi bi-shop"></i>
-                    Ver unidades del festival
-                </a>
-            </div>
-
-            <div class="footer-note">
-                Epicentro Gourmet · Reportes de gestión
+       
+            <div class="text-secondary small">
+                Epicentro Gourmet · Sistema de Gestión y Reportes
             </div>
         </div>
 
