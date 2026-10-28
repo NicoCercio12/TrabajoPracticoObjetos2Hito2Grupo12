@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 3 Platos Más Vendidos | Epicentro Responsable</title>
+
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .sidebar-menu {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-sidebar-module {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.90rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* PANEL CENTRAL */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-content {
+            padding: 35px 40px;
+        }
+
+        /* CARDS PODIO */
+        .card-dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--coral-primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .card-dashboard:hover {
+            border-color: var(--coral-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 34px rgba(255, 77, 45, 0.22);
+        }
+
+        .card-dashboard:hover::before {
+            opacity: 1;
+        }
+
+        .card-title-lg {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .card-info-item {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-info-item strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .podium-icon {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR RESPONSABLE -->
+<aside class="admin-sidebar">
+    <a th:href="@{/responsable}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">RESPONSABLE</span></span>
+    </a>
+
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Operaciones
+        </div>
+
+        <a th:href="@{/responsable}" class="btn-sidebar-module">
+            <i class="bi bi-grid-fill" style="color: #38bdf8;"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a th:href="@{/responsable/unidades}" class="btn-sidebar-module active">
+            <i class="bi bi-shop" style="color: var(--coral-primary);"></i>
+            <span>Mis Unidades</span>
+        </a>
+
+        <a th:href="@{/responsable/empleados}" class="btn-sidebar-module">
+            <i class="bi bi-people-fill" style="color: #4ade80;"></i>
+            <span>Personal Asignado</span>
+        </a>
+    </div>
+
+    <!-- SESIÓN FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username}">responsable</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">RESPONSABLE</div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- PANEL DERECHO -->
+<div class="admin-main">
+    
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-award-fill"></i> ANÁLISIS DE VENTAS Y DEMANDA</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/responsable/unidades}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-arrow-left me-1"></i> Volver a Mis Unidades
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="admin-content">
+
+        <!-- HEADER SECCIÓN -->
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="fw-bold text-white m-0" th:text="${unidad.nombreComercial}">Nombre de Unidad</h2>
+                <p class="text-secondary small m-0 mt-1">
+                    Top 3 platos con mayor rotación en <strong class="text-light" th:text="${festival.nombre}">Festival</strong>
+                </p>
+            </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="|Código: ${unidad.codigoUnico}|">
+                Código: UDV-001
+            </span>
+        </div>
+
+        <!-- GRILLA DEL PODIO (TOP 3) -->
+        <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+            
+            <div class="col" th:each="p, estado : ${topPlatos}">
+                <div class="card-dashboard">
+                    <div>
+                        <!-- HEADER PODIO -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge" 
+                                  th:style="${estado.count == 1} ? 'background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);' : (${estado.count == 2} ? 'background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3);' : 'background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);')"
+                                  th:text="|Puesto #${estado.count}|">
+                                Puesto #1
+                            </span>
+                            <span class="podium-icon" th:text="${estado.count == 1 ? '🥇' : (estado.count == 2 ? '🥈' : '🥉')}">🥇</span>
+                        </div>
+
+                        <!-- NOMBRE DEL PLATO -->
+                        <h4 class="card-title-lg" th:text="${p.nombrePlato}">Hamburguesa Doble Smash</h4>
+
+                        <!-- CANTIDAD VENDIDA -->
+                        <div class="card-info-item">
+                            <i class="bi bi-fire text-danger"></i>
+                            <span>Unidades Vendidas: <strong class="text-white" th:text="${p.cantidadVendida}">42</strong></span>
+                        </div>
+
+                        <!-- TOTAL RECAUDADO -->
+                        <div class="card-info-item">
+                            <i class="bi bi-cash-stack text-success"></i>
+                            <span>Recaudación Total: <strong class="text-warning" th:text="${'$ ' + #numbers.formatDecimal(p.totalRecaudado, 1, 2, 'COMMA')}">$ 315.000,00</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER CARD -->
+                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                        <span class="text-secondary small">
+                            <i class="bi bi-star-fill text-warning me-1"></i> Plato Estrella
+                        </span>
+                        <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-2 py-1 text-secondary small">
+                            Alta Demanda
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADO VACÍO -->
+            <div class="col-12" th:if="${#lists.isEmpty(topPlatos)}">
+                <div class="p-5 text-center rounded-4" style="background: var(--bg-card); border: 1px dashed var(--border-subtle);">
+                    <i class="bi bi-clipboard-x fs-1 text-secondary mb-3 d-block"></i>
+                    <h6 class="text-white fw-bold mb-1">Sin ventas registradas</h6>
+                    <p class="text-secondary small mb-0">Esta unidad todavía no posee pedidos cerrados en este festival.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
