@@ -1,39 +1,880 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Unidades de venta')}"></head>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo != null ? titulo : 'Unidades del Festival | Epicentro Admin'}">Unidades del Festival | Epicentro Admin</title>
+    
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Vis.js Network -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #080b11;
+            --bg-sidebar: #0b1019;
+            --bg-card: rgba(18, 24, 38, 0.92);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* SIDEBAR ADMIN */
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-subtle);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .sidebar-menu {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .btn-sidebar-module {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: left;
+        }
+
+        .btn-sidebar-module:hover, .btn-sidebar-module.active {
+            border-color: var(--coral-primary);
+            background: rgba(255, 77, 45, 0.12);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* ÁREA CENTRAL */
+        .admin-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            height: 72px;
+            background: rgba(8, 11, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-palo-primary {
+            background-color: var(--coral-primary);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 50px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 16px rgba(255, 77, 45, 0.35);
+            font-size: 0.84rem;
+        }
+
+        .btn-palo-primary:hover {
+            background-color: var(--coral-hover);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 45, 0.45);
+        }
+
+        .admin-content {
+            padding: 35px 40px;
+        }
+
+        /* CONTENEDOR DEL MASTERPLAN VIS.JS */
+        .masterplan-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+            margin-bottom: 35px;
+        }
+
+        #red-unidades {
+            width: 100%;
+            height: 540px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            background-color: #4b7a5a;
+            cursor: grab;
+        }
+
+        #red-unidades:active {
+            cursor: grabbing;
+        }
+
+        /* TARJETAS CUADRADAS CON BORDE INTERACTIVO */
+        .card-dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--coral-primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .card-dashboard:hover {
+            border-color: var(--coral-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 34px rgba(255, 77, 45, 0.22);
+        }
+
+        .card-dashboard:hover::before {
+            opacity: 1;
+        }
+
+        .card-title-lg {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .card-info-item {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-info-item strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-circle-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .btn-circle-action:hover {
+            background: var(--coral-primary);
+            border-color: var(--coral-primary);
+            color: #ffffff;
+            transform: scale(1.08);
+        }
+
+        .leyenda-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+    </style>
+</head>
 <body>
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<main class="container py-4">
-    <h1 class="h3 mb-3">Todas las unidades de venta</h1>
+<!-- SIDEBAR ADMIN -->
+<aside class="admin-sidebar">
+    <a th:href="@{/admin}" class="sidebar-brand">
+        <span style="color: var(--coral-primary); font-size: 1.3rem;">❖</span>
+        <span>EPICENTRO <span style="font-size: 0.7rem; color: #ff6448; font-weight: 600;">ADMIN</span></span>
+    </a>
 
-    <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Código</th>
-                <th>Nombre Comercial</th>
-                <th>Tipo</th>
-                <th>Responsable</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="u : ${unidades}">
-                <td th:text="${u.id}"></td>
-                <td th:text="${u.codigoUnico}"></td>
-                <td th:text="${u.nombreComercial}"></td>
-                <td th:text="${u.class.simpleName}"></td>
-                <td th:text="${u.responsable != null} ? ${u.responsable.nombre + ' ' + u.responsable.apellido} : '—'"></td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(unidades)}">
-                <td colspan="5" class="text-center text-muted">No hay unidades registradas.</td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="sidebar-menu">
+        <div class="text-uppercase fw-bold mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Administración
+        </div>
+
+        <a th:href="@{/admin}" class="btn-sidebar-module">
+            <i class="bi bi-speedometer2" style="color: #38bdf8;"></i>
+            <span>Festivales</span>
+        </a>
+
+        <button type="button" class="btn-sidebar-module" onclick="scrollToTarjetas()">
+            <i class="bi bi-shop" style="color: var(--coral-primary);"></i>
+            <span>Unidades del Festival</span>
+        </button>
+
+
+        <div class="text-uppercase fw-bold mt-3 mb-1 px-1" style="color: #64748b; font-size: 0.75rem; letter-spacing: 0.1em;">
+            Reportes
+        </div>
+
+        <a th:href="@{/reportes/ranking(idFestival=${festival.id})}" class="btn-sidebar-module">
+            <i class="bi bi-bar-chart-line" style="color: #f43f5e;"></i>
+            <span>Ranking Ventas</span>
+        </a>
+
+        <a th:href="@{/reportes/canones(idFestival=${festival.id}, cantidad=5)}" class="btn-sidebar-module">
+            <i class="bi bi-cash-coin" style="color: #fb923c;"></i>
+            <span>Mayores Cánones</span>
+        </a>
     </div>
-</main>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
+    <!-- SESIÓN FOOTER -->
+    <div class="sidebar-footer">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-truncate me-2">
+                <div class="small fw-bold text-white text-truncate" th:text="${username != null ? username : 'administrador'}">admin</div>
+                <div style="font-size: 0.7rem; color: #ff6448;">ADMINISTRADOR</div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2" title="Cerrar sesión">
+                    <i class="bi bi-power"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="admin-main">
+    
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge-kicker"><i class="bi bi-geo-alt-fill"></i> PLANIFICACIÓN Y CONTROL DE UNIDADES</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/admin}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-arrow-left me-1"></i> Panel Admin
+            </a>
+            <a href="/" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); color: #cbd5e1;">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Vista Pública
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="admin-content">
+
+        <!-- HEADER SECCIÓN -->
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+            <div>
+                <h2 class="fw-bold text-white m-0" th:text="${festival.nombre}">Nombre del Festival</h2>
+                <p class="text-secondary small m-0 mt-1" 
+                   th:text="|Temporada: ${festival.temporada} • Período: ${#temporals.format(festival.fechaInicio, 'dd/MM/yyyy')} al ${#temporals.format(festival.fechaFin, 'dd/MM/yyyy')}|">
+                    Temporada: Primavera • Período: 01/09/2026 al 15/09/2026
+                </p>
+            </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="|Total: ${unidades != null ? #lists.size(unidades) : 0} Unidades|">
+                Total: 0 Unidades
+            </span>
+        </div>
+
+        <!-- ALERTA SI NO HAY UNIDADES -->
+        <div th:if="${#lists.isEmpty(unidades)}" class="alert alert-warning border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center gap-2" 
+             style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3) !important;">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span>Este festival aún no tiene puestos ni food trucks asignados.</span>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(unidades)}">
+            
+            <!-- MASTERPLAN VIS.JS / MAPA DE CALOR -->
+            <div class="masterplan-container">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-white fs-6">
+                            <i class="bi bi-map-fill text-warning me-1"></i> Masterplan del Predio
+                        </span>
+                        <div class="small d-flex align-items-center gap-3 ms-3">
+                            <span>
+                                <span class="leyenda-dot" style="background-color: #0284c7; border: 2px solid #0369a1;"></span>
+                                <span class="text-secondary small">Food Truck</span>
+                            </span>
+                            <span>
+                                <span class="leyenda-dot" style="background-color: #ea580c; border: 2px solid #c2410c;"></span>
+                                <span class="text-secondary small">Puesto Desarmable</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- SELECTOR DE MODO -->
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-warning active" id="btnModoNormal" onclick="cambiarModo('normal')">
+                                <i class="bi bi-geo-alt me-1"></i> Distribución
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" id="btnModoCalor" onclick="cambiarModo('calor')">
+                                <i class="bi bi-fire me-1"></i> Calor (Consumos)
+                            </button>
+                        </div>
+
+                        <div id="leyendaCalor" class="small text-secondary d-none align-items-center gap-2">
+                            <span>Bajo</span>
+                            <div style="height: 8px; width: 100px; border-radius: 4px; background: linear-gradient(to right, #fde047, #f97316, #dc2626);"></div>
+                            <span class="text-warning">Alto 🔥</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CANVAS DE VIS.JS -->
+                <div id="red-unidades"></div>
+
+                <div class="pt-2 text-secondary small text-center">
+                    <i class="bi bi-info-circle me-1"></i> Podés arrastrar cada Food Truck o Puesto a lo largo de las calles del predio, o hacer zoom con la rueda del ratón.
+                </div>
+            </div>
+
+            <!-- SECCIÓN TITULO TARJETAS -->
+            <div id="seccion-tarjetas" class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold text-white m-0 fs-5">
+                        <i class="bi bi-grid-fill text-warning me-2"></i>Puestos y Food Trucks Habilitados
+                    </h3>
+                    <p class="text-secondary small m-0 mt-1">Inspección de equipamiento, superficie y plato estrella por unidad</p>
+                </div>
+            </div>
+
+            <!-- GRILLA DE CUADRADOS DE UNIDADES -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
+                
+                <div class="col" th:each="u : ${unidades}">
+                    <div class="card-dashboard">
+                        <div>
+                            <!-- HEADER CUADRADO: TIPO & ID -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge" 
+                                      th:style="${u.tipoUnidad == 'Food Truck'} ? 'background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);' : 'background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);'"
+                                      th:text="${u.tipoUnidad}">
+                                    Food Truck
+                                </span>
+                                <span class="text-secondary small">
+                                    ID: <span class="text-white fw-bold" th:text="${u.id}">1</span>
+                                </span>
+                            </div>
+
+                            <!-- NOMBRE COMERCIAL -->
+                            <h4 class="card-title-lg" th:text="${u.nombreComercial}">Nombre Comercial</h4>
+
+                            <!-- CÓDIGO ÚNICO -->
+                            <div class="card-info-item">
+                                <i class="bi bi-upc-scan text-secondary"></i>
+                                <span>Código: <strong class="text-warning" th:text="${u.codigoUnico}">ABC1234567</strong></span>
+                            </div>
+
+                            <!-- RESPONSABLE -->
+                            <div class="card-info-item">
+                                <i class="bi bi-person-circle text-secondary"></i>
+                                <span>Responsable: <strong th:text="${u.responsable}">Juan Pérez</strong></span>
+                            </div>
+
+                            <!-- SUPERFICIE -->
+                            <div class="card-info-item">
+                                <i class="bi bi-aspect-ratio text-secondary"></i>
+                                <span>Superficie: <strong th:text="|${u.superficie} m²|">25 m²</strong></span>
+                            </div>
+
+                            <!-- DATOS ESPECÍFICOS FOOD TRUCK -->
+                            <div th:if="${u.tipoUnidad == 'Food Truck'}">
+                                <div class="card-info-item">
+                                    <i class="bi bi-truck text-secondary"></i>
+                                    <span>Patente: <strong th:text="${u.patente}">AB123CD</strong></span>
+                                </div>
+                                <div class="card-info-item">
+                                    <i class="bi bi-lightning-charge text-secondary"></i>
+                                    <span>Electricidad: 
+                                        <span class="badge rounded-pill px-2 py-1 ms-1"
+                                              th:style="${u.requiereElectricidad} ? 'background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);' : 'background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2);'"
+                                              th:text="${u.requiereElectricidad} ? 'Requerida' : 'No requerida'">
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- DATOS ESPECÍFICOS PUESTO DESARMABLE -->
+                            <div th:if="${u.tipoUnidad == 'Puesto Desarmable'}">
+                                <div class="card-info-item">
+                                    <i class="bi bi-tent text-secondary"></i>
+                                    <span>Carpas: <strong th:text="${u.cantCarpas}">2</strong></span>
+                                </div>
+                                <div class="card-info-item">
+                                    <i class="bi bi-clock-history text-secondary"></i>
+                                    <span>Montaje: <strong th:text="|${u.tiempoMontajeMinutos} min|">45 min</strong></span>
+                                </div>
+                            </div>
+
+                            <!-- PLATO ESTRELLA -->
+                            <div class="mt-3 pt-2 border-top border-secondary border-opacity-10"
+                                 th:if="${pedidoService != null}"
+                                 th:with="platoEstrella=${pedidoService.obtenerPlatoEstrella(festival.id, u.id)}">
+                                <div class="card-info-item mb-0">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <span>Estrella: 
+                                        <strong class="text-light" th:if="${platoEstrella != null}" 
+                                                th:text="|${platoEstrella.nombre} ($ ${platoEstrella.precioVenta})|">
+                                            Milanesa ($ 5000)
+                                        </strong>
+                                        <span class="small text-muted fst-italic" th:unless="${platoEstrella != null}">
+                                            Sin ventas
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FOOTER CUADRADO: BOTONES DE ACCIÓN -->
+                        <div class="pt-3 mt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                            <a th:href="@{/reportes/ranking(idFestival=${festival.id})}" 
+                               class="btn btn-sm btn-outline-warning rounded-pill px-3" 
+                               style="font-size: 0.8rem;">
+                                <i class="bi bi-graph-up me-1"></i> Rendimiento
+                            </a>
+
+                            <a th:href="@{/reportes/ranking(idFestival=${festival.id})}" 
+                               class="btn-circle-action" 
+                               title="Ver informe">
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script Vis.js: Masterplan Campestre y Mapa de Calor -->
+<script th:inline="javascript" th:unless="${#lists.isEmpty(unidades)}">
+    const festivalInfo = /*[[${festival}]]*/ {};
+    const listaUnidades = /*[[${unidades}]]*/ [];
+
+    let modoActual = 'normal';
+
+    const unidadesConMetricas = listaUnidades.map((udv, i) => {
+        const ventas = udv.totalVentas !== undefined ? udv.totalVentas : ((i * 37 + 25) % 100);
+        return { ...udv, ventas };
+    });
+
+    function obtenerColorConsumo(valor) {
+        if (valor > 70) {
+            return { bg: '#fee2e2', border: '#dc2626', glow: 'rgba(220, 38, 38, 0.50)' };
+        }
+        if (valor > 40) {
+            return { bg: '#ffedd5', border: '#ea580c', glow: 'rgba(234, 88, 12, 0.40)' };
+        }
+        return { bg: '#fef9c3', border: '#ca8a04', glow: 'rgba(202, 138, 4, 0.25)' };
+    }
+
+    function generarCoordenadasPredio(index, total) {
+        const puntosClave = [
+            { x: -160, y: -40 },
+            { x: 25,   y: -70 },
+            { x: 160,  y: -50 },
+            { x: 160,  y: 130 },
+            { x: -90,  y: 110 },
+            { x: -210, y: 150 },
+            { x: 330,  y: -40 },
+            { x: 330,  y: 100 }
+        ];
+        
+        if (index < puntosClave.length) {
+            return puntosClave[index];
+        }
+        
+        const angulo = (index * 1.1);
+        return {
+            x: Math.cos(angulo) * 260,
+            y: Math.sin(angulo) * 160
+        };
+    }
+
+    function construirNodos() {
+        return unidadesConMetricas.map((udv, idx) => {
+            const pos = generarCoordenadasPredio(idx, unidadesConMetricas.length);
+            const esFoodTruck = udv.tipoUnidad === 'Food Truck';
+            const colorCalor = obtenerColorConsumo(udv.ventas);
+
+            let icono = esFoodTruck ? "🚚\n" : "⛺\n";
+            let labelTexto = udv.nombreComercial || ('Puesto #' + (idx + 1));
+            
+            if (modoActual === 'calor') {
+                labelTexto += `\n🔥 ${udv.ventas} consumos`;
+            }
+
+            const colorBg = modoActual === 'calor' 
+                ? colorCalor.bg 
+                : '#ffffff';
+                
+            const colorBorde = modoActual === 'calor' 
+                ? colorCalor.border 
+                : (esFoodTruck ? '#0284c7' : '#ea580c');
+
+            return {
+                id: udv.id || ('u_' + idx),
+                x: pos.x,
+                y: pos.y,
+                label: icono + labelTexto,
+                shape: 'box',
+                margin: 10,
+                shapeProperties: { borderRadius: 8 },
+                color: {
+                    background: colorBg,
+                    border: colorBorde,
+                    highlight: { background: '#fef2f2', border: '#ff4d2d' }
+                },
+                borderWidth: modoActual === 'calor' ? 3.5 : 2.5,
+                font: {
+                    color: '#1e293b',
+                    size: 11,
+                    bold: true,
+                    multi: true
+                },
+                ventas: udv.ventas,
+                glowColor: colorCalor.glow
+            };
+        });
+    }
+
+    const datasetNodos = new vis.DataSet(construirNodos());
+    const datasetAristas = new vis.DataSet([]);
+    const contenedor = document.getElementById('red-unidades');
+
+    const opciones = {
+        physics: {
+            enabled: false
+        },
+        interaction: {
+            dragNodes: true,
+            dragView: true,
+            zoomView: true,
+            hover: true
+        }
+    };
+
+    const red = new vis.Network(contenedor, { nodes: datasetNodos, edges: datasetAristas }, opciones);
+
+    // Dibujo del predio en Canvas
+    red.on("beforeDrawing", function (ctx) {
+        ctx.save();
+
+        const w = 920;
+        const h = 580;
+        const x0 = -w / 2;
+        const y0 = -h / 2;
+
+        // Césped / Fondo Verde
+        ctx.beginPath();
+        ctx.fillStyle = '#558b6e'; 
+        ctx.roundRect(x0, y0, w, h, 20);
+        ctx.fill();
+
+        // Calles y caminos
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#e2e8f0';
+
+        // Calle Superior
+        ctx.lineWidth = 26;
+        ctx.beginPath();
+        ctx.moveTo(x0 + 40, y0 + 35);
+        ctx.lineTo(x0 + w - 40, y0 + 35);
+        ctx.stroke();
+
+        // Calle Principal hacia el sur
+        ctx.beginPath();
+        ctx.moveTo(110, y0 + 35);
+        ctx.lineTo(110, 60);
+        ctx.bezierCurveTo(110, 140, -40, 150, -180, 150);
+        ctx.lineTo(x0 + 30, 230);
+        ctx.stroke();
+
+        // Ramal Laguna
+        ctx.beginPath();
+        ctx.moveTo(110, 50);
+        ctx.lineTo(270, 50);
+        ctx.lineTo(270, 130);
+        ctx.lineTo(110, 130);
+        ctx.stroke();
+
+        // Camino alternativo
+        ctx.beginPath();
+        ctx.moveTo(x0 + 35, y0 + 35);
+        ctx.bezierCurveTo(-280, y0 + 110, -210, -25, -130, 0);
+        ctx.lineTo(110, 0);
+        ctx.stroke();
+
+        // Laguna Central
+        ctx.beginPath();
+        ctx.fillStyle = '#93c5fd'; 
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 3;
+        ctx.ellipse(160, 40, 85, 55, -0.15, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 11px system-ui";
+        ctx.fillStyle = "#1e3a8a";
+        ctx.textAlign = "center";
+        ctx.fillText("🌊 LAGUNA", 160, 44);
+
+        // Salón Principal / Escenario
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(-40, y0 + 65, 290, 75, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 13px system-ui";
+        ctx.fillStyle = "#0f172a";
+        ctx.fillText("🎪 SALÓN PRINCIPAL / ESCENARIO", 105, y0 + 105);
+        ctx.font = "10px system-ui";
+        ctx.fillStyle = "#64748b";
+        ctx.fillText(festivalInfo.nombre ? festivalInfo.nombre.toUpperCase() : "EPICENTRO GOURMET", 105, y0 + 123);
+
+        // Área Deportes
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(280, y0 + 65, 140, 85, 4);
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "10px system-ui";
+        ctx.fillStyle = "#475569";
+        ctx.fillText("⚽ ÁREA DEPORTES", 350, y0 + 110);
+
+        // Tenis
+        ctx.beginPath();
+        ctx.roundRect(330, 60, 70, 110, 3);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillText("🎾 TENIS", 365, 120);
+
+        // Parrillas / El Rancho
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(-20, 175, 110, 60, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 11px system-ui";
+        ctx.fillStyle = "#0f172a";
+        ctx.fillText("🔥 EL RANCHO", 35, 210);
+
+        // Piletas
+        ctx.fillStyle = '#bae6fd';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.roundRect(-60, 20, 45, 75, 4);
+        ctx.roundRect(140, 175, 35, 65, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // Árboles
+        function dibujarArbol(x, y, r) {
+            ctx.beginPath();
+            ctx.fillStyle = '#2d6a4f';
+            ctx.arc(x, y, r, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = '#40916c';
+            ctx.arc(x - r * 0.2, y - r * 0.2, r * 0.7, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        dibujarArbol(-380, -180, 26);
+        dibujarArbol(-350, -160, 32);
+        dibujarArbol(-320, -200, 24);
+        dibujarArbol(-380, -100, 30);
+        dibujarArbol(-340, -80, 28);
+        dibujarArbol(-310, -120, 35);
+        dibujarArbol(-270, -70, 24);
+        dibujarArbol(-240, 90, 22);
+        dibujarArbol(-200, 70, 26);
+        dibujarArbol(-170, 100, 20);
+
+        dibujarArbol(70, -15, 18);
+        dibujarArbol(60, 35, 22);
+        dibujarArbol(80, 85, 20);
+        dibujarArbol(250, 15, 20);
+        dibujarArbol(270, 75, 24);
+        dibujarArbol(390, 180, 28);
+        dibujarArbol(410, 220, 32);
+
+        // Accesos
+        ctx.font = "bold 10px system-ui";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("ENTRADA PRINCIPAL ➔", -340, 245);
+        ctx.fillText("➔ ENTRADA SERVICIO", -350, y0 + 20);
+
+        // Modo Calor
+        if (modoActual === 'calor') {
+            const positions = red.getPositions();
+            datasetNodos.forEach(nodo => {
+                const p = positions[nodo.id];
+                if (p) {
+                    const radio = 55 + (nodo.ventas * 0.55);
+                    const gradient = ctx.createRadialGradient(p.x, p.y, 8, p.x, p.y, radio);
+                    gradient.addColorStop(0, nodo.glowColor);
+                    gradient.addColorStop(0.6, nodo.glowColor.replace(/[\d\.]+\)$/, '0.2)'));
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, radio, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            });
+        }
+
+        ctx.restore();
+    });
+
+    function cambiarModo(nuevoModo) {
+        modoActual = nuevoModo;
+        document.getElementById('btnModoNormal').classList.toggle('active', nuevoModo === 'normal');
+        document.getElementById('btnModoCalor').classList.toggle('active', nuevoModo === 'calor');
+        
+        const leyenda = document.getElementById('leyendaCalor');
+        if (nuevoModo === 'calor') {
+            leyenda.classList.remove('d-none');
+            leyenda.classList.add('d-flex');
+        } else {
+            leyenda.classList.remove('d-flex');
+            leyenda.classList.add('d-none');
+        }
+
+        datasetNodos.update(construirNodos());
+        red.redraw();
+    }
+
+    setTimeout(() => {
+        red.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+    }, 200);
+
+    function centrarEnPredio() {
+        red.moveTo({ position: { x: 0, y: 0 }, scale: 0.95, animation: { duration: 500 } });
+    }
+
+    function resetearVistaMapa() {
+        red.fit({ animation: { duration: 500 } });
+    }
+
+    function scrollToTarjetas() {
+        document.getElementById('seccion-tarjetas').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
 </body>
 </html>

@@ -166,45 +166,7 @@
             box-shadow: 0 4px 14px rgba(255, 77, 45, 0.35);
         }
 
-        /* CARD Y TABLA */
-        .enterprise-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            backdrop-filter: blur(14px);
-        }
-
-        .enterprise-card-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-subtle);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .custom-table th {
-            background-color: #0b111a;
-            color: #cbd5e1;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .custom-table td {
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            color: #f1f5f9;
-            font-size: 0.9rem;
-        }
-
-        .custom-table tr:hover td {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
+        /* BADGES ESTADO */
         .badge-live {
             background: rgba(16, 185, 129, 0.25);
             color: #4ade80;
@@ -224,6 +186,66 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
+
+        /* RECUADROS / CARDS INTERACTIVAS ESTILO DASHBOARD */
+        .card-dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--coral-primary);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .card-dashboard:hover {
+            border-color: var(--coral-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 34px rgba(255, 77, 45, 0.22);
+        }
+
+        .card-dashboard:hover::before {
+            opacity: 1;
+        }
+
+        .card-title-lg {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .card-info-item {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-info-item strong {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -236,9 +258,6 @@
     </a>
 
     <div class="sidebar-menu">
-        <div class="text-uppercase fw-bold mb-2 px-1" style="color: #cbd5e1; font-size: 0.78rem; letter-spacing: 0.1em;">
-            Navegación
-        </div>
         <!-- VUELTA AL DASHBOARD / FESTIVALES -->
         <a th:href="@{/admin}" class="btn-sidebar-module">
             <i class="bi bi-calendar3-event" style="color: var(--coral-primary); font-size: 1.25rem;"></i>
@@ -249,16 +268,10 @@
             Gestión Operativa
         </div>
 
-        <!-- BOTÓN PERSONAL Y STAFF (Activo en esta vista) -->
+        <!-- BOTÓN PERSONAL Y STAFF -->
         <a th:href="@{/admin/empleados}" class="btn-sidebar-module active">
             <i class="bi bi-people-fill" style="color: #4ade80; font-size: 1.25rem;"></i>
             <span>Personal y Staff</span>
-        </a>
-
-        <!-- BOTÓN REPORTES Y AUDITORÍA -->
-        <a th:href="@{/reportes}" class="btn-sidebar-module">
-            <i class="bi bi-graph-up-arrow" style="color: #38bdf8; font-size: 1.25rem;"></i>
-            <span>Reportes y Auditoría</span>
         </a>
     </div>
 
@@ -287,9 +300,6 @@
             <span class="badge-kicker"><i class="bi bi-sliders"></i> GOBIERNO & OPERACIONES</span>
         </div>
         <div class="d-flex align-items-center gap-3">
-            <a th:href="@{/admin}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: var(--border-subtle); font-size: 0.85rem;">
-                <i class="bi bi-arrow-left me-1"></i> Panel Festivales
-            </a>
         </div>
     </header>
 
@@ -302,6 +312,10 @@
                 <h2 class="fw-bold text-white m-0">Personal y Staff</h2>
                 <p class="text-secondary small m-0 mt-1">Supervisión de empleados asignados a cada unidad de venta y sus responsables.</p>
             </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="|${#lists.size(empleados)} registrados|">
+                0 registrados
+            </span>
         </div>
 
         <!-- FILTROS DE ESTADO -->
@@ -314,59 +328,73 @@
                th:href="@{/admin/empleados(activo=false)}">Dados de baja</a>
         </div>
 
-        <!-- TABLA DE EMPLEADOS -->
-        <div class="enterprise-card">
-            <div class="enterprise-card-header">
-                <span class="fw-bold text-white fs-6">Nómina General</span>
-                <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
-                      th:text="|${#lists.size(empleados)} registrados|">0 registrados</span>
+        <!-- GRILLA DE RECUADROS ESTILO FESTIVALES -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
+            
+            <div class="col" th:each="e : ${empleados}">
+                <div class="card-dashboard">
+                    <div>
+                        <!-- HEADER RECUADRO: BADGE ESTADO + IDENTIFICADOR TIPO -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span th:if="${e.activo}" class="badge-live">● Activo</span>
+                                <span th:unless="${e.activo}" class="badge-past">● Inactivo</span>
+                            </div>
+                            <span class="badge" 
+                                  th:style="${e.class.simpleName == 'Cajero'} ? 'background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);' : 'background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);'"
+                                  th:text="${e.class.simpleName}">
+                                Cajero
+                            </span>
+                        </div>
+
+                        <!-- TÍTULO PRINCIPAL: NOMBRE COMPLETO -->
+                        <h4 class="card-title-lg" th:text="${e.nombre + ' ' + e.apellido}">Nombre y Apellido</h4>
+
+                        <!-- DATOS APILADOS CON ÍCONOS -->
+                        <div class="card-info-item">
+                            <i class="bi bi-person-vcard text-secondary"></i>
+                            <span>DNI: <strong class="text-white" th:text="${e.dni}">12345678</strong></span>
+                        </div>
+
+                        <div class="card-info-item text-truncate">
+                            <i class="bi bi-envelope text-secondary"></i>
+                            <span class="text-truncate">Email: <strong class="text-white" th:text="${e.email}">correo@ejemplo.com</strong></span>
+                        </div>
+
+                        <div class="card-info-item">
+                            <i class="bi bi-shop text-secondary"></i>
+                            <span>Puesto: <strong class="text-warning" th:text="${e.unidadAsignada != null ? e.unidadAsignada.nombreComercial : 'Sin puesto asignado'}">Puesto de Venta</strong></span>
+                        </div>
+
+                        <div class="card-info-item">
+                            <i class="bi bi-person-badge text-secondary"></i>
+                            <span>Responsable: <strong class="text-white" th:text="${e.unidadAsignada != null and e.unidadAsignada.responsable != null ? e.unidadAsignada.responsable.nombre + ' ' + e.unidadAsignada.responsable.apellido : 'No asignado'}">Responsable</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER DEL RECUADRO (SIN e.id ROTO) -->
+                    <div class="pt-3 mt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                        <span class="text-secondary small">
+                            <i class="bi bi-shield-check text-success me-1"></i> Staff Epicentro
+                        </span>
+                        
+                        <span class="btn btn-sm btn-outline-light rounded-pill px-3" 
+                              style="font-size: 0.8rem; border-color: var(--border-subtle); pointer-events: none;">
+                            Asignado <i class="bi bi-check2 ms-1 text-success"></i>
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table custom-table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Apellido</th>
-                            <th scope="col">DNI</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Unidad de Venta</th>
-                            <th scope="col">Responsable Asignado</th>
-                            <th scope="col" class="text-end">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="e : ${empleados}">
-                            <td class="fw-bold text-white" th:text="${e.nombre}"></td>
-                            <td th:text="${e.apellido}"></td>
-                            <td class="text-secondary" th:text="${e.dni}"></td>
-                            <td class="text-secondary" th:text="${e.email}"></td>
-                            <td>
-                                <span class="badge bg-dark border border-secondary border-opacity-50 text-light rounded-pill px-2 py-1" 
-                                      style="font-size: 0.72rem;" th:text="${e.class.simpleName}"></span>
-                            </td>
-                            <td>
-                                <span class="fw-semibold text-white" 
-                                      th:text="${e.unidadAsignada != null ? e.unidadAsignada.nombreComercial : '-'}"></span>
-                            </td>
-                            <td class="text-secondary" 
-                                th:text="${e.unidadAsignada != null and e.unidadAsignada.responsable != null ? e.unidadAsignada.responsable.nombre + ' ' + e.unidadAsignada.responsable.apellido : '-'}">
-                            </td>
-                            <td class="text-end">
-                                <span th:if="${e.activo}" class="badge-live">● Activo</span>
-                                <span th:unless="${e.activo}" class="badge-past">Dado de baja</span>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(empleados)}">
-                            <td colspan="8" class="text-center py-5 text-secondary">
-                                <i class="bi bi-people fs-2 d-block mb-2 text-secondary"></i>
-                                No hay empleados cargados para el filtro seleccionado.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- ESTADO VACÍO -->
+            <div class="col-12" th:if="${#lists.isEmpty(empleados)}">
+                <div class="p-5 text-center rounded-4" style="background: var(--bg-card); border: 1px dashed var(--border-subtle);">
+                    <i class="bi bi-people fs-1 text-secondary mb-3 d-block"></i>
+                    <h5 class="text-white fw-bold mb-1">No hay personal registrado</h5>
+                    <p class="text-secondary small mb-0">No se encontraron empleados para el filtro actual.</p>
+                </div>
             </div>
+
         </div>
 
     </main>
