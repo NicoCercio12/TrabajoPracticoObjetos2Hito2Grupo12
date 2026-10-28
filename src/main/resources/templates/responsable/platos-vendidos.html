@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Platos vendidos | Epicentro Gourmet</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #080b11;
+            color: #f8fafc;
+            font-family: "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+
+        .barra {
+            background: #0b1019;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .marca {
+            color: #ff6448;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .panel {
+            background: #121826;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: clamp(20px, 4vw, 32px);
+        }
+
+        .texto-secundario {
+            color: #cbd5e1;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #0b1019;
+            color: #f8fafc;
+            border-color: #475569;
+            color-scheme: dark;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #0b1019;
+            color: #ffffff;
+            border-color: #ff6448;
+            box-shadow: 0 0 0 0.2rem rgba(255, 77, 45, 0.18);
+        }
+
+        .btn-coral {
+            background: #ff4d2d;
+            color: white;
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 10px 24px;
+        }
+
+        .btn-coral:hover {
+            background: #ff3410;
+            color: white;
+        }
+
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-color: #f8fafc;
+            --bs-table-border-color: #334155;
+        }
+    </style>
+</head>
+
+<body>
+<header class="barra py-3">
+    <div class="container d-flex flex-wrap gap-2
+                justify-content-between align-items-center">
+        <a class="marca" th:href="@{/responsable}">
+            EPICENTRO · RESPONSABLE
+        </a>
+
+        <span class="texto-secundario small"
+              th:text="${username}"></span>
+    </div>
+</header>
+<main class="container py-5" style="max-width: 1100px;">
+
+    <a class="btn btn-outline-light rounded-pill mb-4"
+       th:href="@{/responsable}">
+        ← Volver al panel
+    </a>
+
+    <h1 class="h3 fw-bold">Platos vendidos entre fechas</h1>
+
+    <p class="texto-secundario mb-4">
+        Consultá las cantidades vendidas en una unidad,
+        sumando sus ventas de todos los festivales.
+        Se incluyen las fechas desde y hasta.
+    </p>
+
+    <div th:if="${error != null}"
+         class="alert alert-danger"
+         role="alert"
+         th:text="${error}">
+    </div>
+
+    <div th:if="${#lists.isEmpty(unidades)}"
+         class="alert alert-warning">
+        No tenés unidades asignadas para consultar.
+    </div>
+
+    <section class="panel mb-4">
+        <form th:action="@{/responsable/platos-vendidos}" method="get">
+
+            <input type="hidden" name="consultar" value="true">
+
+            <div class="row g-3">
+
+                <div class="col-12">
+                    <label for="unidadId" class="form-label">
+                        Unidad de venta
+                    </label>
+
+                    <select id="unidadId"
+                            name="unidadId"
+                            class="form-select"
+                            required>
+                        <option value="">Seleccioná una unidad</option>
+
+                        <option th:each="unidad : ${unidades}"
+                                th:value="${unidad.id}"
+                                th:text="${unidad.nombreComercial}"
+                                th:selected="${unidadId != null
+                                    and unidadId == unidad.id}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="desde" class="form-label">Desde</label>
+                    <input id="desde"
+                           name="desde"
+                           type="date"
+                           class="form-control"
+                           th:value="${desde}"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="hasta" class="form-label">Hasta</label>
+                    <input id="hasta"
+                           name="hasta"
+                           type="date"
+                           class="form-control"
+                           th:value="${hasta}"
+                           required>
+                </div>
+            </div>
+
+            <p class="texto-secundario small mt-3">
+                Podés consultar un día, un mes o un período
+                que abarque varios festivales.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="submit"
+                        class="btn btn-coral"
+                        th:disabled="${#lists.isEmpty(unidades)}">
+                    Consultar ventas
+                </button>
+
+                <a class="btn btn-outline-light rounded-pill px-4"
+                   th:href="@{/responsable/platos-vendidos}">
+                    Limpiar
+                </a>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel" th:if="${consultado}">
+        <h2 class="h5 fw-bold mb-3">Resultado de la consulta</h2>
+
+        <p class="texto-secundario"
+           th:text="|Período: ${desde} al ${hasta}|"></p>
+
+        <div th:if="${#lists.isEmpty(platos)}"
+             class="alert alert-info mb-0"
+             role="status">
+            No se registraron ventas de platos para los filtros seleccionados.
+        </div>
+
+        <div class="table-responsive"
+             th:unless="${#lists.isEmpty(platos)}">
+            <table class="table align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">Plato</th>
+                    <th scope="col" class="text-end">Cantidad vendida</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="plato : ${platos}">
+                    <td th:text="${plato.nombre}"></td>
+                    <td class="text-end fw-bold"
+                        th:text="${plato.cantidadVendida}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
