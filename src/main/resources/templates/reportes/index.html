@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head th:replace="~{fragments/layout :: head('Reportes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container pb-5">
+
+    <header class="page-header">
+        <div class="badge-kicker"><i class="bi bi-bar-chart-fill"></i> GESTIÓN</div>
+        <h1 class="page-title">Reportes de <span class="highlight">festivales</span></h1>
+        <p class="page-sub">Elegí un festival para ver su recaudación, el ranking de unidades y las de mayor canon.</p>
+    </header>
+
+    <section class="enterprise-card">
+        <div class="enterprise-card-header">
+            <div>
+                <h5 class="fw-bold text-white m-0 fs-5">Festivales</h5>
+                <p class="m-0 mt-1" style="color: #cbd5e1; font-size: 0.88rem;">Reportes disponibles por festival</p>
+            </div>
+            <span class="badge bg-dark border border-secondary border-opacity-25 rounded-pill px-3 py-2 text-white small"
+                  th:text="|${#lists.size(festivales)} festivales|">0 festivales</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                <tr>
+                    <th>Festival</th>
+                    <th>Temporada</th>
+                    <th>Apertura</th>
+                    <th>Cierre</th>
+                    <th class="text-end">Reportes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="f : ${festivales}">
+                    <td class="fw-bold text-white" th:text="${f.nombre}"></td>
+                    <td th:text="${f.temporada}"></td>
+                    <td th:text="${#temporals.format(f.fechaInicio, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(f.fechaFin, 'dd/MM/yyyy')}"></td>
+                    <td class="text-end">
+                        <a class="btn-palo-outline btn-sm-eg"
+                           th:href="@{/reportes/recaudacion/{id}(id=${f.id})}">Recaudación</a>
+                        <a class="btn-palo-outline btn-sm-eg"
+                           th:href="@{/reportes/ranking(idFestival=${f.id})}">Ranking</a>
+                        <a class="btn-palo-outline btn-sm-eg"
+                           th:href="@{/reportes/canones(idFestival=${f.id}, cantidad=5)}">Mayor canon</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(festivales)}">
+                    <td colspan="5" class="empty-state">
+                        <i class="bi bi-calendar-x fs-3 d-block mb-2 text-white"></i>
+                        No hay festivales cargados.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
