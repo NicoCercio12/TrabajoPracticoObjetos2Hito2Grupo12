@@ -1,10 +1,299 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="es">
-<head th:replace="~{fragments/layout :: head('Cierre de caja')}"></head>
+      lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cierre de caja | Epicentro Gourmet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Diseño general de Epicentro Gourmet (el mismo del inicio) */
+        :root {
+            --bg-dark: #080b11;
+            --bg-card: rgba(18, 24, 38, 0.88);
+            --coral-primary: #ff4d2d;
+            --coral-hover: #ff3410;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted-eg: #94a3b8;
+            --border-card: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-x: hidden;
+            background-image:
+                    radial-gradient(circle at 85% 15%, rgba(255, 77, 45, 0.1) 0%, transparent 45%),
+                    radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.08) 0%, transparent 45%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main { flex: 1; }
+
+        /* Navbar */
+        .navbar-public {
+            background: rgba(8, 11, 17, 0.88);
+            border-bottom: 1px solid var(--border-card);
+            backdrop-filter: blur(12px);
+        }
+        .nav-link-eg {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+        .nav-link-eg:hover,
+        .nav-link-eg.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Encabezado de página */
+        .page-header { padding: 44px 0 26px; }
+        .badge-kicker {
+            color: #ff6448;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .page-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+        .page-title .highlight { color: var(--coral-primary); }
+        .page-sub { color: var(--text-secondary); margin: 0; }
+
+        /* Botones */
+        .btn-palo-primary {
+            background-color: var(--coral-primary);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 12px 26px;
+            border-radius: 50px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 18px rgba(255, 77, 45, 0.35);
+            cursor: pointer;
+        }
+        .btn-palo-primary:hover {
+            background-color: var(--coral-hover);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(255, 77, 45, 0.45);
+        }
+        .btn-palo-outline {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-palo-outline:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+        .btn-sm-eg { padding: 6px 16px; font-size: 0.82rem; }
+
+        /* Tarjetas */
+        .enterprise-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        .enterprise-card-header {
+            padding: 22px 26px;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .enterprise-card-body { padding: 24px 26px; }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 20px 22px;
+            height: 100%;
+        }
+        .stat-label {
+            color: var(--text-muted-eg);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .stat-value {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .stat-value.coral { color: var(--coral-primary); }
+        .stat-value.small-text { font-size: 1.2rem; }
+
+        /* Lista de datos */
+        .dl-eg dt {
+            color: var(--text-muted-eg);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding-top: 6px;
+        }
+        .dl-eg dd { color: #f1f5f9; padding-top: 4px; margin-bottom: 8px; }
+
+        /* Tablas */
+        .custom-table { color: #e2e8f0; margin-bottom: 0; }
+        .custom-table th {
+            background-color: #0b111a;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-card);
+        }
+        .custom-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: transparent;
+            font-size: 0.95rem;
+            color: #f1f5f9;
+        }
+        .custom-table tr:hover td { background: rgba(255, 255, 255, 0.04); }
+
+        /* Badges de estado */
+        .badge-live {
+            background: rgba(16, 185, 129, 0.25);
+            color: #4ade80;
+            border: 1px solid #22c55e;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .badge-next {
+            background: rgba(56, 189, 248, 0.2);
+            color: #7dd3fc;
+            border: 1px solid #38bdf8;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .badge-past {
+            background: rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+            border: 1px solid rgba(203, 213, 225, 0.35);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        /* Avisos */
+        .alert-eg {
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-eg-ok { background: rgba(16, 185, 129, 0.15); border-color: #22c55e; color: #bbf7d0; }
+        .alert-eg-error { background: rgba(255, 77, 45, 0.15); border-color: var(--coral-primary); color: #fecaca; }
+        .alert-eg-info { background: rgba(148, 163, 184, 0.12); border-color: rgba(203, 213, 225, 0.35); color: #e2e8f0; }
+
+        .empty-state { color: var(--text-secondary); text-align: center; padding: 40px 20px; }
+
+        .footer-eg {
+            text-align: center;
+            color: var(--text-muted-eg);
+            font-size: 0.85rem;
+            padding: 28px 0;
+        }
+    </style>
+</head>
 <body>
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav class="navbar navbar-expand-lg navbar-public py-3">
+    <div class="container">
+        <a class="navbar-brand text-white fw-bold d-flex align-items-center gap-2" th:href="@{/}">
+            <span style="color: var(--coral-primary); font-size: 1.4rem;">❖</span> EPICENTRO GOURMET
+        </a>
+
+        <div class="d-flex align-items-center flex-wrap gap-2">
+
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center flex-wrap gap-1">
+                <a th:href="@{/festivales}" class="nav-link-eg">Festivales</a>
+
+                <th:block sec:authorize="hasRole('RESPONSABLE')">
+                    <a th:href="@{/responsable/unidades}" class="nav-link-eg">Mis unidades</a>
+                    <a th:href="@{/responsable/empleados}" class="nav-link-eg">Empleados</a>
+                    <a th:href="@{/registro}" class="nav-link-eg">Registrar unidad</a>
+                </th:block>
+
+                <a sec:authorize="hasRole('CAJERO')" th:href="@{/cajero/cierre}" class="nav-link-eg">Cerrar caja</a>
+
+                <a sec:authorize="hasAnyRole('CAJERO','COCINERO')" th:href="@{/empleado/mi-perfil}" class="nav-link-eg">Mi perfil</a>
+
+                <th:block sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/empleados}" class="nav-link-eg">Empleados</a>
+                    <a th:href="@{/admin/unidades}" class="nav-link-eg">Unidades</a>
+                </th:block>
+            </div>
+
+            <div sec:authorize="isAnonymous()" class="d-flex gap-2">
+                <a th:href="@{/login}" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: rgba(255,255,255,0.3);">Iniciar sesión</a>
+                <a th:href="@{/signup}" class="btn-palo-primary btn-sm py-1 px-3">Registrarse</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-3">
+                <span class="small text-secondary d-none d-sm-inline" sec:authentication="name">usuario</span>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-outline-light btn-sm rounded-pill px-3" style="border-color: rgba(255,255,255,0.3);">Salir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
 
 <main class="container pb-5">
 
@@ -85,6 +374,9 @@
     </section>
 </main>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
+<footer class="footer-eg">
+    Epicentro Gourmet · Grupo 12 · Objetos II
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

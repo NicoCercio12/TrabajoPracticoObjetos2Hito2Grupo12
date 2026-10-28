@@ -26,11 +26,8 @@ public class FestivalController {
 
     @GetMapping
     public String listarFestivales(Model model) {
-        List<FestivalDTO> festivales = festivalService.obtenerTodosDTO();
-        model.addAttribute("festivales", festivales);
-        model.addAttribute("titulo", "Listado de Festivales");
-        return "festivales/lista";
-    }
+            return "redirect:/#cartelera";
+        }
 
   
 }
