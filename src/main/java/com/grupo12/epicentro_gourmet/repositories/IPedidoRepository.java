@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.grupo12.epicentro_gourmet.dtos.PlatoVendidoDTO;
+import java.time.LocalDate;
+
 import java.util.List;
 
 @Repository
@@ -24,4 +27,25 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
     List<Plato> encontrarPlatoEstrella(@Param("festivalId") Long festivalId,
                                        @Param("unidadId") Long unidadId,
                                        Pageable pageable);
+    @Query("""
+        SELECT new com.grupo12.epicentro_gourmet.dtos.PlatoVendidoDTO(
+            plato.idPlato,
+            plato.nombre,
+            SUM(item.cantidad)
+        )
+        FROM Pedido pedido
+        JOIN pedido.lstItems item
+        JOIN item.plato plato
+        WHERE pedido.unidadDeVenta.id = :unidadId
+          AND pedido.unidadDeVenta.responsable.usuario.username = :username
+          AND pedido.fecha BETWEEN :desde AND :hasta
+        GROUP BY plato.idPlato, plato.nombre
+        ORDER BY SUM(item.cantidad) DESC, plato.nombre, plato.idPlato
+        """)
+    List<PlatoVendidoDTO> traerPlatosVendidosEntreFechas(
+            @Param("unidadId") Long unidadId,
+            @Param("desde") LocalDate desde,
+            @Param("hasta") LocalDate hasta,
+            @Param("username") String usernameResponsable);
+
 }
