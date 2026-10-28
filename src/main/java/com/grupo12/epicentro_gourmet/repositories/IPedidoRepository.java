@@ -1,5 +1,6 @@
 package com.grupo12.epicentro_gourmet.repositories;
 
+import com.grupo12.epicentro_gourmet.dtos.PlatoMasVendidoDTO;
 import com.grupo12.epicentro_gourmet.entities.Pedido;
 import com.grupo12.epicentro_gourmet.entities.Plato;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +25,25 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
     List<Plato> encontrarPlatoEstrella(@Param("festivalId") Long festivalId,
                                        @Param("unidadId") Long unidadId,
                                        Pageable pageable);
+
+
+
+@Query("SELECT new com.grupo12.epicentro_gourmet.dtos.PlatoMasVendidoDTO(" +
+           "pl.nombre, " +
+           "SUM(ip.cantidad), " +
+           "SUM(ip.cantidad * pl.precioVenta)) " +
+           "FROM ItemPedido ip " +
+           "JOIN ip.pedido p " +
+           "JOIN ip.plato pl " +
+           "WHERE p.festival.id = :idFestival AND p.unidadDeVenta.id = :idUnidad " +
+           "GROUP BY pl.id, pl.nombre, pl.precioVenta " +
+           "ORDER BY SUM(ip.cantidad) DESC")
+    List<PlatoMasVendidoDTO> findTopPlatosByUnidadAndFestival(
+            @Param("idFestival") Long idFestival,
+            @Param("idUnidad") Long idUnidad,
+            Pageable pageable
+    );
+
+
+                                       
 }

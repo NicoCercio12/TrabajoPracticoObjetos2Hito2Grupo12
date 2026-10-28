@@ -1,10 +1,8 @@
 package com.grupo12.epicentro_gourmet.controllers;
 
 import com.grupo12.epicentro_gourmet.dtos.FestivalDTO;
-import com.grupo12.epicentro_gourmet.dtos.PlatoDTO;
 import com.grupo12.epicentro_gourmet.dtos.UnidadDeVentaDTO;
 import com.grupo12.epicentro_gourmet.services.IFestivalService;
-import com.grupo12.epicentro_gourmet.services.IPedidoService;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,8 +20,8 @@ public class FestivalController {
 
     private final IFestivalService festivalService;
     private final IUnidadDeVentaService unidadDeVentaService;
-    private final IPedidoService pedidoService;
 
+    //MOSTRAR UNIDADES DE VENTA AL ADMIN
     @GetMapping
     public String listarFestivales(Model model) {
         List<FestivalDTO> festivales = festivalService.obtenerTodosDTO();
@@ -32,5 +30,5 @@ public class FestivalController {
         return "festivales/lista";
     }
 
-  
+
 }
