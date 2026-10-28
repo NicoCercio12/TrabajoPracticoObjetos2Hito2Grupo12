@@ -24,11 +24,8 @@ public class FestivalController {
     //MOSTRAR UNIDADES DE VENTA AL ADMIN
     @GetMapping
     public String listarFestivales(Model model) {
-        List<FestivalDTO> festivales = festivalService.obtenerTodosDTO();
-        model.addAttribute("festivales", festivales);
-        model.addAttribute("titulo", "Listado de Festivales");
-        return "festivales/lista";
-    }
+            return "redirect:/#cartelera";
+        }
 
 
 }
