@@ -41,15 +41,18 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/cajero/**").hasRole(Roles.CAJERO);
                     auth.requestMatchers("/empleado/**").hasAnyRole(Roles.CAJERO, Roles.COCINERO);
 
-                    auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades","/cuenta-pendiente").permitAll();
-
-                    // Permite probar el canon y la liquidación sin pasar por el login
-                    auth.requestMatchers("/responsable/canon/**", "/responsable/liquidacion/**");
+                    auth.requestMatchers("/", "/login", "/signup", "/error", "/festivales", "/unidades",
+                            "/cuenta-pendiente").permitAll();
 
                     auth.requestMatchers("/admin/**").hasRole(Roles.ADMINISTRADOR);
+
+                    // Reportes: el índice, el ranking y el mayor canon son solo del administrador
+                    auth.requestMatchers("/reportes", "/reportes/ranking/**", "/reportes/canones/**")
+                            .hasRole(Roles.ADMINISTRADOR);
                     auth.requestMatchers("/reportes/**", "/unidades/**", "/empleados/**", "/platos/**")
                             .hasAnyRole(Roles.ADMINISTRADOR, Roles.RESPONSABLE);
-                    auth.requestMatchers("/responsable/**").hasAnyRole(Roles.RESPONSABLE);
+
+                    auth.requestMatchers("/responsable/**").hasRole(Roles.RESPONSABLE);
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(login -> {
