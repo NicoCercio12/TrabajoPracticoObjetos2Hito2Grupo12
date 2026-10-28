@@ -21,4 +21,6 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     List<Empleado> findByUnidadAsignada_Responsable_Usuario_UsernameAndActivo(
             String username, boolean activo);
+
+    List<Empleado> findByUnidadAsignada_Id(Long idUnidad);
 }
