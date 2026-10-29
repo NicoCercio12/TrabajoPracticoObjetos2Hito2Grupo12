@@ -109,4 +109,28 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
             @Param("unidadId") Long unidadId,
             @Param("fechaInicio") LocalDate fechaInicio,
             @Param("fechaFin") LocalDate fechaFin);
+
+
+    @Query("""
+        SELECT new com.grupo12.epicentro_gourmet.dtos.RentabilidadDiariaDTO(
+            p.fecha,
+            SUM(item.cantidad * item.plato.precioVenta),
+            SUM(item.cantidad * item.plato.costoProduccion)
+        )
+        FROM Pedido p
+        JOIN p.lstItems item
+        WHERE p.festival.id = :festivalId
+          AND p.unidadDeVenta.id = :unidadId
+          AND p.fecha BETWEEN :fechaInicio AND :fechaFin
+        GROUP BY p.fecha
+        ORDER BY p.fecha
+        """)
+    List<com.grupo12.epicentro_gourmet.dtos.RentabilidadDiariaDTO>
+    obtenerRentabilidadDiaria(
+            @Param("festivalId") Long festivalId,
+            @Param("unidadId") Long unidadId,
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin);
+
+
 }

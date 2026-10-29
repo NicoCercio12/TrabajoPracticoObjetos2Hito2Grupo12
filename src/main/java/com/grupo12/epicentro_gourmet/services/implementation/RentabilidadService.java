@@ -8,6 +8,11 @@ import com.grupo12.epicentro_gourmet.repositories.IPedidoRepository;
 import com.grupo12.epicentro_gourmet.services.IRentabilidadService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.grupo12.epicentro_gourmet.dtos.RentabilidadDiariaDTO;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import java.time.LocalDate;
 
@@ -126,4 +131,97 @@ public class RentabilidadService implements IRentabilidadService {
                     "La unidad de venta no pertenece al festival indicado.");
         }
     }
+
+    @Override
+    public List<RentabilidadDiariaDTO> calcularEvolucionDiaria(
+            Festival festival,
+            UnidadDeVenta unidad,
+            LocalDate fechaInicio,
+            LocalDate fechaFin) {
+
+        validarFestivalYUnidad(festival, unidad);
+
+        if (fechaInicio == null || fechaFin == null) {
+            throw new IllegalArgumentException(
+                    "Debés indicar ambas fechas.");
+        }
+
+        if (fechaInicio.isAfter(fechaFin)) {
+            throw new IllegalArgumentException(
+                    "La fecha inicial no puede ser posterior a la fecha final.");
+        }
+
+        if (fechaInicio.isBefore(festival.getFechaInicio())
+                || fechaFin.isAfter(festival.getFechaFin())) {
+            throw new IllegalArgumentException(
+                    "El período debe estar dentro de las fechas del festival.");
+        }
+
+        List<RentabilidadDiariaDTO> diasConPedidos =
+                pedidoRepository.obtenerRentabilidadDiaria(
+                        festival.getId(),
+                        unidad.getId(),
+                        fechaInicio,
+                        fechaFin);
+
+        Map<LocalDate, RentabilidadDiariaDTO> datosPorFecha =
+                new HashMap<>();
+
+        for (RentabilidadDiariaDTO dia : diasConPedidos) {
+            datosPorFecha.put(dia.getFecha(), dia);
+        }
+
+        double totalSueldos = empleadoRepository
+                .findByUnidadAsignada_Id(unidad.getId())
+                .stream()
+                .mapToDouble(empleado -> empleado.calcularSueldo(festival))
+                .sum();
+
+        double totalCanon = unidad.calcularCanon();
+
+        long diasFestival = festival.getFechaInicio()
+                .datesUntil(festival.getFechaFin().plusDays(1))
+                .count();
+
+        if (diasFestival <= 0) {
+            throw new IllegalArgumentException(
+                    "El festival tiene un período de fechas inválido.");
+        }
+
+        double sueldoDiario = totalSueldos / diasFestival;
+        double canonDiario = totalCanon / diasFestival;
+
+        List<RentabilidadDiariaDTO> resultado = new ArrayList<>();
+        double rentabilidadAcumulada = 0.0;
+
+        for (LocalDate fecha = fechaInicio;
+             !fecha.isAfter(fechaFin);
+             fecha = fecha.plusDays(1)) {
+
+            RentabilidadDiariaDTO dia = datosPorFecha.get(fecha);
+
+            if (dia == null) {
+                dia = new RentabilidadDiariaDTO(fecha, 0.0, 0.0);
+            }
+
+            dia.setSueldos(sueldoDiario);
+            dia.setCanon(canonDiario);
+
+            double rentabilidadNeta =
+                    dia.getRecaudacion()
+                            - dia.getCostoPlatos()
+                            - dia.getSueldos()
+                            - dia.getCanon();
+
+            dia.setRentabilidadNeta(rentabilidadNeta);
+
+            rentabilidadAcumulada += rentabilidadNeta;
+            dia.setRentabilidadAcumulada(rentabilidadAcumulada);
+
+            resultado.add(dia);
+        }
+
+        return resultado;
+    }
+
 }
