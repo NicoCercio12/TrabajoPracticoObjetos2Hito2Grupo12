@@ -102,7 +102,7 @@
             <span class="badge bg-warning text-dark fs-6 ms-2">Panel Admin</span>
         </a>
         <div class="d-flex align-items-center gap-3">
-            <a th:href="@{/festivales/{id}/unidades(id=${festival.id})}" class="btn btn-sm btn-outline-light px-3">
+            <a th:href="@{/admin/{id}/unidades(id=${admin.id})}" class="btn btn-sm btn-outline-light px-3">
                 <i class="bi bi-arrow-left"></i> Volver a Unidades
             </a>
             <form th:action="@{/logout}" method="post" class="m-0">
@@ -124,7 +124,7 @@
                 <i class="bi bi-bezier2"></i> Todos los Festivales
             </a>
 
-            <a th:href="@{/festivales/{id}/unidades(id=${festival.id})}" class="btn btn-menu w-100">
+            <a th:href="@{/admin/{id}/unidades(id=${admin.id})}" class="btn btn-menu w-100">
                 <i class="bi bi-shop"></i> Unidades del Festival
             </a>
 

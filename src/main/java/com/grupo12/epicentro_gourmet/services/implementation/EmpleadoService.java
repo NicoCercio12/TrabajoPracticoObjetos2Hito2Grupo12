@@ -226,10 +226,10 @@ public class EmpleadoService implements IEmpleadoService {
         }
 
         // Crear el tipo de empleado seleccionado.
+
         Empleado empleado;
 
         if (dto.getTipoEmpleado() == TipoEmpleado.COCINERO) {
-
             if (dto.getRolCocina() == null) {
                 throw new IllegalArgumentException("Seleccioná el rol en la cocina");
             }
