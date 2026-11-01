@@ -1,5 +1,6 @@
 package com.grupo12.epicentro_gourmet.repositories;
 
+import com.grupo12.epicentro_gourmet.dtos.PlatoMasVendidoDTO;
 import com.grupo12.epicentro_gourmet.dtos.PlatoVendidoDTO;
 import com.grupo12.epicentro_gourmet.entities.Pedido;
 import com.grupo12.epicentro_gourmet.entities.Plato;
@@ -21,16 +22,14 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
     Double calcularRecaudacionTotalPorFestival(
             @Param("festivalId") Long festivalId);
 
-    // Plato estrella por festival y unidad
+    // Consulta para obtener el plato estrella por festival y unidad de venta
     @Query("SELECT item.plato FROM Pedido p JOIN p.lstItems item " +
-            "WHERE p.festival.id = :festivalId " +
-            "AND p.unidadDeVenta.id = :unidadId " +
+            "WHERE p.festival.id = :festivalId AND p.unidadDeVenta.id = :unidadId " +
             "GROUP BY item.plato " +
             "ORDER BY SUM(item.cantidad) DESC")
-    List<Plato> encontrarPlatoEstrella(
-            @Param("festivalId") Long festivalId,
-            @Param("unidadId") Long unidadId,
-            Pageable pageable);
+    List<Plato> encontrarPlatoEstrella(@Param("festivalId") Long festivalId,
+                                       @Param("unidadId") Long unidadId,
+                                       Pageable pageable);
 
     // Platos vendidos por unidad entre fechas, sin limitar por festival
     @Query("""
@@ -53,6 +52,21 @@ public interface IPedidoRepository extends JpaRepository<Pedido, Long> {
             @Param("desde") LocalDate desde,
             @Param("hasta") LocalDate hasta,
             @Param("username") String usernameResponsable);
+
+    // Top 3 Platos Más Vendidos por Unidad y Festival
+    @Query("SELECT new com.grupo12.epicentro_gourmet.dtos.PlatoMasVendidoDTO(" +
+            "item.plato.nombre, " +
+            "SUM(item.cantidad), " +
+            "SUM(item.cantidad * item.plato.precioVenta)) " +
+            "FROM Pedido p JOIN p.lstItems item " +
+            "WHERE p.festival.id = :idFestival AND p.unidadDeVenta.id = :idUnidad " +
+            "GROUP BY item.plato.idPlato, item.plato.nombre, item.plato.precioVenta " +
+            "ORDER BY SUM(item.cantidad) DESC")
+    List<PlatoMasVendidoDTO> findTopPlatosByUnidadAndFestival(
+            @Param("idFestival") Long idFestival,
+            @Param("idUnidad") Long idUnidad,
+            Pageable pageable
+    );
 
     // Rentabilidad: recaudación total por festival y unidad
     @Query("SELECT COALESCE(SUM(item.cantidad * item.plato.precioVenta), 0) " +

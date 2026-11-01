@@ -25,4 +25,5 @@ public interface IEmpleadoService {
     ModificarEmpleadoDTO obtenerParaModificar(Long idEmpleado, String usernameResponsable);
     void modificar(Long idEmpleado, ModificarEmpleadoDTO dto, String usernameResponsable);
     List<Empleado> filtrarActivosPorResponsable(String usernameResponsable, String texto, Long idUnidad);
+    void reasignarUnidad(Long idEmpleado, Long idNuevaUnidad, String usernameResponsable);
 }
