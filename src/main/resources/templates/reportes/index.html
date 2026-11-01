@@ -337,6 +337,11 @@
                            th:href="@{/reportes/ranking(idFestival=${f.id})}">Ranking</a>
                         <a class="btn-palo-outline btn-sm-eg"
                            th:href="@{/reportes/canones(idFestival=${f.id}, cantidad=5)}">Mayor canon</a>
+                        <a class="btn-palo-outline btn-sm-eg"
+                           th:href="@{/reportes/rentabilidad(idFestival=${f.id})}">
+                            <i class="bi bi-graph-up-arrow me-1"></i>
+                            Rentabilidad neta
+                        </a>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(festivales)}">

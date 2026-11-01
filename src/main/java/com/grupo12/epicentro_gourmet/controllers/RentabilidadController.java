@@ -10,6 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import com.grupo12.epicentro_gourmet.services.implementation.PdfRentabilidadService;
 
 import java.time.LocalDate;
 
@@ -19,16 +23,21 @@ public class RentabilidadController {
     private final IRentabilidadService rentabilidadService;
     private final IFestivalRepository festivalRepository;
     private final IUnidadDeVentaRepository unidadRepository;
+    private final PdfRentabilidadService pdfRentabilidadService;
+
 
     public RentabilidadController(
             IRentabilidadService rentabilidadService,
             IFestivalRepository festivalRepository,
-            IUnidadDeVentaRepository unidadRepository) {
+            IUnidadDeVentaRepository unidadRepository,
+            PdfRentabilidadService pdfRentabilidadService) {
 
         this.rentabilidadService = rentabilidadService;
         this.festivalRepository = festivalRepository;
         this.unidadRepository = unidadRepository;
+        this.pdfRentabilidadService = pdfRentabilidadService;
     }
+
 
     @GetMapping("/reportes/rentabilidad")
     public String mostrarRentabilidad(
@@ -93,5 +102,35 @@ public class RentabilidadController {
         }
 
         return "reportes/rentabilidad";
+    }
+
+    @GetMapping("/reportes/rentabilidad/pdf")
+    public ResponseEntity<byte[]> descargarPdfRentabilidad(
+            @RequestParam Long idFestival,
+            @RequestParam Long idUnidad,
+            @RequestParam LocalDate fechaInicio,
+            @RequestParam LocalDate fechaFin) {
+
+        Festival festival = festivalRepository.findById(idFestival)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Festival no encontrado"));
+
+        UnidadDeVenta unidad = unidadRepository.findById(idUnidad)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Unidad de venta no encontrada"));
+
+        var datos = rentabilidadService.calcularEvolucionDiaria(
+                festival, unidad, fechaInicio, fechaFin);
+
+        byte[] pdf = pdfRentabilidadService.generarPdf(
+                festival, unidad, fechaInicio, fechaFin, datos);
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"reporte-rentabilidad.pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }
