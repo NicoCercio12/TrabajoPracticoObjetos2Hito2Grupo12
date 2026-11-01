@@ -23,6 +23,7 @@ import com.grupo12.epicentro_gourmet.entities.Cocinero;
 import com.grupo12.epicentro_gourmet.entities.UnidadDeVenta;
 import com.grupo12.epicentro_gourmet.enums.TipoEmpleado;
 import com.grupo12.epicentro_gourmet.helpers.GeneradorPassword;
+import com.grupo12.epicentro_gourmet.helpers.Roles;
 
 @Service
 public class EmpleadoService implements IEmpleadoService {
@@ -255,7 +256,9 @@ public class EmpleadoService implements IEmpleadoService {
         // Crear la cuenta con contraseña aleatoria y rol EMPLEADO.
         String passwordGenerada = GeneradorPassword.generar();
 
-        User usuario = cuentaService.crearCuentaEmpleado(email, passwordGenerada);
+        String rolEspecifico = dto.getTipoEmpleado() == TipoEmpleado.CAJERO ? Roles.CAJERO : Roles.COCINERO;
+
+        User usuario = cuentaService.crearCuentaEmpleado(email, passwordGenerada, rolEspecifico);
 
         empleado.setUsuario(usuario);
         empleado.setUnidadAsignada(unidad);

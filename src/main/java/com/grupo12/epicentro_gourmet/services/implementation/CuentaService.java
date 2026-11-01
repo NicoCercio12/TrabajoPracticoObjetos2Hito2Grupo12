@@ -75,4 +75,20 @@ public class CuentaService {
         return userRepository.save(usuario);
     }
 
+    @Transactional
+    public User crearCuentaEmpleado(String email, String password, String rolEspecifico) {
+
+        if (!Roles.CAJERO.equals(rolEspecifico) && !Roles.COCINERO.equals(rolEspecifico)) {
+            throw new IllegalArgumentException("El rol debe ser CAJERO o COCINERO");
+        }
+
+        // Crea la cuenta con contraseña codificada y rol EMPLEADO.
+        User usuario = crearCuentaEmpleado(email, password);
+
+        // Agrega el permiso correspondiente al tipo de empleado.
+        usuario.getUserRoles().add(new UserRole(usuario, rolEspecifico));
+
+        return userRepository.save(usuario);
+    }
+
 }

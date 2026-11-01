@@ -36,7 +36,7 @@ public class LoginController {
 
         // 3. Empleado -> Vista operativa / registro de pedidos / jornada
         if (tieneRol(auth, Roles.EMPLEADO)) {
-            return "redirect:/empleado";
+            return "redirect:/empleado/mi-perfil";
         }
 
         // 4. Pendiente -> Pantalla de espera o alta de unidad de venta
