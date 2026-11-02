@@ -110,7 +110,6 @@ La aplicación sigue una arquitectura en capas con el patrón MVC de Spring:
 - **MySQL** como base de datos (`db_grupo_12_hito_2`)
 - **OpenPDF** para generar los recibos de sueldo
 - **Lombok** y **ModelMapper**
-- **JUnit 5, Mockito y AssertJ** para las pruebas
 - **Maven** como gestor de dependencias
 
 ---
@@ -162,14 +161,6 @@ server:
 La aplicación queda disponible en `http://localhost:8080`.
 
 En IntelliJ, las variables de entorno se definen en la configuración de ejecución (*Run → Edit Configurations → Environment variables*).
-
-### Pruebas
-```bash
-./mvnw test
-```
-Las pruebas unitarias usan Mockito y no necesitan base de datos.
-
----
 
 ## Integrantes
 
