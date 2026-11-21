@@ -6,7 +6,7 @@ public interface IUnidadDeVentaService {
 
     // Devuelve la lista de unidades de venta asociadas al festival indicado por su ID
     List<UnidadDeVentaDTO> obtenerUnidadesPorFestivalId(Long festivalId);
-UnidadDeVenta buscarPorId(Long idUnidad);
+    UnidadDeVenta buscarPorId(Long idUnidad);
     double calcularCanon(Long idUnidad);
    
 }

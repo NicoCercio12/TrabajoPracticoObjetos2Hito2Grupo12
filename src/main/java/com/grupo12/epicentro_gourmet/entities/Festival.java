@@ -71,7 +71,7 @@ public class Festival {
         this.fechaFin = fechaFin;
     }
 
-    //duracion d efestival
+    //duracion del festival
     public long getDuracionEnDias() {
         if (fechaInicio == null || fechaFin == null) return 0;
         return java.time.temporal.ChronoUnit.DAYS.between(fechaInicio, fechaFin) + 1;

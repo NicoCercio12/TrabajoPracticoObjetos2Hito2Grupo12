@@ -18,4 +18,8 @@ public interface IFestivalRepository extends JpaRepository<Festival, Long> {
     List<Festival> findAllByOrderByFechaInicioAsc();
     List<Festival> findByLstUdvContainingOrderByFechaInicioDesc(UnidadDeVenta unidad);
 
+
+    Optional<Festival> findByNombreAndTemporadaAndFechaInicio(String nombre, String temporada, LocalDate fechaInicio);
+
+
 }
