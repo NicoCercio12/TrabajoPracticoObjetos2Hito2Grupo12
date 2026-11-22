@@ -69,8 +69,6 @@ public class AdminController {
         FestivalDTO festival = festivalService.obtenerPorIdDTO(id);
         List<UnidadDeVentaDTO> unidades = unidadDeVentaService.obtenerUnidadesPorFestivalId(id);
 
-        // 👉 Opcional: Si quieres inyectar el plato estrella por cada unidad para mostrarlo en el HTML,
-        // puedes recorrerlas o consultar según lo necesites en tu lógica.
 
         model.addAttribute("festival", festival);
         model.addAttribute("unidades", unidades);

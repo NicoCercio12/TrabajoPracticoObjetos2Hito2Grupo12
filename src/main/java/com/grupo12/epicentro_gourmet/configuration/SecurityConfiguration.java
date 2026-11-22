@@ -36,6 +36,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/css/**", "/imgs/**", "/js/**", "/images/**",
                             "/vendor/**", "/webjars/**", "/favicon.ico").permitAll();
+                    //Se agrega esta linea para permitir las rutas publicas de la api y swagger        
+                    auth.requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/api/**").permitAll();
 
                     auth.requestMatchers("/registro/**").hasRole(Roles.RESPONSABLE);
                     auth.requestMatchers("/cajero/**").hasRole(Roles.CAJERO);
