@@ -1,14 +1,20 @@
 package com.grupo12.epicentro_gourmet.services.implementation;
 import com.grupo12.epicentro_gourmet.dtos.UnidadDeVentaDTO;
+import com.grupo12.epicentro_gourmet.dtos.ModificarPlatoDeUnidadResponseDTO;
 import com.grupo12.epicentro_gourmet.entities.FoodTruck;
 import com.grupo12.epicentro_gourmet.entities.PuestoDesarmable;
 import com.grupo12.epicentro_gourmet.entities.UnidadDeVenta;
+import com.grupo12.epicentro_gourmet.entities.Plato;
+import com.grupo12.epicentro_gourmet.entities.FoodTruck;
+import com.grupo12.epicentro_gourmet.entities.PuestoDesarmable;
 import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
 import lombok.RequiredArgsConstructor;
+
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.Set;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,4 +77,61 @@ public class UnidadDeVentaService implements IUnidadDeVentaService {
         UnidadDeVenta unidad = buscarPorId(idUnidad);
         return unidad.calcularCanon();
     }
+
+    //FUNCION AUXILIAR PARA MAPEAR EL DTO RESPONSE
+    private ModificarPlatoDeUnidadResponseDTO mapearResponse(UnidadDeVenta unidadDeVenta,Plato plato){
+
+        ModificarPlatoDeUnidadResponseDTO UnidadResponse =new ModificarPlatoDeUnidadResponseDTO();
+        UnidadResponse.setCodigoUnico(unidadDeVenta.getCodigoUnico());
+        UnidadResponse.setId(unidadDeVenta.getId());
+        UnidadResponse.setNombreComercial(unidadDeVenta.getNombreComercial());
+        UnidadResponse.setSuperficie(unidadDeVenta.getSuperficie());
+        UnidadResponse.setPlato(plato);
+
+        if(unidadDeVenta instanceof FoodTruck ){
+            FoodTruck foodTruck = (FoodTruck)unidadDeVenta;
+            UnidadResponse.setPatente(foodTruck.getPatente());
+            UnidadResponse.setRequiereElectricidad(foodTruck.isRequiereElectricidad());}else{
+
+
+                PuestoDesarmable puestoDesarmable=(PuestoDesarmable)unidadDeVenta;
+                UnidadResponse.setCantCarpas(puestoDesarmable.getCantCarpas());
+                UnidadResponse.setTiempoMontajeMinutos(puestoDesarmable.getTiempoMontajeMinutos());
+
+            }
+
+            return UnidadResponse;
+
+
+
+    }
+
+    // API - REST TRANSACCIONES
+    @Override
+    @Transactional 
+     public ModificarPlatoDeUnidadResponseDTO modificarPlatoDeUnaUnidad(String codigoUnico,String nombrePlato, double precioPlato){
+    
+        UnidadDeVenta unidadAux = unidadDeVentaRepository.findByCodigoUnicoAndNombrePlato(codigoUnico,nombrePlato);
+        Set<Plato>lstPlatos= unidadAux.getLstPlatos();
+        Plato platoModificado=null;
+        for (Plato p:lstPlatos){
+            if(p.getNombre().equalsIgnoreCase(nombrePlato)){
+                p.setCostoProduccion(precioPlato);
+                platoModificado=p;
+                break;
+
+            }
+
+            
+        }
+
+        if (platoModificado == null) {
+        throw new RuntimeException("No se cargo el plato");
+    } 
+        UnidadDeVenta unidad = unidadDeVentaRepository.save(unidadAux);
+        return(mapearResponse(unidad,platoModificado));
+    }
+
+
+
 }
