@@ -1,7 +1,9 @@
 package com.grupo12.epicentro_gourmet.controllers.api;
 
+import com.grupo12.epicentro_gourmet.dtos.ConsultarAntiguedadEmpleadosResponseDTO;
 import com.grupo12.epicentro_gourmet.dtos.ModificarPlatoDeUnidadRequestDTO;
 import com.grupo12.epicentro_gourmet.dtos.ModificarPlatoDeUnidadResponseDTO;
+import com.grupo12.epicentro_gourmet.enums.TipoEstadoEmpleado;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,5 +38,24 @@ public ResponseEntity <ModificarPlatoDeUnidadResponseDTO> modificarPlatoDeUnidad
     return ResponseEntity.status(HttpStatus.CREATED).body(unidadEditada);
 }
 
+@Operation(
+    summary="Consultar los empleados con mas de x años de antiguedad",
+    description="Permite consultar los  empleados  con una antiguedad superior al valor ingresado")
+@ApiResponse (responseCode = "200", description ="Consulta realizada exitosamente" )
+@ApiResponse(responseCode = "404", description = "Unidad no encontrada")
+@GetMapping 
+public ResponseEntity <ConsultarAntiguedadEmpleadosResponseDTO> consultarAntiguedadEmpleados(
+    @Parameter(description = "Codigo Unico de la Unidad", example = "UDV-001")
+    @RequestParam(required = false) String codigoUnico,
+
+    @Parameter(description = "Parametro de antiguedad del cual se debe filtrar", example = "5")
+    @RequestParam(required = false) int antiguedad,
+
+    @Parameter(description = "Estado del Empleado, ACTIVO/INACTIVO/AMBOS", example = "ACTIVO")
+    @RequestParam(required = false) TipoEstadoEmpleado estado){
+    
+    ConsultarAntiguedadEmpleadosResponseDTO consultaResponse=unidadDeVenta.consultarAntiguedadEmpleados(codigoUnico, antiguedad,estado);
+    return ResponseEntity.ok(consultaResponse);
+}
 
 }

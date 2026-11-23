@@ -29,5 +29,5 @@ public interface IUnidadDeVentaRepository extends JpaRepository<UnidadDeVenta, L
         @Param("codigoUnico") String codigoUnico,
         @Param("nombrePlato") String nombrePlato
 );
-
+    UnidadDeVenta findByCodigoUnico(String codigoUnico);
 }
