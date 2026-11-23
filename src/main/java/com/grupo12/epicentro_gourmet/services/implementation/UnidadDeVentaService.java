@@ -1,12 +1,15 @@
 package com.grupo12.epicentro_gourmet.services.implementation;
 import com.grupo12.epicentro_gourmet.dtos.UnidadDeVentaDTO;
+import com.grupo12.epicentro_gourmet.dtos.ConsultarAntiguedadEmpleadosResponseDTO;
+import com.grupo12.epicentro_gourmet.dtos.EmpleadoUnidadDTO;
 import com.grupo12.epicentro_gourmet.dtos.ModificarPlatoDeUnidadResponseDTO;
 import com.grupo12.epicentro_gourmet.entities.FoodTruck;
 import com.grupo12.epicentro_gourmet.entities.PuestoDesarmable;
 import com.grupo12.epicentro_gourmet.entities.UnidadDeVenta;
 import com.grupo12.epicentro_gourmet.entities.Plato;
-import com.grupo12.epicentro_gourmet.entities.FoodTruck;
-import com.grupo12.epicentro_gourmet.entities.PuestoDesarmable;
+import com.grupo12.epicentro_gourmet.enums.TipoEstadoEmpleado;
+import com.grupo12.epicentro_gourmet.enums.TipoUnidad;
+import com.grupo12.epicentro_gourmet.entities.Empleado;
 import com.grupo12.epicentro_gourmet.repositories.IUnidadDeVentaRepository;
 import com.grupo12.epicentro_gourmet.services.IUnidadDeVentaService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +18,7 @@ import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Set;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,6 +110,8 @@ public class UnidadDeVentaService implements IUnidadDeVentaService {
     }
 
     // API - REST TRANSACCIONES
+
+    //1) CU _MODIFICAR PRECIO DE COSTO DEL PALTO DE UNA UNIDAD, ALUMNO LUCAS LA ROSA 
     @Override
     @Transactional 
      public ModificarPlatoDeUnidadResponseDTO modificarPlatoDeUnaUnidad(String codigoUnico,String nombrePlato, double precioPlato){
@@ -132,6 +137,95 @@ public class UnidadDeVentaService implements IUnidadDeVentaService {
         return(mapearResponse(unidad,platoModificado));
     }
 
+//1)CU_ CONSULTAR ANTIGUEDAD DE LOS EMPLEADOS DE UNA UNIDAD DE VENTA, ALUMNO LA ROSA LUCAS
+@Override 
+@Transactional (readOnly = true)
+public ConsultarAntiguedadEmpleadosResponseDTO consultarAntiguedadEmpleados(String codigoUnico,int antiguedad,TipoEstadoEmpleado estado){
+
+
+UnidadDeVenta unidadAux=unidadDeVentaRepository.findByCodigoUnico(codigoUnico);
+
+Set<Empleado>lstEmpleados=unidadAux.getLstStaff();
+Set<EmpleadoUnidadDTO>lstEmpleadosDTO=new HashSet<>();
+
+
+for(Empleado e:lstEmpleados){
+   
+    if(estado==TipoEstadoEmpleado.ACTIVO){
+
+        if(e.calcularAntiguedad()>antiguedad && e.isActivo()){
+             EmpleadoUnidadDTO empDTO =new EmpleadoUnidadDTO();
+            
+    
+            empDTO.setIdEmpleado(e.getIdEmpleado());
+            empDTO.setNombre(e.getNombre());
+            empDTO.setApellido(e.getApellido());
+            empDTO.setDni(e.getDni());
+            empDTO.setEmail(e.getEmail());
+            empDTO.setFechaIngreso(e.getFechaIngreso());
+            empDTO.setFechaNacimiento(e.getFechaNacimiento());
+            empDTO.setAntiguedad(e.calcularAntiguedad());
+
+            lstEmpleadosDTO.add(empDTO);
+}}
+
+    if(estado==TipoEstadoEmpleado.INACTIVO){
+        if(e.calcularAntiguedad()>antiguedad && !e.isActivo()){
+
+             EmpleadoUnidadDTO empDTO =new EmpleadoUnidadDTO();
+    
+            empDTO.setIdEmpleado(e.getIdEmpleado());
+            empDTO.setNombre(e.getNombre());
+            empDTO.setApellido(e.getApellido());
+            empDTO.setDni(e.getDni());
+            empDTO.setEmail(e.getEmail());
+            empDTO.setFechaIngreso(e.getFechaIngreso());
+            empDTO.setFechaNacimiento(e.getFechaNacimiento());
+            empDTO.setAntiguedad(e.calcularAntiguedad());
+
+            lstEmpleadosDTO.add(empDTO);
+}}
+
+    if(estado==TipoEstadoEmpleado.AMBOS){
+        if(e.calcularAntiguedad()>antiguedad){
+
+            EmpleadoUnidadDTO empDTO =new EmpleadoUnidadDTO();
+            empDTO.setIdEmpleado(e.getIdEmpleado());
+            empDTO.setNombre(e.getNombre());
+            empDTO.setApellido(e.getApellido());
+            empDTO.setDni(e.getDni());
+            empDTO.setEmail(e.getEmail());
+            empDTO.setFechaIngreso(e.getFechaIngreso());
+            empDTO.setFechaNacimiento(e.getFechaNacimiento());
+            empDTO.setAntiguedad(e.calcularAntiguedad());
+
+            lstEmpleadosDTO.add(empDTO);
+
+
+        }
+
+
+
+}
+
+}
+
+ConsultarAntiguedadEmpleadosResponseDTO UnidadResponse =new ConsultarAntiguedadEmpleadosResponseDTO();
+UnidadResponse.setCodigoUnico(unidadAux.getCodigoUnico());
+UnidadResponse.setId(unidadAux.getId());
+UnidadResponse.setNombreComercial(unidadAux.getNombreComercial());
+UnidadResponse.setSuperficie(unidadAux.getSuperficie());
+if(unidadAux instanceof PuestoDesarmable ){
+UnidadResponse.setTipoUnidad(TipoUnidad.PUESTO_DESARMABLE);
+
+}else{
+UnidadResponse.setTipoUnidad(TipoUnidad.FOOD_TRUCK);
+
+}
+UnidadResponse.setLstEmpleados(lstEmpleadosDTO);
+
+return UnidadResponse;
+}
 
 
 }
